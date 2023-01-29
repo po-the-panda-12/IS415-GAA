@@ -1,0 +1,15 @@
+---
+title: "Week 3"
+---
+
+## Load Packages
+
+```{r}
+pacman::p_load(sf, tmap, tidyverse)
+```
+
+## Importing Data
+
+```{r}
+
+```

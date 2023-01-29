@@ -2,7 +2,7 @@
 title: "Week 2"
 ---
 
-## Load Packages 
+## Load Packages
 
 ```{r}
 pacman::p_load(sf, tidyverse)
@@ -11,14 +11,14 @@ pacman::p_load(sf, tidyverse)
 ## Importing Geospatial Data
 
 ```{r}
-MP14_SUBZONE_WEB_PL = st_read(dsn = '../Week 2/Hands-on_Ex01/data/geospatial/master-plan-2014-subzone-boundary-web/master-plan-2014-subzone-boundary-web-shp/MP14_SUBZONE_WEB_PL.shp')
+#MP14_SUBZONE_WEB_PL = st_read(dsn = '../Week 2/Hands-on_Ex01/data/geospatial/master-plan-2014-subzone-boundary-web/master-plan-2014-subzone-boundary-web-shp/MP14_SUBZONE_WEB_PL.shp')
 
-CyclingPath = st_read(dsn = '../Week 2/Hands-on_Ex01/data/geospatial/CyclingPath_Jun2022/CyclingPathGazette.shp')
+#CyclingPath = st_read(dsn = '../Week 2/Hands-on_Ex01/data/geospatial/CyclingPath_Jun2022/CyclingPathGazette.shp')
 
-PreSchool = st_read(dsn = '../Week 2/Hands-on_Ex01/data/geospatial/preschools-location.kml')
+#PreSchool = st_read(dsn = '../Week 2/Hands-on_Ex01/data/geospatial/preschools-location.kml')
 ```
 
-## Importing polygon feature data 
+## Importing polygon feature data
 
 ```{r}
 mpsz = st_read(dsn = "../Week 2/Hands-on_Ex01/data/geospatial/master-plan-2014-subzone-boundary-web/master-plan-2014-subzone-boundary-web-shp/MP14_SUBZONE_WEB_PL.shp", 
