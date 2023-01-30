@@ -6,11 +6,43 @@ website:
   navbar:
     left:
       - href: index.qmd
-        text: Week 1
-      - href: Week2.qmd
-        text: Week 2
-      - href: Week3.qmd
-        text: Week 3
+        text: "Home"
+        
+      - sidebar:ICE
+      - sidebar:Hands-on
+      
+  sidebar: 
+    - id: ICE
+      title: "In Class"
+      contents: 
+        - href: ICE/Week1.qmd
+          text: "Week 1"
+        - href: ICE/Week2.qmd
+          text: "Week 2"
+        - href: ICE/Week3.qmd
+          text: "Week 3"
+        - href: ICE/Week4.qmd
+          text: "Week 4"
+          
+      
+    - id: Hands-on
+      title: "Hands-on Exercise"
+      contents: 
+        - href: index.qmd
+          text: "Week 1"
+        - href: Hands-on/Week2.qmd
+          text: "Week 2"
+        - href: Hands-on/Week3.qmd
+          text: "Week 3"
+        - href: Hands-on/Week4.qmd
+          text: "Week 4"
+  
+        
+      
+        
+
+        
+
 
 format:
   html:
