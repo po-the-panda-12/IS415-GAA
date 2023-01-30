@@ -1,5 +1,11 @@
 ---
-title: "Week 2"
+title: "Hands-on Exercise 1: Geospatial Data Wrangling with R"
+date: "25 January 2023"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
 ---
 
 ## Load Packages
@@ -8,17 +14,7 @@ title: "Week 2"
 pacman::p_load(sf, tidyverse)
 ```
 
-## Importing Geospatial Data
-
-```{r}
-#MP14_SUBZONE_WEB_PL = st_read(dsn = 'data/geospatial/master-plan-2014-subzone-boundary-web/master-plan-2014-subzone-boundary-web-shp/MP14_SUBZONE_WEB_PL.shp')
-
-#CyclingPath = st_read(dsn = 'data/geospatial/CyclingPath_Jun2022/CyclingPathGazette.shp')
-
-#PreSchool = st_read(dsn = 'data/geospatial/preschools-location.kml')
-```
-
-## Importing polygon feature data
+## Importing data
 
 ```{r}
 mpsz = st_read(dsn = "data/geospatial/master-plan-2014-subzone-boundary-web/master-plan-2014-subzone-boundary-web-shp/MP14_SUBZONE_WEB_PL.shp", 

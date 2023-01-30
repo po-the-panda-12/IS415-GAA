@@ -1,0 +1,21 @@
+---
+title: "Hands-on Exercise 2: Choropleth Mapping with R"
+date: "30 January 2023"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+---
+
+## Load Packages
+
+```{r}
+pacman::p_load(sf, tmap, tidyverse)
+```
+
+## Importing Data
+
+```{r}
+
+```

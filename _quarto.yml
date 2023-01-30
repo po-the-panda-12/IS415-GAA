@@ -9,6 +9,16 @@ website:
       - href: index.qmd
         text: "Home"
         
+        
+      - text: "Hands-on Exercise"
+        menu: 
+          - text: "Hands-on Exercise 1"
+            href: hands-on_ex/hands-on_ex01/hands-on_ex01.qmd
+          - text: "Hands-on Exercise 2"
+            href: hands-on_ex/hands-on_ex02/hands-on_ex02.qmd
+        
+        
+      
       - text: "In-Class Exercise"
         menu: 
           - text: "In-class Exercise 2"
@@ -18,17 +28,6 @@ website:
           - text: "In-class Exercise 4"
             href: in-class_ex/in-class_ex04/in-class_ex04.qmd
             
-            
-      - text: "Hands-on Exercise"
-        menu: 
-          - text: "Week 1"
-            href: Hands-on/Week 1/Week1.qmd
-          - text: "Week 2"
-            href: Hands-on/Week 2/Week2.qmd
-          - text: "Week 3"
-            href: Hands-on/Week 3/Week3.qmd
-          - text: "Week 4"
-            href: Hands-on/Week 4/Week4.qmd
             
             
       - text: "Take-home Exercise"
