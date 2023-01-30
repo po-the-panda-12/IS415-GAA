@@ -11,14 +11,12 @@ website:
         
       - text: "In-Class Exercise"
         menu: 
-          - text: "Week 1"
-            href: ICE/Week 1/Week1.qmd
-          - text: "Week 2"
-            href: ICE/Week 2/Week2.qmd
-          - text: "Week 3"
-            href: ICE/Week 3/Week3.qmd
-          - text: "Week 4"
-            href: ICE/Week 4/Week4.qmd
+          - text: "In-class Exercise 2"
+            href: in-class_ex/in-class_ex02/in-class_ex02.qmd
+          - text: "In-class Exercise 3"
+            href: in-class_ex/in-class_ex03/in-class_ex03.qmd
+          - text: "In-class Exercise 4"
+            href: in-class_ex/in-class_ex04/in-class_ex04.qmd
             
             
       - text: "Hands-on Exercise"

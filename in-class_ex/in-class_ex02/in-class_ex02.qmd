@@ -1,0 +1,208 @@
+---
+title: "In-class Exercise 2: Geospatial Data Wrangling with R"
+date: "20 January 2023"
+date-modified: "`r Sys.Date()`"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+---
+
+# **Installing the R packages**
+
+First, we need to check if we have the three R packages to be used for the In-Class Excercise (sf ,tidyverse and funModelling) installed. If not, we need to install it automatically. The below code checks if the packages are already installed, else it will install the packages for us. However, before running the below code, ensure that \'packman\' package has been installed in your RStudio.
+
+```{r}
+pacman::p_load(sf, tidyverse, funModeling)
+```
+
+# **Importing the Geospatial Dataset**
+
+## **The geoBoundaries Dataset**
+
+To Import the Geospatial data, run the following code. Ensure that the directory of the files and the file name is correct. By running the code, the data will be in meters and it will be in simple feature format.
+
+```{r}
+geoNGA <- st_read("data/geospatial", 
+                  layer = "geoBoundaries-NGA-ADM2") %>%
+  st_transform(crs = 26392)
+```
+
+## **Importing the NGA Dataset**
+
+To Import the NGAdata, run the following code. Ensure that the directory of the files and the file name is correct.
+
+```{r}
+NGA <- st_read("data/geospatial", 
+                  layer = "nga_admbnda_adm2_osgof_20190417") %>%
+  st_transform(crs = 26392)
+```
+
+# **Importing Aspatial data**
+
+Similar to the Geospatial data, import the Aspatial data, however, remember that the data is in CSV format and hence, read_csv() must be used
+
+```{r}
+wp_nga <- read_csv("data/aspatial/WPdx.csv") %>%
+  filter(`#clean_country_name` == "Nigeria")
+```
+
+# **Converting Aspatial Data into Geospatial**
+
+We now convert the newly extracted Aspatial data (wp_nga) into point sf dataframe using the below code.
+
+```{r}
+wp_nga$Geometry = st_as_sfc(wp_nga$`New Georeferenced Column`)
+wp_nga
+```
+
+```{r}
+wp_sf <- st_sf(wp_nga, crs=4326)
+wp_sf
+```
+
+## **Project Transformation**
+
+We now transform the projection from wgs84 to appropriate projected coordinate system of Nigeria.
+
+```{r}
+wp_sf <- wp_sf %>%
+  st_transform(crs = 26392)
+```
+
+# **Geospatial Data Cleaning**
+
+## **Excluding redundent fields**
+
+```{r}
+NGA <- NGA %>%
+  select(c(3:4,8:9))
+```
+
+## **Checking for duplicate name**
+
+It is important to check for duplicate name in the data main data fields. Using duplicate(), we can flag out the LGA names.
+
+```{r}
+NGA$ADM2_EN[duplicated(NGA$ADM2_EN)==TRUE]
+```
+
+The printout above shows that there are 6 LGAs with the same name,. A Google search using the coordinates showed that there are LGAs with the same name but are located in different states.
+
+```{r}
+NGA$ADM2_EN[94] <- "Bassa, Kogi"
+NGA$ADM2_EN[95] <- "Bassa, Plateau"
+NGA$ADM2_EN[304] <- "Ifelodun, Kwara"
+NGA$ADM2_EN[305] <- "Ifelodun, Osun"
+NGA$ADM2_EN[355] <- "Irepodun, Kwara"
+NGA$ADM2_EN[356] <- "Irepodun, Osun"
+NGA$ADM2_EN[519] <- "Nasarawa, Kano"
+NGA$ADM2_EN[520] <- "Nasarawa, Nasarawa"
+NGA$ADM2_EN[546] <- "Obi, Benue"
+NGA$ADM2_EN[547] <- "Obi, Nasarawa"
+NGA$ADM2_EN[693] <- "Surulere, Lagos"
+NGA$ADM2_EN[694] <- "Surulere, Oyo"
+```
+
+Check if there are any duplicated codes now
+
+```{r}
+NGA$ADM2_EN[duplicated(NGA$ADM2_EN)==TRUE]
+```
+
+# **Data Wrangling for Water Point Data**
+
+```{r}
+freq(data = wp_sf,
+     input = '#status_clean')
+```
+
+```{r}
+wp_sf_nga <- wp_sf %>%
+  rename(status_clean = '#status_clean') %>%
+  select(status_clean) %>%
+  mutate(status_clean = replace_na(
+    status_clean, "unknown"))
+```
+
+## **Extracting Water Point Data**
+
+```{r}
+wp_functional <- wp_sf_nga %>%
+  filter(status_clean %in%
+           c("Functional",
+             "Functional but not in use",
+             "Functional but needs repair"))
+```
+
+```{r}
+wp_nonfunctional <- wp_sf_nga %>%
+  filter(status_clean %in%
+           c("Abandoned/Decommissioned",
+             "Abandoned",
+             "Non-Functional due to dry season",
+             "Non-Functional",
+             "Non functional due to dry season"))
+```
+
+```{r}
+wp_unknown <- wp_sf_nga %>%
+  filter(status_clean == "unknown")
+```
+
+Next, the code chunk below is used to perform a quick EDA on the derived sf data.frames.
+
+```{r}
+freq(data = wp_functional,
+     input = 'status_clean')
+```
+
+```{r}
+freq(data = wp_nonfunctional,
+     input = 'status_clean')
+```
+
+```{r}
+freq(data = wp_unknown,
+     input = 'status_clean')
+```
+
+## **Performing Point-in Polygon Count**
+
+```{r}
+NGA_wp <- NGA %>%
+  mutate(`total_wp` = lengths(
+    st_intersects(NGA, wp_sf_nga))) %>%
+  mutate(`wp_functional` = lengths(
+    st_intersects(NGA, wp_functional))) %>%
+  mutate(`wp_nonfunctional` = lengths(
+    st_intersects(NGA, wp_nonfunctional))) %>%
+  mutate(`wp_unknown` = lengths(
+    st_intersects(NGA, wp_unknown)))
+```
+
+## **Visualising attributes by using statistical graphs**
+
+```{r}
+ggplot(data= NGA_wp,
+       aes(x = total_wp)) + 
+  geom_histogram(bins = 20,
+                 color="black",
+                 fill="light blue") + 
+  geom_vline(aes(xintercept=mean(
+    total_wp, na.rm=T)),
+              color="red",
+              linetype="dashed",
+              size=0.8) + 
+  ggtitle("Distribution of total water points by LGA") + 
+  xlab("No. of water points") + 
+  ylab("No. of\nLGAs") + 
+  theme(axis.title.y = element_text(angle = 0))
+```
+
+## **Saving the Analytical data in rds format**
+
+```{r}
+write_rds(NGA_wp, "data/rds/NGA_wp.rds")
+```
