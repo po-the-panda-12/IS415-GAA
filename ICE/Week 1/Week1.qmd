@@ -1,0 +1,15 @@
+---
+title: "In Class Exercise - Week 1"
+---
+
+This is a Quarto website.
+
+To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+
+```{r}
+#myData <- read.csv('../Week 1/data/PopData2019_fat.csv')
+```
+
+```{r}
+#head(myData, 5)
+```
