@@ -3,5 +3,6 @@
 .Rdata
 .httr-oauth
 .DS_Store
+./in-class-ex/in-class_ex02/data/apsatial
 
 /.quarto/
