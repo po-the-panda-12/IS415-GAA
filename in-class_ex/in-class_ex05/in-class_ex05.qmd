@@ -76,7 +76,6 @@ LCLQ_stores <- cbind(stores, LCLQ) #append not join
 ```{r}
 tmap_mode("view")
 tm_shape(studyArea) + 
-  #remember to draw in order
   tm_polygons() + 
   tm_shape(LCLQ_stores) + 
   tm_dots(col = "Name",
