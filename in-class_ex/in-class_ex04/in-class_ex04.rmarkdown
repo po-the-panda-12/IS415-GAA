@@ -10,9 +10,13 @@ editor: visual
 ---
 
 
+
+
 # 1st Order Spatial Point Patterns Analysis Methods
 
 ## Getting Started
+
+
 
 
 ```{r}
@@ -20,11 +24,15 @@ pacman::p_load(maptools, sf, raster, spatstat, tmap)
 ```
 
 
+
+
 Things to learn from this code chunk.
 
 ## Spatial Data Wrangling
 
 ### Importing Data
+
+
 
 
 ```{r}
@@ -42,7 +50,11 @@ mpsz_sf <- st_read(dsn = "data",
 ```
 
 
+
+
 ### Mapping Data
+
+
 
 
 ```{r}
@@ -59,9 +71,13 @@ tmap_mode('plot')
 ```
 
 
+
+
 ## Data Wrangling
 
 ### Converting sf data frames to sp spatial
+
+
 
 
 ```{r}
@@ -83,7 +99,11 @@ sg
 ```
 
 
+
+
 ### Converting Spatial class to sp format
+
+
 
 
 ```{r}
@@ -100,7 +120,11 @@ sg_sp
 ```
 
 
+
+
 ### Converting sp to spatstat
+
+
 
 
 ```{r}
@@ -117,7 +141,11 @@ summary(childcare_ppp)
 ```
 
 
+
+
 ### Handling Duplicate Points
+
+
 
 
 ```{r}
@@ -155,7 +183,11 @@ any(duplicated(childcare_ppp_jit))
 ```
 
 
+
+
 ### Creating owin object
+
+
 
 
 ```{r}
@@ -171,7 +203,11 @@ summary(sg_owin)
 ```
 
 
+
+
 ### Combining point events object and owin object
+
+
 
 
 ```{r}
@@ -183,11 +219,15 @@ summary(childcareSG_ppp)
 ```
 
 
+
+
 ## First-order Spatial Point Patterns Analysis
 
 ### KDE
 
 #### Computing kernel density estimation using automatic bandwidth selection method
+
+
 
 
 ```{r}
@@ -207,7 +247,11 @@ bw
 ```
 
 
+
+
 #### Rescalling KDE values
+
+
 
 
 ```{r}
@@ -220,7 +264,11 @@ plot(kde_childcareSG.bw)
 ```
 
 
+
+
 ### Working with different automatic badwidth methods
+
+
 
 
 ```{r}
@@ -250,7 +298,11 @@ plot(kde_childcareSG.ppl, main = "bw.ppl")
 ```
 
 
+
+
 ### Working with different kernel methods
+
+
 
 
 ```{r}
@@ -278,9 +330,13 @@ plot(density(childcareSG_ppp.km,
 ```
 
 
+
+
 ## Fixed and Adaptive KDE
 
 ### Computing KDE by using fixed bandwidth
+
+
 
 
 ```{r}
@@ -289,7 +345,11 @@ plot(kde_childcareSG_600)
 ```
 
 
+
+
 ### Computing KDE by using adaptive bandwidth
+
+
 
 
 ```{r}
@@ -304,7 +364,11 @@ plot(kde_childcareSG_adaptive, main = "Adaptive bandwidth")
 ```
 
 
+
+
 ### Converting KDE output into grid object
+
+
 
 
 ```{r}
@@ -313,7 +377,11 @@ spplot(gridded_kde_childcareSG_bw)
 ```
 
 
+
+
 #### Converting gridded output into raster
+
+
 
 
 ```{r}
@@ -325,7 +393,11 @@ kde_childcareSG_bw_raster
 ```
 
 
+
+
 #### Assigning projection systems
+
+
 
 
 ```{r}
@@ -334,7 +406,11 @@ kde_childcareSG_bw_raster
 ```
 
 
+
+
 ### Visualising the output in **tmap**
+
+
 
 
 ```{r}
@@ -344,11 +420,15 @@ tm_shape(kde_childcareSG_bw_raster) +
 ```
 
 
+
+
 ### Comparing Spatial Point Patterns using KDE
 
 #### Extracting study area
 
 The code chunk below will be used to extract the target planning areas.
+
+
 
 
 ```{r}
@@ -359,7 +439,11 @@ jw = mpsz[mpsz@data$PLN_AREA_N == "JURONG WEST",]
 ```
 
 
+
+
 Plotting target planning areas
+
+
 
 
 ```{r}
@@ -371,7 +455,11 @@ plot(jw, main = "Jurong West")
 ```
 
 
+
+
 #### Converting the spatial point data frame into generic sp format
+
+
 
 
 ```{r}
@@ -382,7 +470,11 @@ jw_sp = as(jw, "SpatialPolygons")
 ```
 
 
+
+
 #### Creating ***owin*** object
+
+
 
 
 ```{r}
@@ -393,7 +485,11 @@ jw_owin = as(jw_sp, "owin")
 ```
 
 
+
+
 #### Combining childcare points and the study area
+
+
 
 
 ```{r}
@@ -419,7 +515,11 @@ plot(childcare_jw_ppp.km, main="Jurong West")
 ```
 
 
+
+
 #### Computing KDE
+
+
 
 
 ```{r}
@@ -447,7 +547,11 @@ plot(density(childcare_jw_ppp.km,
 ```
 
 
+
+
 #### Computing fixed bandwidth KDE
+
+
 
 
 ```{r}
@@ -475,9 +579,13 @@ plot(density(childcare_tm_ppp.km,
 ```
 
 
+
+
 ## Nearest Neighbour Analysis
 
 ### Testing spatial point patterns using Clark and Evans Test
+
+
 
 
 ```{r}
@@ -489,7 +597,11 @@ clarkevans.test(childcareSG_ppp,
 ```
 
 
+
+
 ### Clark and Evans Test: Choa Chu Kang planning area
+
+
 
 
 ```{r}
@@ -501,7 +613,11 @@ clarkevans.test(childcare_ck_ppp,
 ```
 
 
+
+
 ### Clark and Evans Test: Tampines planning area
+
+
 
 
 ```{r}
