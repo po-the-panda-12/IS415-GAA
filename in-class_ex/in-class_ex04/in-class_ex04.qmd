@@ -41,7 +41,10 @@ mpsz_sf <- st_read(dsn = "data",
 
 ```{r}
 tmap_mode('view')
-tm_shape(childcare_sf)+tm_dots()
+tm_shape(childcare_sf) +
+  tm_dots(size = 0.01, alpha = 0.5) + #tm_bubbles
+  tm_view(set.zoom.limits = c(11,14), set.bounds = c(103.6,1.15,103.99,1.5))
+
 ```
 
 ```{r}
