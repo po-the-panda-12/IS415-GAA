@@ -78,7 +78,7 @@ tmap_mode("view")
 tm_shape(studyArea) + 
   tm_polygons() + 
   tm_shape(LCLQ_stores) + 
-  tm_dots(col = "Name",
+  tm_dots(col = "X7.Eleven",
           size = 0.01,
           border.col = "black",
           border.lwd = 0.5)
