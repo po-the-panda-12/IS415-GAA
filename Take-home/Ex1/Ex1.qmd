@@ -1,8 +1,139 @@
 ---
-title: "Take-home Exercise 1"
+title: "Take Home Exercise 1"
+date: "9 February 2023"
+date-modified: "`r Sys.Date()`"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
 ---
 
-Take home 1
+# 1.0 Overview
+
+## 1.1 Background
+
+Water in Africa
+
+## 1.2 Problem Statement
+
+To do - EDA, Spatial Point Analysis
+
+# 2.0 Setup
+
+## 2.1 Import Packages
+
+-   sf
+
+-   tidyVerse
+
+-   tmap, maptools, kableExtra - Used for visualizing dataframes and plots
+
+```{r}
+pacman::p_load(sf, maptools, raster, spatstat, tmap, kableExtra, tidyverse, funModeling)
+```
+
+# 3.0 Data Preparation
+
+## 3.1 Datasets Used
+
+```{r}
+#| code-fold: true
+# initialise a dataframe of our geospatial and aspatial dataset details
+datasets <- data.frame(
+  Type=c("Geospatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         "Geospatial",
+         
+         "Aspatial"),
+  
+  Name=c("geoBoundaries-NGA-ADM2",
+         "geoBoundaries-NGA-ADM2",
+         "geoBoundaries-NGA-ADM2",
+         "geoBoundaries-NGA-ADM2",
+         "geoBoundaries-NGA-ADM2",
+         "geoBoundaries-NGA-ADM2",
+         "nga_admbnda_adm2_osgof_20190417",
+         "nga_admbnda_adm2_osgof_20190417",
+         "nga_admbnda_adm2_osgof_20190417",
+         "nga_admbnda_adm2_osgof_20190417",
+         "nga_admbnda_adm2_osgof_20190417",
+         "nga_admbnda_adm2_osgof_20190417",
+         "nga_admbnda_adm2_osgof_20190417",
+         "nga_admbnda_adm2_osgof_20190417",
+         
+         "WPdx"),
+  
+  Format=c(".dbf", 
+           ".geojson", 
+           ".prj", 
+           ".shp", 
+           ".shx", 
+           ".topojson",
+           ".CPG",
+           ".dbf",
+           ".prj",
+           ".sbn", 
+           ".sbx", 
+           ".shp", 
+           ".shp", 
+           ".shx", 
+          
+           ".csv"),
+  
+  Source=c("[geoBoundaries](https://www.geoboundaries.org/index.html#getdata)",
+           "[geoBoundaries](https://www.geoboundaries.org/index.html#getdata)",
+           "[geoBoundaries](https://www.geoboundaries.org/index.html#getdata)",
+           "[geoBoundaries](https://www.geoboundaries.org/index.html#getdata)",
+           "[geoBoundaries](https://www.geoboundaries.org/index.html#getdata)",
+           "[geoBoundaries](https://www.geoboundaries.org/index.html#getdata)",
+           
+          "[Humanitarian Data Exchange](https://data.humdata.org/dataset/cod-ab-nga)",
+           "[Humanitarian Data Exchange](https://data.humdata.org/dataset/cod-ab-nga)",
+           "[Humanitarian Data Exchange](https://data.humdata.org/dataset/cod-ab-nga)",
+           "[Humanitarian Data Exchange](https://data.humdata.org/dataset/cod-ab-nga)",
+           "[Humanitarian Data Exchange](https://data.humdata.org/dataset/cod-ab-nga)",
+           "[Humanitarian Data Exchange](https://data.humdata.org/dataset/cod-ab-nga)",
+           "[Humanitarian Data Exchange](https://data.humdata.org/dataset/cod-ab-nga)",
+           "[Humanitarian Data Exchange](https://data.humdata.org/dataset/cod-ab-nga)",
+           
+           "[ WPdx Global Data Repositories](https://www.waterpointdata.org/access-data/)")
+  )
+
+# with reference to this guide on kableExtra:
+# https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
+# kable_material is the name of the kable theme
+# 'hover' for to highlight row when hovering, 'scale_down' to adjust table to fit page width
+library(knitr)
+library(kableExtra)
+kable(datasets, caption="Datasets Used") %>%
+  kable_material("hover", latex_options="scale_down")
+
+```
+
+## 3.2 Geospatial Data
+
+### 3.2.1 Load Data
+
+```{r}
+NGA <- st_read("data/geospatial", 
+                  layer = "nga_admbnda_adm2_osgof_20190417") %>%
+  filter(ADM1_EN == "Osun") %>%
+  st_transform(crs = 26392)
+```
+
+### 3.2.1 Data Preprocessing
 
 ```{r}
 
