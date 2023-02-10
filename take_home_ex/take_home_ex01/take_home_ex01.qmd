@@ -155,7 +155,7 @@ This is because
 
 ```{r}
 NGA <- NGA %>%
-  select(c(3:4, 8:9))
+  select(c(3:4, 8:9)) #dplyr
 ```
 
 #### 3.2.2.2 Invalid Geometries
@@ -188,7 +188,7 @@ plot(st_geometry(NGA))
 
 ## 3.3 Aspatial Data
 
-### 3.3.1
+### 3.3.1 Load Data
 
 ::: panel-tabset
 #### Import
@@ -209,9 +209,7 @@ glimpse(wp_nga)
 
 #### 3.3.2.1 Convert point data to sf point features
 
-First convert wkt field into sfc field
-
-Then convert it into sf object
+First convert wkt field into sfc field. Then convert it into sf object.
 
 ```{r}
 wp_nga$Geometry = st_as_sfc(wp_nga$`New Georeferenced Column`)
@@ -247,8 +245,9 @@ wp_sf_nga <- wp_sf %>%
 
 ### 3.3.3 Water Point Extraction
 
+Functional Points
+
 ```{r}
-#for functional points
 wp_functional <- wp_sf_nga %>%
   filter(status_clean %in%
            c("Functional",
@@ -257,8 +256,9 @@ wp_functional <- wp_sf_nga %>%
              "Functional but not in use"))
 ```
 
+Non-Functional Points
+
 ```{r}
-#for non-functional points
 wp_nonfunctional <- wp_sf_nga %>%
   filter(status_clean %in%
            c("Abandoned/Decommissioned",
@@ -266,8 +266,9 @@ wp_nonfunctional <- wp_sf_nga %>%
              "Non-Functional"))
 ```
 
+Unknown Status Points
+
 ```{r}
-#for unknown status points
 wp_unknown <- wp_sf_nga %>%
   filter(status_clean == "unknown")
 ```
@@ -310,3 +311,121 @@ NGA_wp <- NGA %>%
   mutate(`wp_unknown` = lengths(
     st_intersects(NGA, wp_unknown)))
 ```
+
+## 3.4 Combined Data Wrangling
+
+### 3.4.1 Convert sf dataframes to sp Spatial class
+
+```{r}
+wp_functional_spat = as_Spatial(wp_functional)
+wp_nonfunctional_spat = as_Spatial(wp_nonfunctional)
+NGA_spat = as_Spatial(NGA)
+```
+
+Peek
+
+::: panel-tabset
+#### Functional
+
+```{r}
+wp_functional_spat
+```
+
+#### Non-Functional
+
+```{r}
+wp_nonfunctional_spat
+```
+
+#### NGA
+
+```{r}
+NGA_spat
+```
+:::
+
+### 3.4.2 Convert sp Spatial to generic sp format
+
+```{r}
+wp_functional_sp <- as(wp_functional_spat, "SpatialPoints")
+wp_nonfunctional_sp <- as(wp_nonfunctional_spat, "SpatialPoints")
+NGA_sp <-as(NGA_spat, "SpatialPolygons")
+```
+
+Peek
+
+::: panel-tabset
+#### Functional 
+
+```{r}
+wp_functional_sp
+```
+
+#### Non-Functional
+
+```{r}
+wp_nonfunctional_sp
+```
+
+#### NGA
+
+```{r}
+NGA_sp
+```
+:::
+
+### 3.4.3 Convert generic sp to spatstat ppp format
+
+```{r}
+# from sp object, convert into ppp format
+wp_functional_ppp <- as(wp_functional_sp, "ppp")
+wp_nonfunctional_ppp <- as(wp_nonfunctional_sp, "ppp")
+```
+
+View
+
+```{r}
+par(mfrow=c(1,2))
+plot(wp_functional_ppp)
+plot(wp_nonfunctional_ppp)
+```
+
+#### 3.4.3.1 Check for Duplication
+
+```{r}
+any(duplicated(wp_functional_ppp)); any(duplicated(wp_nonfunctional_ppp)) 
+```
+
+No duplicates means no jittering needed
+
+### 3.4.4 Create Owin object
+
+```{r}
+NGA_owin <- as(NGA_sp, "owin")
+plot(NGA_owin)
+```
+
+### 3.4.4 Combine point event object with Owin object
+
+```{r}
+wp_functional_ppp = wp_functional_ppp[NGA_owin]
+wp_nonfunctional_ppp = wp_nonfunctional_ppp[NGA_owin]
+```
+
+View
+
+```{r}
+par(mfrow=c(1,2))
+plot(wp_functional_ppp)
+plot(wp_nonfunctional_ppp)
+```
+
+# 4.0 Exploratory Spatial Data Analysis (ESDA)
+
+-   Derive kernel density maps of functional and non-functional water points
+
+-   Display kernel density maps of Osun State
+
+-   Describe spatial patterns displayed by the kernel density maps
+
+## 4.1 Kernel Density Estimation 
