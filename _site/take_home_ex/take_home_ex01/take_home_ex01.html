@@ -125,6 +125,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <script src="../../site_libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="../../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<script src="../../site_libs/htmlwidgets-1.6.1/htmlwidgets.js"></script>
+<script src="../../site_libs/jquery-1.12.4/jquery.min.js"></script>
+<link href="../../site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
+<script src="../../site_libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="../../site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
+<script src="../../site_libs/proj4-2.6.2/proj4.min.js"></script>
+<script src="../../site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="../../site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
+<script src="../../site_libs/leaflet-binding-2.1.1/leaflet.js"></script>
+<script src="../../site_libs/leaflet-providers-1.9.0/leaflet-providers_1.9.0.js"></script>
+<script src="../../site_libs/leaflet-providers-plugin-2.1.1/leaflet-providers-plugin.js"></script>
 
 
 <link rel="stylesheet" href="../../styles.css">
@@ -254,7 +265,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </ul></li>
   <li><a href="#exploratory-spatial-data-analysis-esda" id="toc-exploratory-spatial-data-analysis-esda" class="nav-link" data-scroll-target="#exploratory-spatial-data-analysis-esda">4.0 Exploratory Spatial Data Analysis (ESDA)</a>
   <ul class="collapse">
-  <li><a href="#kernel-density-estimation" id="toc-kernel-density-estimation" class="nav-link" data-scroll-target="#kernel-density-estimation">4.1 Kernel Density Estimation</a></li>
+  <li><a href="#kernel-density-estimation-kde" id="toc-kernel-density-estimation-kde" class="nav-link" data-scroll-target="#kernel-density-estimation-kde">4.1 Kernel Density Estimation (KDE)</a>
+  <ul class="collapse">
+  <li><a href="#re-scale-kde-values" id="toc-re-scale-kde-values" class="nav-link" data-scroll-target="#re-scale-kde-values">4.2.1 Re-Scale KDE values</a></li>
+  <li><a href="#re-scale-kde-values-1" id="toc-re-scale-kde-values-1" class="nav-link" data-scroll-target="#re-scale-kde-values-1">4.2.2 Re-Scale KDE values</a></li>
+  <li><a href="#convert-grid-object-to-raster" id="toc-convert-grid-object-to-raster" class="nav-link" data-scroll-target="#convert-grid-object-to-raster">4.2.3 Convert grid object to Raster</a></li>
+  <li><a href="#assign-projection-system" id="toc-assign-projection-system" class="nav-link" data-scroll-target="#assign-projection-system">4.2.4 Assign Projection System</a></li>
+  </ul></li>
+  <li><a href="#visualize-kde" id="toc-visualize-kde" class="nav-link" data-scroll-target="#visualize-kde">4.2 Visualize KDE</a></li>
+  <li><a href="#nearest-neighbor-index" id="toc-nearest-neighbor-index" class="nav-link" data-scroll-target="#nearest-neighbor-index">4.3 Nearest Neighbor Index</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -1032,10 +1051,275 @@ crs         : +proj=tmerc +lat_0=4 +lon_0=8.5 +k=0.99975 +x_0=670553.98 +y_0=0 +
 <section id="exploratory-spatial-data-analysis-esda" class="level1">
 <h1>4.0 Exploratory Spatial Data Analysis (ESDA)</h1>
 <ul>
-<li></li>
+<li><p>Derive kernel density maps of functional and non-functional water points</p></li>
+<li><p>Display kernel density maps of Osun State</p></li>
+<li><p>Describe spatial patterns displayed by the kernel density maps</p></li>
 </ul>
-<section id="kernel-density-estimation" class="level2">
-<h2 class="anchored" data-anchor-id="kernel-density-estimation">4.1 Kernel Density Estimation</h2>
+<section id="kernel-density-estimation-kde" class="level2">
+<h2 class="anchored" data-anchor-id="kernel-density-estimation-kde">4.1 Kernel Density Estimation (KDE)</h2>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">Automatic</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">Adaptive</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>kde_wpfunc.mppl <span class="ot">&lt;-</span> <span class="fu">density</span>(wp_functional_ppp, </span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">sigma=</span>bw.ppl, </span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">edge=</span><span class="cn">TRUE</span>)</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>kde_wpnonfunc.mppl <span class="ot">&lt;-</span> <span class="fu">density</span>(wp_nonfunctional_ppp,</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">sigma=</span>bw.ppl,</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">edge=</span><span class="cn">TRUE</span>)</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_wpfunc.mppl, </span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Functional Water Points"</span>,</span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">ribside=</span><span class="fu">c</span>(<span class="st">"bottom"</span>))</span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_wpnonfunc.mppl,</span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Non-Functional Water Points"</span>,</span>
+<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">ribside=</span><span class="fu">c</span>(<span class="st">"bottom"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="take_home_ex01_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>kde_wpfunc.m <span class="ot">&lt;-</span> <span class="fu">adaptive.density</span>(wp_functional_ppp,</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">method =</span> <span class="st">"kernel"</span>)</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>kde_wpnonfunc.m <span class="ot">&lt;-</span> <span class="fu">adaptive.density</span>(wp_nonfunctional_ppp,</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">method =</span> <span class="st">"kernel"</span>)</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_wpfunc.m,</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Functional Water Points"</span>,</span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">ribside=</span><span class="fu">c</span>(<span class="st">"right"</span>))</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_wpnonfunc.m,</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Non-Functional Water Points"</span>,</span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">ribside=</span><span class="fu">c</span>(<span class="st">"right"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="take_home_ex01_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<section id="re-scale-kde-values" class="level3">
+<h3 class="anchored" data-anchor-id="re-scale-kde-values">4.2.1 Re-Scale KDE values</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>wp_functional_ppp.km <span class="ot">&lt;-</span> <span class="fu">rescale</span>(wp_functional_ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>wp_nonfunctional_ppp.km <span class="ot">&lt;-</span> <span class="fu">rescale</span>(wp_nonfunctional_ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true">Automatic</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false">Adaptive</a></li></ul>
+<div class="tab-content">
+<div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>kde_wpfunc.ppl <span class="ot">&lt;-</span> <span class="fu">density</span>(wp_functional_ppp.km,</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sigma =</span> bw.ppl,</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">edge =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>kde_wpnonfunc.ppl <span class="ot">&lt;-</span> <span class="fu">density</span>(wp_nonfunctional_ppp.km,</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">sigma =</span> bw.ppl,</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">edge =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_wpfunc.ppl,</span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Functional Water Points"</span>,</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">ribside=</span><span class="fu">c</span>(<span class="st">"bottom"</span>))</span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_wpnonfunc.ppl,</span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Non-Functional Water Points"</span>,</span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">ribside=</span><span class="fu">c</span>(<span class="st">"bottom"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="take_home_ex01_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>kde_wpfunc.km <span class="ot">&lt;-</span> <span class="fu">adaptive.density</span>(wp_functional_ppp.km,</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">method =</span> <span class="st">"kernel"</span>)</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>kde_wpnonfunc.km <span class="ot">&lt;-</span> <span class="fu">adaptive.density</span>(wp_nonfunctional_ppp.km,</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">method =</span> <span class="st">"kernel"</span>)</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_wpfunc.km,</span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Functional Water Points"</span>,</span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">ribside=</span><span class="fu">c</span>(<span class="st">"bottom"</span>))</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_wpnonfunc.km,</span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Non-Functional Water Points"</span>,</span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">ribside=</span><span class="fu">c</span>(<span class="st">"bottom"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="take_home_ex01_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="re-scale-kde-values-1" class="level3">
+<h3 class="anchored" data-anchor-id="re-scale-kde-values-1">4.2.2 Re-Scale KDE values</h3>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true">Automatic</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false">Adaptive</a></li></ul>
+<div class="tab-content">
+<div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>gridded_wpfunc.ppl <span class="ot">&lt;-</span> <span class="fu">as.SpatialGridDataFrame.im</span>(kde_wpfunc.ppl)</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>gridded_wpnonfunc.ppl <span class="ot">&lt;-</span> <span class="fu">as.SpatialGridDataFrame.im</span>(kde_wpnonfunc.ppl)</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a><span class="fu">spplot</span>(gridded_wpfunc.ppl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="take_home_ex01_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spplot</span>(gridded_wpnonfunc.ppl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="take_home_ex01_files/figure-html/unnamed-chunk-42-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>gridded_wpfunc <span class="ot">&lt;-</span> <span class="fu">as.SpatialGridDataFrame.im</span>(kde_wpfunc.km)</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>gridded_wpnonfunc <span class="ot">&lt;-</span> <span class="fu">as.SpatialGridDataFrame.im</span>(kde_wpnonfunc.km)</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a><span class="fu">spplot</span>(gridded_wpfunc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="take_home_ex01_files/figure-html/unnamed-chunk-43-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spplot</span>(gridded_wpnonfunc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="take_home_ex01_files/figure-html/unnamed-chunk-43-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="convert-grid-object-to-raster" class="level3">
+<h3 class="anchored" data-anchor-id="convert-grid-object-to-raster">4.2.3 Convert grid object to Raster</h3>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-9-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-1" role="tab" aria-controls="tabset-9-1" aria-selected="true">Functional</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-9-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-2" role="tab" aria-controls="tabset-9-2" aria-selected="false">Non-Functional</a></li></ul>
+<div class="tab-content">
+<div id="tabset-9-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-9-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>kde_wpfunc_raster <span class="ot">&lt;-</span> <span class="fu">raster</span>(gridded_wpfunc)</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>kde_wpfunc_raster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class      : RasterLayer 
+dimensions : 128, 128, 16384  (nrow, ncol, ncell)
+resolution : 0.8948485, 0.9616045  (x, y)
+extent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)
+crs        : NA 
+source     : memory
+names      : v 
+values     : -1.303367e-15, 24.61848  (min, max)</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-9-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>kde_wpnonfunc_raster <span class="ot">&lt;-</span> <span class="fu">raster</span>(gridded_wpnonfunc)</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>kde_wpnonfunc_raster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class      : RasterLayer 
+dimensions : 128, 128, 16384  (nrow, ncol, ncell)
+resolution : 0.8948485, 0.9616045  (x, y)
+extent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)
+crs        : NA 
+source     : memory
+names      : v 
+values     : -1.795722e-16, 21.27264  (min, max)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="assign-projection-system" class="level3">
+<h3 class="anchored" data-anchor-id="assign-projection-system">4.2.4 Assign Projection System</h3>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-10-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-1" role="tab" aria-controls="tabset-10-1" aria-selected="true">Functional</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-10-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-2" role="tab" aria-controls="tabset-10-2" aria-selected="false">Non-Functional</a></li></ul>
+<div class="tab-content">
+<div id="tabset-10-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-10-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">projection</span>(kde_wpfunc_raster) <span class="ot">&lt;-</span> <span class="fu">CRS</span>(<span class="st">"+init=EPSG:26391 +datum:WGS84 +units=km"</span>)</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>kde_wpfunc_raster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class      : RasterLayer 
+dimensions : 128, 128, 16384  (nrow, ncol, ncell)
+resolution : 0.8948485, 0.9616045  (x, y)
+extent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)
+crs        : +init=EPSG:26391 +datum:WGS84 +units=km 
+source     : memory
+names      : v 
+values     : -1.303367e-15, 24.61848  (min, max)</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-10-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">projection</span>(kde_wpnonfunc_raster) <span class="ot">&lt;-</span> <span class="fu">CRS</span>(<span class="st">"+init=EPSG:26391 +datum:WGS84 +units=km"</span>)</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>kde_wpnonfunc_raster</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class      : RasterLayer 
+dimensions : 128, 128, 16384  (nrow, ncol, ncell)
+resolution : 0.8948485, 0.9616045  (x, y)
+extent     : 176.5032, 291.0438, 331.4347, 454.5201  (xmin, xmax, ymin, ymax)
+crs        : +init=EPSG:26391 +datum:WGS84 +units=km 
+source     : memory
+names      : v 
+values     : -1.795722e-16, 21.27264  (min, max)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="visualize-kde" class="level2">
+<h2 class="anchored" data-anchor-id="visualize-kde">4.2 Visualize KDE</h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co">#tmap generation function</span></span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>density_map <span class="ot">&lt;-</span> <span class="cf">function</span>(raster_object, map_title) {</span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tmap_mode</span>(<span class="st">"view"</span>)</span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_basemap</span>(<span class="st">"OpenStreetMap"</span>) <span class="sc">+</span></span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(raster_object) <span class="sc">+</span></span>
+<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_raster</span>(<span class="st">"v"</span>, <span class="at">alpha=</span><span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.bounds =</span> <span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">7</span>,<span class="dv">5</span>,<span class="dv">8</span>),</span>
+<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">set.zoom.limits =</span> <span class="fu">c</span>(<span class="dv">8</span>, <span class="dv">13</span>))</span>
+<span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a>  } </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-11-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-1" role="tab" aria-controls="tabset-11-1" aria-selected="true">Functional</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-11-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-11-2" role="tab" aria-controls="tabset-11-2" aria-selected="false">Non-Functional</a></li></ul>
+<div class="tab-content">
+<div id="tabset-11-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-11-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">density_map</span>(kde_wpfunc_raster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-372af19f47f8182294f0" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-372af19f47f8182294f0">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"minZoom":8,"maxZoom":13},"calls":[{"method":"createMapPane","args":["tmap401",401]},{"method":"addProviderTiles","args":["OpenStreetMap",null,"OpenStreetMap",{"minZoom":8,"maxZoom":13,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addRasterImage","args":["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHwAAACGCAYAAAAfF+7BAAAE9ElEQVR4nO2dvWoUURTHzwT76AMIQgQFi5TW21iIraVdsPYR7H0DsRNsbEOKNFsHqy0EUywEArZhn2As4iS7m5k79/uej/8PBMF15+75zbnn3jtzZzoCbOj7ZT/8vesWXYljFPlSEMe28DFynAQQPkGNbHMd00VKeyB8j7Gg+wa475f98NkpeVPf5Ss7pk3bn4dwiu9KfQTPfWfo//Np19j3Qvh/aog6uzqlt8/ehTYtuE0Drt4FwhMyjAvbwl2/p+sW3UGdJoEauGSvNysiIoJwAQyyXMz1VM8ff+qIIDwIn8CXOObJ+YXzMyGDTtRwBTXcxf6ADhluDAg3BoQbw7Rw7fV7jKqDtpR16tLt0MhYbKsFe24FiEM7NDEV02aBXm9WdHR4fN+QQtKtCN7GFUtW13mJ0sRzlrt/gpdiLn7shBOFSeckuZZUF02Fh15CfPHk6V3ApEpviU/MHuU+aIvgd92iq3VcDlm8T0hysJiHrzcr+vLrLxHdZjoR76xdb1Z3f2L/fy5CxzzZu/Q5UVMZst6s6PLmOqpb53xylCJ2cMtqKjQ3VZu6T8uacLZ3reYQYVXqFKnrFSxq+ByQfQubjQgchXAcTadSRfj2vddj/5baAOBHrqVnr3k4xOrBWcMli25xw6EERAzaYtEiPeeVRO+9SaAtuaSrznDwEAg3RnHhWuqoFooL17b44ULCyW26S88tSMLJbVb4erOi739+t25GdcwKtwrWyAWQc+HFfIZLGGjlRPxK2+LnVyIiWr7/6Pyc1MuluTdoiM7wITu/vXk9m6kSZZdAfIYTyc3eOUpsv3J+oSTpGikhfLRL7/tlX0K2tQESR7ye4AfqU2o37V2GQ7YNDogg2xIHkG0L7OpgSMlHoGDQxpCSwnemZbEHit0+i2lafR7Mw2Oln5xfBK92aVwdG4jdP176iVZVlla1Ln1O8fniB314+SrqNzcTPoC6Hk7KCV5aeNarZajJtxwdHkfHonSCzQrfebh6t+haPCpTIiklrKT0KHno5utQ/fLoGJBdl9zSvZ/TBtE6CDp7IL0Nze5axYBNPqJvYgThBAtHlssmWHjLOm51YSdnzJOyFYO4erB45Ae6d3lg0GYMCBdCrvIJ4cZIEi590CZt1J8j3qYz/PLmunUTqoNpmUBSZkemMzwWaaVgG2S4UGKzPDrDIVsmKt/zaYnQTEcNF05o4kG4AoLe3lz6AKAePt07MlwRPokI4caAcGNkf384aIPv9AzCK5N6l9BQp6u/Thoj9TC43A6GGl4BLrKJIoUju+WCDDcGhBsDwgvDqX4TYVpWDG6iB5DhxoBwY4jaPQrSwf5wYyDDjYEabgxv4aXedLSP5Jv8JcAuwy09dbkFXsJRt/UwKxyydeEUDtn6YFfDNcB5rULF24U5wVk2ETI8K9xlE0F4MmdXp0QkQzYRhJtj9Kz0rd/DWY16LyfDowZt+z/OknApYqcYvcVpSqD0HwscNRyvrxpHem+WRaL0IIQg/cTP1njt0qWLHsC0zAMtsokg3BzYiOBAU2YPIMONUT3Dx7KG44BPY3YTVR6lzwWRi3itsokydulzQfIJouZAc6FKlx4i0vI6fQ2yDtr2ZWFJlh/ZMxyCeYNpmTFEZGOtOm6hd2L/A3PJtiDTBxNdOmTfI1q4zywAsncREYyxbt1niRayBVNrfzoAqvgH01RqvkxGOGgAAAAASUVORK5CYII=",[[8.11116627626476,4.00779999543113],[6.9906002877626,5.05382935235654]],0.898039215686275,null,"tmap401","raster_object"]},{"method":"addLegend","args":[{"colors":["#FFFFBF","#DCF090","#B5DF73","#7FC865","#40AA59"],"labels":["0 to 5","5 to 10","10 to 15","15 to 20","20 to 25"],"na_color":null,"na_label":"NA","opacity":0.898039215686275,"position":"topright","type":"unknown","title":"v","extra":null,"layerId":"legend401","className":"info legend raster_object","group":"raster_object"}]},{"method":"addLayersControl","args":[[],"raster_object",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]},{"method":"setMaxBounds","args":[7,4,8,5]}],"limits":{"lat":[6.9906002877626,8.11116627626476],"lng":[4.00779999543113,5.05382935235654]},"setView":[[7.5,4.5],8,[]]},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-11-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-11-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">density_map</span>(kde_wpnonfunc_raster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-a57eea0e424851194ead" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-a57eea0e424851194ead">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"minZoom":8,"maxZoom":13},"calls":[{"method":"createMapPane","args":["tmap401",401]},{"method":"addProviderTiles","args":["OpenStreetMap",null,"OpenStreetMap",{"minZoom":8,"maxZoom":13,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addRasterImage","args":["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHwAAACGCAYAAAAfF+7BAAAEdUlEQVR4nO2dO27cMBCGR4uUAQIfwEGAFC5zhMBtkBPmCmkNt3uGLV0sYMAHMPYESmEr0Sp6kNJwNMP//yoX6yWXn4YcPiQ1QtzQtse2+7tp7psSZRT5UrKOvvAxNC4CCp/AItrmypxjS30ofMBYo6c2cNse2+6zU/KmvitV9po69T9P4bK+K00RvPSduf+XUq+x76Xwd/YQpc1Q/Fzv8sGmSvXgSfQYS/U7WFWElCflYqTwFTw+P5iWd76cFj+TmodQ+Arubm7NytKULcKkzf2YvJVhQscIB4PCwaBwMKCF1z5+j2GatG1Zpy5djxoZa1uzxp5rZEvpyLJFnAgXKScdRXCfubZ0tc8rsk08otwhS+3nbvOkv+WY+vmS9amNohFeaq9Xs5yaSGkzdeFajZ/btVtJ79a2v376ZlFcEjlt5Woe3t8oiBC1KRsbpckNDLcRLpJ/bsua8+UkT68vcndzax7xa5Nb9aStae6bUgKmzmntRSc5imwRx0lbh8czZHuy9SJ3NYZPQdlvuLkRwaOQ8+XkKpPWQEP4YoTPyWzbY+tRdo1o5StJSVtUqTVG+VZmIzyqaBFfCyOeCJG0oaM5/Uy+N4nsi5Z0RjgYFA4GhYNB4WBAC/ewvWkNtPCn15e9q2AOtHBEVB4wQ8qiufDCCAdjVPjeJ0lyqD3x0nbBCAeDa+mOKdHTTkZ4pG6dpDN6AILRXS9JT/Aj9pTqYf926ZSNwUGEspE4UDYWvKvDISVnSEzaHFJS+NU8nHPv+vlv4WWN9PPlZP6E4VopHXRmS6tId4FseUpEaeGzS6uahaPI9s6iUCZy9phl6VMMX4XEi6A8rt5MSOE2mG6PToEi28NJmhJtzYffOUc7yl0+/I5cs9upVa7ExYeHGMHIFs4oj022vD3HcY8PtrVCK9A2fQmTODtcPPKD3Xs8mLSBQeFB0Bo+KRyMTcIjJ22Pzw9y//vX3tXIQqO9YSP8x5ef8v3zRxebJJZAT8uiHrvaMjuCjXCR9Qs4kXsF6AiPzNooXx3hlB0TvuczOLmRDj2G10Bu4FF4BWS9vbl0AcSOlO6dEV4RKYFI4WBQOBjqL5sl+5A6PaNwY7aeEhre55dd/taCSRpejoOpjOGRNxMs8CJbhPNwEzwJZ5YOBoWDQeGF8dSdi3BaVgxvojsY4WBQOBh8xgsYvD8cDEY4GBzDwUieljGy64ARDkaScEZ3PSwKp+y6mBVO2fXBMbwAntcq+HZhZTzLFmGEq+JdtgiFqxFBtgiFwzEqPHX81n7zESnPqqRtKBkpwYt+gY+upU8JjP5jycKL6vp/U/Yb0XszFYnRGyGH6Be+WuVrlx5ddAenZQnUIluEwuHgjQgz1BTZHYxwMMwjfCxqPCZ8NUa3iHGWvtSIXsTXKltEsUtfaqSURqy5ob1g0qXniERep7dANWkbyuKSrD/UI5yCfcNpGRghotFqHEfondz/QC3ZCDJTgOjSKfsfoYWnzAIo+5oQjTHWracs0VJ2YNr22HIRhpBM/gA2bwX8GZRS8wAAAABJRU5ErkJggg==",[[8.11116627626476,4.00779999543113],[6.9906002877626,5.05382935235654]],0.898039215686275,null,"tmap401","raster_object"]},{"method":"addLegend","args":[{"colors":["#FFFFBF","#DCF090","#B5DF73","#7FC865","#40AA59"],"labels":["0 to 5","5 to 10","10 to 15","15 to 20","20 to 25"],"na_color":null,"na_label":"NA","opacity":0.898039215686275,"position":"topright","type":"unknown","title":"v","extra":null,"layerId":"legend401","className":"info legend raster_object","group":"raster_object"}]},{"method":"addLayersControl","args":[[],"raster_object",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]},{"method":"setMaxBounds","args":[7,4,8,5]}],"limits":{"lat":[6.9906002877626,8.11116627626476],"lng":[4.00779999543113,5.05382935235654]},"setView":[[7.5,4.5],8,[]]},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="nearest-neighbor-index" class="level2">
+<h2 class="anchored" data-anchor-id="nearest-neighbor-index">4.3 Nearest Neighbor Index</h2>
 
 
 </section>

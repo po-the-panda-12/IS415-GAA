@@ -428,4 +428,221 @@ plot(wp_nonfunctional_ppp)
 
 -   Describe spatial patterns displayed by the kernel density maps
 
-## 4.1 Kernel Density Estimation 
+## 4.1 Kernel Density Estimation (KDE)
+
+::: panel-tabset
+### Automatic
+
+```{r}
+kde_wpfunc.mppl <- density(wp_functional_ppp, 
+                               sigma=bw.ppl, 
+                               edge=TRUE)
+
+kde_wpnonfunc.mppl <- density(wp_nonfunctional_ppp,
+                             sigma=bw.ppl,
+                             edge=TRUE)
+
+par(mfrow=c(1,2))
+plot(kde_wpfunc.mppl, 
+     main = "Functional Water Points",
+     ribside=c("bottom"))
+plot(kde_wpnonfunc.mppl,
+     main = "Non-Functional Water Points",
+     ribside=c("bottom"))
+```
+
+### Adaptive
+
+```{r}
+kde_wpfunc.m <- adaptive.density(wp_functional_ppp,
+                                  method = "kernel")
+
+kde_wpnonfunc.m <- adaptive.density(wp_nonfunctional_ppp,
+                                     method = "kernel")
+
+par(mfrow=c(1,2))
+plot(kde_wpfunc.m,
+     main = "Functional Water Points",
+     ribside=c("right"))
+plot(kde_wpnonfunc.m,
+     main = "Non-Functional Water Points",
+     ribside=c("right"))
+```
+:::
+
+### 4.2.1 Re-Scale KDE values 
+
+```{r}
+wp_functional_ppp.km <- rescale(wp_functional_ppp, 1000, "km")
+
+wp_nonfunctional_ppp.km <- rescale(wp_nonfunctional_ppp, 1000, "km")
+```
+
+::: panel-tabset
+#### Automatic
+
+```{r}
+kde_wpfunc.ppl <- density(wp_functional_ppp.km,
+                          sigma = bw.ppl,
+                          edge = TRUE)
+
+kde_wpnonfunc.ppl <- density(wp_nonfunctional_ppp.km,
+                             sigma = bw.ppl,
+                             edge = TRUE)
+
+par(mfrow=c(1,2))
+plot(kde_wpfunc.ppl,
+     main = "Functional Water Points",
+     ribside=c("bottom"))
+plot(kde_wpnonfunc.ppl,
+     main = "Non-Functional Water Points",
+     ribside=c("bottom"))
+```
+
+#### Adaptive
+
+```{r}
+kde_wpfunc.km <- adaptive.density(wp_functional_ppp.km,
+                                  method = "kernel")
+
+kde_wpnonfunc.km <- adaptive.density(wp_nonfunctional_ppp.km,
+                                     method = "kernel")
+
+par(mfrow=c(1,2))
+plot(kde_wpfunc.km,
+     main = "Functional Water Points",
+     ribside=c("bottom"))
+plot(kde_wpnonfunc.km,
+     main = "Non-Functional Water Points",
+     ribside=c("bottom"))
+```
+:::
+
+### 4.2.2 Re-Scale KDE values 
+
+::: panel-tabset
+## Automatic
+
+```{r}
+gridded_wpfunc.ppl <- as.SpatialGridDataFrame.im(kde_wpfunc.ppl)
+gridded_wpnonfunc.ppl <- as.SpatialGridDataFrame.im(kde_wpnonfunc.ppl)
+
+spplot(gridded_wpfunc.ppl)
+spplot(gridded_wpnonfunc.ppl)
+```
+
+## Adaptive
+
+```{r}
+gridded_wpfunc <- as.SpatialGridDataFrame.im(kde_wpfunc.km)
+gridded_wpnonfunc <- as.SpatialGridDataFrame.im(kde_wpnonfunc.km)
+
+spplot(gridded_wpfunc)
+spplot(gridded_wpnonfunc)
+```
+:::
+
+### 4.2.3 Convert grid object to Raster
+
+::: panel-tabset
+#### Functional
+
+```{r}
+kde_wpfunc_raster <- raster(gridded_wpfunc)
+kde_wpfunc_raster
+```
+
+#### Non-Functional
+
+```{r}
+kde_wpnonfunc_raster <- raster(gridded_wpnonfunc)
+kde_wpnonfunc_raster
+```
+:::
+
+### 4.2.4 Assign Projection System
+
+::: panel-tabset
+#### Functional
+
+```{r}
+projection(kde_wpfunc_raster) <- CRS("+init=EPSG:26391 +datum:WGS84 +units=km")
+kde_wpfunc_raster
+```
+
+#### Non-Functional
+
+```{r}
+projection(kde_wpnonfunc_raster) <- CRS("+init=EPSG:26391 +datum:WGS84 +units=km")
+kde_wpnonfunc_raster
+```
+:::
+
+## 4.2 Visualize KDE
+
+```{r}
+#| code-fold: true
+#tmap generation function
+density_map <- function(raster_object, map_title) {
+  tmap_mode("view")
+  tm_basemap("OpenStreetMap") +
+tm_shape(raster_object) +
+  tm_raster("v", alpha=0.9) +
+  tm_view(set.bounds = c(4,7,5,8),
+          set.zoom.limits = c(8, 13))
+  } 
+```
+
+::: panel-tabset
+### Functional
+
+```{r}
+density_map(kde_wpfunc_raster)
+```
+
+### Non-Functional
+
+```{r}
+density_map(kde_wpnonfunc_raster)
+```
+:::
+
+## 4.3 Nearest Neighbor Index
+
+Clarke-Evans Test to check if distribution is random, clustered or dispersed with a 95% confidence interval
+
+### 4.3.1 Test - Functional Water Points
+
+The test hypotheses for Functional Water Point is :
+
+**H~0~ :** The distribution is random
+
+**H~1~ :** The distribution is not random
+
+```{r}
+clarkevans.test(wp_functional_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("clustered"),
+                nsim=99)
+```
+
+### 4.3.2 Test - Non-Functional Water Points
+
+The test hypotheses for Non-Functional Water Point is :
+
+**H~0~ :** The distribution is random
+
+**H~1~ :** The distribution is not random
+
+```{r}
+clarkevans.test(wp_nonfunctional_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("clustered"),
+                nsim=99)
+```
+
+### 4.3.3 Conclusion
+
+# 5.0 2nd Order Spatial Point Pattern Analysis
