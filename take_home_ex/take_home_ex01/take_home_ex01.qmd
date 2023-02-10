@@ -13,11 +13,15 @@ editor: visual
 
 ## 1.1 Background
 
-Water in Africa
+This analysis aims to apply appropriate spatial point patterns analysis methods to discover the geographical distribution of functional and non-function water points and their co-locations if any in Osun State, Nigeria.
 
-## 1.2 Problem Statement
+## 1.2 Task
 
-To do - EDA, Spatial Point Analysis
+-   Exploratory Spatial Data Analysis (ESDA)
+
+-   Second-order Spatial Point Pattern Analysis
+
+-   Spatial Correlation Analysis
 
 # 2.0 Setup
 
@@ -33,7 +37,7 @@ To do - EDA, Spatial Point Analysis
 pacman::p_load(sf, maptools, raster, spatstat, tmap, kableExtra, tidyverse, funModeling)
 ```
 
-# 3.0 Data Preparation
+# 3.0 Data Wrangling
 
 ## 3.1 Datasets Used
 
@@ -126,6 +130,9 @@ kable(datasets, caption="Datasets Used") %>%
 
 ### 3.2.1 Load Data
 
+::: panel-tabset
+#### Import
+
 ```{r}
 NGA <- st_read("data/geospatial", 
                   layer = "nga_admbnda_adm2_osgof_20190417") %>%
@@ -133,8 +140,173 @@ NGA <- st_read("data/geospatial",
   st_transform(crs = 26392)
 ```
 
-### 3.2.1 Data Preprocessing
+#### Glimpse
 
 ```{r}
+glimpse(NGA)
+```
+:::
 
+### 3.2.2 Data Preprocessing
+
+#### 3.2.2.1 Excluding redundant fields 
+
+This is because
+
+```{r}
+NGA <- NGA %>%
+  select(c(3:4, 8:9))
+```
+
+#### 3.2.2.2 Invalid Geometries
+
+```{r}
+length(which(st_is_valid(NGA) == FALSE))
+```
+
+Everything is valid
+
+#### 3.2.2.3 Checking for Duplicate Names
+
+```{r}
+NGA$ADM2_EN[duplicated(NGA$ADM2_EN)==TRUE]
+```
+
+No duplicate names
+
+#### 3.2.2.4 Remove Missing Values
+
+```{r}
+NGA[rowSums(is.na(NGA))!=0,]
+```
+
+### 3.2.3 Initial Visualisation
+
+```{r}
+plot(st_geometry(NGA))
+```
+
+## 3.3 Aspatial Data
+
+### 3.3.1
+
+::: panel-tabset
+#### Import
+
+```{r}
+wp_nga <- read_csv("data/aspatial/WPdx.csv") %>%
+  filter(`#clean_country_name` == "Nigeria" & `#clean_adm1` == "Osun")
+```
+
+#### Glimpse
+
+```{r}
+glimpse(wp_nga)
+```
+:::
+
+### 3.3.2 Data Preprocessing
+
+#### 3.3.2.1 Convert point data to sf point features
+
+First convert wkt field into sfc field
+
+Then convert it into sf object
+
+```{r}
+wp_nga$Geometry = st_as_sfc(wp_nga$`New Georeferenced Column`)
+
+wp_sf <- st_sf(wp_nga, crs=4326)
+```
+
+#### 3.3.2.2 Transform into Coordinate System
+
+```{r}
+wp_sf <- wp_sf %>%
+  st_transform(crs = 26392)
+```
+
+#### 3.3.2.3 Handle Missing Data 
+
+```{r}
+freq(data = wp_sf,
+     input = '#status_clean')
+```
+
+There are eight classes in the #status_clean fields.
+
+To change NA with "unknown"
+
+```{r}
+wp_sf_nga <- wp_sf %>% 
+  rename(status_clean = '#status_clean') %>%
+  select(status_clean) %>%
+  mutate(status_clean = replace_na(
+    status_clean, "unknown"))
+```
+
+### 3.3.3 Water Point Extraction
+
+```{r}
+#for functional points
+wp_functional <- wp_sf_nga %>%
+  filter(status_clean %in%
+           c("Functional",
+             "Functional, needs repair",
+             "Functional, not in use",
+             "Functional but not in use"))
+```
+
+```{r}
+#for non-functional points
+wp_nonfunctional <- wp_sf_nga %>%
+  filter(status_clean %in%
+           c("Abandoned/Decommissioned",
+             "Non-Functional, dry",
+             "Non-Functional"))
+```
+
+```{r}
+#for unknown status points
+wp_unknown <- wp_sf_nga %>%
+  filter(status_clean == "unknown")
+```
+
+::: panel-tabset
+#### Functional
+
+```{r}
+freq(data = wp_functional,
+     input = 'status_clean')
+```
+
+#### Non-Functional
+
+```{r}
+freq(data = wp_nonfunctional,
+     input = 'status_clean')
+```
+
+#### Unknown
+
+```{r}
+freq(data = wp_unknown,
+     input = 'status_clean')
+```
+:::
+
+### 3.3.4 Point-in-Polygon Count 
+
+Extract number of total, functional, nonfunctional and unknown water points
+
+```{r}
+NGA_wp <- NGA %>% 
+  mutate(`total_wp` = lengths(
+    st_intersects(NGA, wp_sf_nga))) %>%
+  mutate(`wp_functional` = lengths(
+    st_intersects(NGA, wp_functional))) %>%
+  mutate(`wp_nonfunctional` = lengths(
+    st_intersects(NGA, wp_nonfunctional))) %>%
+  mutate(`wp_unknown` = lengths(
+    st_intersects(NGA, wp_unknown)))
 ```
