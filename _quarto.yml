@@ -37,7 +37,7 @@ website:
       - text: "Take-home Exercise"
         menu: 
           - text: "Exercise 1"
-            href: Take-home/Ex1/Ex1.qmd
+            href: take_home_ex/take_home_ex01/take_home_ex01.qmd
           
 
 format:
