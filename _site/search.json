@@ -746,7 +746,7 @@
     "href": "take_home_ex/take_home_ex01/take_home_ex01.html#import-packages",
     "title": "Take Home Exercise 1",
     "section": "2.1 Import Packages",
-    "text": "2.1 Import Packages\n\nsf\ntidyVerse\ntmap, maptools, kableExtra - Used for visualizing dataframes and plots\n\n\npacman::p_load(sf, maptools, raster, spatstat, tmap, kableExtra, tidyverse, funModeling)"
+    "text": "2.1 Import Packages\n\nsf\ntidyVerse\ntmap, maptools, kableExtra - Used for visualizing dataframes and plots\n\n\npacman::p_load(sf, maptools, raster, spatstat, tmap, kableExtra, tidyverse, funModeling, sfdep)"
   },
   {
     "objectID": "take_home_ex/take_home_ex01/take_home_ex01.html#datasets-used",
@@ -802,6 +802,41 @@
     "href": "take_home_ex/take_home_ex01/take_home_ex01.html#nearest-neighbor-index",
     "title": "Take Home Exercise 1",
     "section": "4.3 Nearest Neighbor Index",
-    "text": "4.3 Nearest Neighbor Index"
+    "text": "4.3 Nearest Neighbor Index\nClarke-Evans Test to check if distribution is random, clustered or dispersed with a 95% confidence interval\n\n4.3.1 Test - Functional Water Points\nThe test hypotheses for Functional Water Point is :\nH0 : The distribution is random\nH1 : The distribution is not random\n\nclarkevans.test(wp_functional_ppp,\n                correction=\"none\",\n                clipregion=NULL,\n                alternative=c(\"clustered\"),\n                nsim=99)\n\n\n    Clark-Evans test\n    No edge correction\n    Monte Carlo test based on 99 simulations of CSR with fixed n\n\ndata:  wp_functional_ppp\nR = 0.42546, p-value = 0.01\nalternative hypothesis: clustered (R < 1)\n\n\n\n\n4.3.2 Test - Non-Functional Water Points\nThe test hypotheses for Non-Functional Water Point is :\nH0 : The distribution is random\nH1 : The distribution is not random\n\nclarkevans.test(wp_nonfunctional_ppp,\n                correction=\"none\",\n                clipregion=NULL,\n                alternative=c(\"clustered\"),\n                nsim=99)\n\n\n    Clark-Evans test\n    No edge correction\n    Monte Carlo test based on 99 simulations of CSR with fixed n\n\ndata:  wp_nonfunctional_ppp\nR = 0.41415, p-value = 0.01\nalternative hypothesis: clustered (R < 1)\n\n\n\n\n4.3.3 Conclusion\nSomething"
+  },
+  {
+    "objectID": "take_home_ex/take_home_ex01/take_home_ex01.html#functional-water-points",
+    "href": "take_home_ex/take_home_ex01/take_home_ex01.html#functional-water-points",
+    "title": "Take Home Exercise 1",
+    "section": "5.1 Functional Water Points",
+    "text": "5.1 Functional Water Points\n\n5.1.1 F-Function\n\n#G_wp_functional = Gest(wp_functional_ppp, correction = \"border\")\n#plot(G_wp_functional)\n\nSpatial Randomness Test\n\nPlotSimulation\n\n\n\n#plot(G_wp_functional.csr)\n\n\n\n\n#G_wp_functional.csr <- envelope(wp_functional_ppp, Gest, nsim = 999)\n\n\n\n\n\n\n5.1.2 K-Function\n\n#K_wp_functional = Kest(wp_functional_ppp, correction = \"Ripley\")\n#plot(K_ck, . -r ~ r, ylab= \"K(d)-r\", xlab = \"d(m)\")\n\nSpatial Randomness\n\nPlotSimulation\n\n\n\n#plot(K_wp_functional.csr, . - r ~ r, xlab=\"d\", ylab=\"K(d)-r\", title=\"K test - Functional\")\n\n\n\n\n#K_wp_functional.csr <- envelope(wp_functional_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)\n\n\n\n\n\n\n5.1.3 L-Function\n\n#L_wp_functional = Lest(wp_functional_ppp, correction = \"Ripley\")\n#plot(L_wp_functional_ppp, . -r ~ r, ylab= \"L(d)-r\", xlab = \"d(m)\")\n\nSpatial Randomness\n\nPlotSimulation\n\n\n\n#plot(L_wp_functional.csr, . - r ~ r, xlab=\"d\", ylab=\"L(d)-r\")\n\n\n\n\n#L_wp_functional.csr <- envelope(wp_functional_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)"
+  },
+  {
+    "objectID": "take_home_ex/take_home_ex01/take_home_ex01.html#non-functional-water-points",
+    "href": "take_home_ex/take_home_ex01/take_home_ex01.html#non-functional-water-points",
+    "title": "Take Home Exercise 1",
+    "section": "5.2 Non-Functional Water Points",
+    "text": "5.2 Non-Functional Water Points\n\n5.2.1 F-Function\n\n#G_wp_nonfunctional = Gest(wp_functional_ppp, correction = \"border\")\n#plot(G_wp_nonfunctional)\n\nSpatial Randomness Test\n\nPlotSimulation\n\n\n\n#plot(G_wp_nonfunctional.csr)\n\n\n\n\n#G_wp_nonfunctional.csr <- envelope(wp_functional_ppp, Gest, nsim = 999)\n\n\n\n\n\n\n5.1.2 K-Function\n\n#K_wp_nonfunctional = Kest(wp_nonfunctional_ppp, correction = \"Ripley\")\n#plot(K_ck, . -r ~ r, ylab= \"K(d)-r\", xlab = \"d(m)\")\n\nSpatial Randomness\n\nPlotSimulation\n\n\n\n#plot(K_wp_nonfunctional.csr, . - r ~ r, xlab=\"d\", ylab=\"K(d)-r\", title=\"K test - Functional\")\n\n\n\n\n#K_wp_nonfunctional.csr <- envelope(wp_functional_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)\n\n\n\n\n\n\n5.1.3 L-Function\n\n#L_wp_nonfunctional = Lest(wp_nonfunctional_ppp, correction = \"Ripley\")\n#plot(L_wp_nonfunctional_ppp, . -r ~ r, ylab= \"L(d)-r\", xlab = \"d(m)\")\n\nSpatial Randomness\n\nPlotSimulation\n\n\n\n#plot(L_wp_nonfunctional.csr, . - r ~ r, xlab=\"d\", ylab=\"L(d)-r\")\n\n\n\n\n#L_wp_nonfunctional.csr <- envelope(wp_nonfunctional_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)"
+  },
+  {
+    "objectID": "take_home_ex/take_home_ex01/take_home_ex01.html#conclusion-1",
+    "href": "take_home_ex/take_home_ex01/take_home_ex01.html#conclusion-1",
+    "title": "Take Home Exercise 1",
+    "section": "5.3 Conclusion",
+    "text": "5.3 Conclusion\nSomething"
+  },
+  {
+    "objectID": "take_home_ex/take_home_ex01/take_home_ex01.html#hypothesis",
+    "href": "take_home_ex/take_home_ex01/take_home_ex01.html#hypothesis",
+    "title": "Take Home Exercise 1",
+    "section": "6.1 Hypothesis",
+    "text": "6.1 Hypothesis\nSomething"
+  },
+  {
+    "objectID": "take_home_ex/take_home_ex01/take_home_ex01.html#test",
+    "href": "take_home_ex/take_home_ex01/take_home_ex01.html#test",
+    "title": "Take Home Exercise 1",
+    "section": "6.2 Test",
+    "text": "6.2 Test\n\nnb = include_self(st_knn(st_geometry(wp_sf_nga), 6))\n\nwt = st_kernel_weights(nb, wp_sf_nga, \"gaussian\", adaptive = TRUE)\n\n\nfunctional = wp_sf_nga %>%\n  filter(status_clean %in%\n           c(\"Functional\",\n             \"Functional, needs repair\",\n             \"Function, not in use\",\n             \"Functional but not in use\"))\n\nA = functional$status_clean\n\n\nnonfunctional = wp_sf_nga %>%\n  filter(status_clean %in%\n           c(\"Abandoned/Decommissioned\",\n             \"Non-Functional, dry\",\n             \"Non-Functional\"))\nB = nonfunctional$status_clean\n\n\nLCLQ = local_colocation(A, B, nb, wt, 49)\n\n\nLCLQ_wp = cbind(wp_sf_nga, LCLQ)\n\n\ntmap_mode(\"view\")\ntm_shape(NGA)+\n  tm_polygons()+\ntm_shape(LCLQ_wp)+\n  tm_dots(col = c(\"Abandoned.Decommissioned\", \"Non.Functional\", \"Non.Functional..dry\"),\n          size = 0.01,\n          border.col = \"black\",\n          border.lwd = 0.5) +\n  tm_view(set.zoom.limits = c(8, 13))\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n6.3 Analysis + Conclusion"
   }
 ]
