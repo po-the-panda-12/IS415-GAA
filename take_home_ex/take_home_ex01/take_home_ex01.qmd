@@ -134,8 +134,8 @@ kable(datasets, caption="Datasets Used") %>%
 #### Import
 
 ```{r}
-NGA <- st_read("data/geospatial", 
-                  layer = "nga_admbnda_adm2_osgof_20190417") %>%
+osun <- st_read(dsn = "data/geospatial/",
+               layer = "nga_admbnda_adm2_osgof_20190417") %>%
   filter(ADM1_EN == "Osun") %>%
   st_transform(crs = 26392)
 ```
@@ -143,7 +143,7 @@ NGA <- st_read("data/geospatial",
 #### Glimpse
 
 ```{r}
-glimpse(NGA)
+glimpse(osun)
 ```
 :::
 
@@ -152,14 +152,14 @@ glimpse(NGA)
 #### 3.2.2.1 Exclude redundant fields
 
 ```{r}
-NGA <- NGA %>%
-  select(c(3:4, 8:9)) #dplyr
+osun <- osun %>%
+  select(c(3:4, 8:9))
 ```
 
 #### 3.2.2.2 Invalid Geometries
 
 ```{r}
-length(which(st_is_valid(NGA) == FALSE))
+length(which(st_is_valid(osun) == FALSE))
 ```
 
 Everything is valid
@@ -167,21 +167,21 @@ Everything is valid
 #### 3.2.2.3 Checking for Duplicate Names
 
 ```{r}
-NGA$ADM2_EN[duplicated(NGA$ADM2_EN)==TRUE]
+osun$ADM2_EN[duplicated(osun$ADM2_EN)==TRUE]
 ```
 
-No duplicate names
+No duplicate Local Government Areas (LGAs)
 
 #### 3.2.2.4 Remove Missing Values
 
 ```{r}
-NGA[rowSums(is.na(NGA))!=0,]
+osun[rowSums(is.na(osun))!=0,]
 ```
 
 ### 3.2.3 Initial Visualisation
 
 ```{r}
-plot(st_geometry(NGA))
+plot(st_geometry(osun), main="Osun State")
 ```
 
 ## 3.3 Aspatial Data
@@ -192,32 +192,33 @@ plot(st_geometry(NGA))
 #### Import
 
 ```{r}
-wp_nga <- read_csv("data/aspatial/WPdx.csv") %>%
+wp <- read_csv("data/aspatial/WPdx.csv") %>%
   filter(`#clean_country_name` == "Nigeria" & `#clean_adm1` == "Osun")
 ```
 
 #### Glimpse
 
 ```{r}
-glimpse(wp_nga)
+glimpse(wp)
 ```
 :::
 
 ### 3.3.2 Data Preprocessing
 
-#### 3.3.2.1 Convert point data to sf point features
+#### 3.3.2.1 Create sfc object column
 
 First convert wkt field into sfc field. Then convert it into sf object.
 
 ```{r}
-wp_nga$Geometry = st_as_sfc(wp_nga$`New Georeferenced Column`)
-
-wp_sf <- st_sf(wp_nga, crs=4326)
+wp$Geometry = st_as_sfc(wp$`New Georeferenced Column`)
+wp$Geometry
 ```
 
-#### 3.3.2.2 Transform into Coordinate System
+#### 3.3.2.2 Create Simple Feature DataFrame
 
 ```{r}
+wp_sf <- st_sf(wp, crs=4326)
+
 wp_sf <- wp_sf %>%
   st_transform(crs = 26392)
 ```
@@ -234,40 +235,40 @@ There are eight classes in the #status_clean fields.
 To change NA with "unknown"
 
 ```{r}
-wp_sf_nga <- wp_sf %>% 
+wp_sf <- wp_sf %>% 
   rename(status_clean = '#status_clean') %>%
   select(status_clean) %>%
   mutate(status_clean = replace_na(
     status_clean, "unknown"))
 ```
 
-### 3.3.3 Water Point Extraction
+### 3.3.3 Extract Water Points
 
 Functional Points
 
 ```{r}
-wp_functional <- wp_sf_nga %>%
+wp_f <- wp_sf %>%
   filter(status_clean %in%
            c("Functional",
-             "Functional, needs repair",
-             "Functional, not in use",
+             "Functional but needs repair",
              "Functional but not in use"))
 ```
 
 Non-Functional Points
 
 ```{r}
-wp_nonfunctional <- wp_sf_nga %>%
+wp_nf <- wp_sf %>%
   filter(status_clean %in%
-           c("Abandoned/Decommissioned",
-             "Non-Functional, dry",
-             "Non-Functional"))
+           c("Non-Functional",
+             "Non-Functional due to dry season",
+             "Abandoned",
+             "Abandoned/Decommissioned"))
 ```
 
 Unknown Status Points
 
 ```{r}
-wp_unknown <- wp_sf_nga %>%
+wp_u <- wp_sf %>%
   filter(status_clean == "unknown")
 ```
 
@@ -275,21 +276,21 @@ wp_unknown <- wp_sf_nga %>%
 #### Functional
 
 ```{r}
-freq(data = wp_functional,
+freq(data = wp_f,
      input = 'status_clean')
 ```
 
 #### Non-Functional
 
 ```{r}
-freq(data = wp_nonfunctional,
+freq(data = wp_nf,
      input = 'status_clean')
 ```
 
 #### Unknown
 
 ```{r}
-freq(data = wp_unknown,
+freq(data = wp_u,
      input = 'status_clean')
 ```
 :::
@@ -299,25 +300,43 @@ freq(data = wp_unknown,
 Extract number of total, functional, nonfunctional and unknown water points
 
 ```{r}
-NGA_wp <- NGA %>% 
-  mutate(`total_wp` = lengths(
-    st_intersects(NGA, wp_sf_nga))) %>%
-  mutate(`wp_functional` = lengths(
-    st_intersects(NGA, wp_functional))) %>%
-  mutate(`wp_nonfunctional` = lengths(
-    st_intersects(NGA, wp_nonfunctional))) %>%
-  mutate(`wp_unknown` = lengths(
-    st_intersects(NGA, wp_unknown)))
+wp <- osun %>% 
+  mutate(`total_wp` = lengths(st_intersects(osun, wp_sf))) %>%
+  mutate(`wp_f` = lengths(st_intersects(osun, wp_f))) %>%
+  mutate(`wp_nf` = lengths(st_intersects(osun, wp_nf))) %>%
+  mutate(`wp_u` = lengths(st_intersects(osun, wp_u)))
+```
+
+To save as rds format
+
+```{r}
+#write_rds(wp, "Data/rds/wp.rds")
+```
+
+```{r}
+ggplot(data = wp,
+       aes(x = total_wp)) + 
+  geom_histogram(bins=20,
+                 color="black",
+                 fill="light blue") +
+  geom_vline(aes(xintercept=mean(
+    total_wp, na.rm=T)),
+             color="red", 
+             linetype="dashed", 
+             size=0.8) +
+  ggtitle("Distribution of total water points by LGA") +
+  xlab("No. of water points") +
+  ylab("No. of LGAs") 
 ```
 
 ## 3.4 Combined Data Wrangling
 
-### 3.4.1 Convert sf dataframes to sp Spatial class
+### 3.4.1 Convert sf dataframes to sp Spatial\* class
 
 ```{r}
-wp_functional_spat = as_Spatial(wp_functional)
-wp_nonfunctional_spat = as_Spatial(wp_nonfunctional)
-NGA_spat = as_Spatial(NGA)
+wp_f_spat = as_Spatial(wp_f)
+wp_nf_spat = as_Spatial(wp_nf)
+osun_spat = as_Spatial(osun)
 ```
 
 Peek
@@ -326,28 +345,28 @@ Peek
 #### Functional
 
 ```{r}
-wp_functional_spat
+wp_f_spat
 ```
 
 #### Non-Functional
 
 ```{r}
-wp_nonfunctional_spat
+wp_nf_spat
 ```
 
 #### NGA
 
 ```{r}
-NGA_spat
+osun_spat
 ```
 :::
 
-### 3.4.2 Convert sp Spatial to generic sp format
+### 3.4.2 Convert sp Spatial\* to generic sp format
 
 ```{r}
-wp_functional_sp <- as(wp_functional_spat, "SpatialPoints")
-wp_nonfunctional_sp <- as(wp_nonfunctional_spat, "SpatialPoints")
-NGA_sp <-as(NGA_spat, "SpatialPolygons")
+wp_f_sp <- as(wp_f_spat, "SpatialPoints")
+wp_nf_sp <- as(wp_nf_spat, "SpatialPoints")
+osun_sp <-as(osun_spat, "SpatialPolygons")
 ```
 
 Peek
@@ -356,19 +375,19 @@ Peek
 #### Functional
 
 ```{r}
-wp_functional_sp
+wp_f_sp
 ```
 
 #### Non-Functional
 
 ```{r}
-wp_nonfunctional_sp
+wp_nf_sp
 ```
 
 #### NGA
 
 ```{r}
-NGA_sp
+osun_sp
 ```
 :::
 
@@ -376,22 +395,22 @@ NGA_sp
 
 ```{r}
 # from sp object, convert into ppp format
-wp_functional_ppp <- as(wp_functional_sp, "ppp")
-wp_nonfunctional_ppp <- as(wp_nonfunctional_sp, "ppp")
+wp_f_ppp <- as(wp_f_sp, "ppp")
+wp_nf_ppp <- as(wp_nf_sp, "ppp")
 ```
 
 View
 
 ```{r}
 par(mfrow=c(1,2))
-plot(wp_functional_ppp)
-plot(wp_nonfunctional_ppp)
+plot(wp_f_ppp, main="Functional")
+plot(wp_nf_ppp, main="Non-functional")
 ```
 
 #### 3.4.3.1 Check for Duplication
 
 ```{r}
-any(duplicated(wp_functional_ppp)); any(duplicated(wp_nonfunctional_ppp)) 
+any(duplicated(wp_f_ppp)); any(duplicated(wp_nf_ppp)) 
 ```
 
 No duplicates means no jittering needed
@@ -399,15 +418,15 @@ No duplicates means no jittering needed
 ### 3.4.4 Create Owin object
 
 ```{r}
-NGA_owin <- as(NGA_sp, "owin")
-plot(NGA_owin)
+osun_owin <- as(osun_sp, "owin")
+plot(osun_owin, main="Owin object of Osun State")
 ```
 
 ### 3.4.4 Combine point event object with Owin object
 
 ```{r}
-wp_functional_ppp = wp_functional_ppp[NGA_owin]
-wp_nonfunctional_ppp = wp_nonfunctional_ppp[NGA_owin]
+wp_f_ppp = wp_f_ppp[osun_owin]
+wp_nf_ppp = wp_nf_ppp[osun_owin]
 ```
 
 View
@@ -415,8 +434,8 @@ View
 ```{r}
 #| code-fold: true
 par(mfrow=c(1,2))
-plot(wp_functional_ppp)
-plot(wp_nonfunctional_ppp)
+plot(wp_f_ppp, main="Functional")
+plot(wp_nf_ppp, main="Non-functional")
 ```
 
 # 4.0 Exploratory Spatial Data Analysis (ESDA)
@@ -427,91 +446,146 @@ plot(wp_nonfunctional_ppp)
 
 -   Describe spatial patterns displayed by the kernel density maps
 
+## 4.1 Initial Visualization
+
+::: panel-tabset
+### Visual 1
+
+```{r}
+#| code-fold: true
+wp_f_1 <- tm_shape(wp) +
+  tm_fill("wp_f",
+          n = 10,
+          style = "equal",
+          palette = "Blues") +
+  tm_borders(lwd = 0.1,
+             alpha = 1) +
+  tm_layout(main.title = "Functional Water Points by LGA",
+            legend.outside = FALSE)
+
+wp_f_2 <- tm_shape(wp) +
+  tm_fill("wp_nf",
+          n = 10,
+          style = "equal",
+          palette = "Blues") +
+  tm_borders(lwd = 0.1,
+             alpha = 1) +
+  tm_layout(main.title = "Non-functional Water Points by LGA",
+            legend.outside = FALSE)
+
+
+tmap_arrange(wp_f_1, wp_f_2, nrow = 1)
+```
+
+### Visual 2
+
+```{r}
+#| code-fold: true
+tmap_mode("view") + 
+tm_basemap("OpenStreetMap") +
+tm_shape(wp_functional) +
+ tm_dots(col = "status_clean",
+         pal = "blue",
+         border.col = "black",
+         title = "Functional") +
+tm_shape(wp_nonfunctional) +
+ tm_dots(col = "status_clean",
+         pal = "purple",
+         border.col = "black",
+         title = "Non-Functional") +
+  tm_view(set.bounds = c(4,7,5,8),
+          set.zoom.limits = c(8,15)) 
+```
+:::
+
 ## 4.1 Kernel Density Estimation (KDE)
 
 ::: panel-tabset
 ### Automatic Bandwidth
 
 ```{r}
-kde_wpfunc.mppl <- density(wp_functional_ppp, 
-                               sigma=bw.ppl, 
-                               edge=TRUE)
+kde_wp_f <- density(wp_f_ppp, 
+                    sigma=bw.ppl, 
+                    edge=TRUE,
+                    kernel = "gaussian")
 
-kde_wpnonfunc.mppl <- density(wp_nonfunctional_ppp,
-                             sigma=bw.ppl,
-                             edge=TRUE)
+kde_wp_nf <- density(wp_nf_ppp,
+                     sigma=bw.ppl,
+                     edge=TRUE,
+                     kernel = "gaussian")
 
 par(mfrow=c(1,2))
-plot(kde_wpfunc.mppl, 
-     main = "Functional Water Points",
+plot(kde_wp_f, 
+     main = "Functional Water Points (in m)",
      ribside=c("bottom"))
-plot(kde_wpnonfunc.mppl,
-     main = "Non-Functional Water Points",
+plot(kde_wp_nf,
+     main = "Non-Functional Water Points (in m)",
      ribside=c("bottom"))
 ```
 
 ### Adaptive Bandwidth
 
 ```{r}
-kde_wpfunc.m <- adaptive.density(wp_functional_ppp,
+kde_wp_f_ad <- adaptive.density(wp_f_ppp,
                                   method = "kernel")
 
-kde_wpnonfunc.m <- adaptive.density(wp_nonfunctional_ppp,
+kde_wp_nf_ad <- adaptive.density(wp_nf_ppp,
                                      method = "kernel")
 
 par(mfrow=c(1,2))
-plot(kde_wpfunc.m,
-     main = "Functional Water Points",
-     ribside=c("right"))
-plot(kde_wpnonfunc.m,
-     main = "Non-Functional Water Points",
-     ribside=c("right"))
+plot(kde_wp_f_ad,
+     main = "Functional Water Points (in m)",
+     ribside=c("bottom"))
+plot(kde_wp_nf_ad,
+     main = "Non-Functional Water Points (in m)",
+     ribside=c("bottom"))
 ```
 :::
 
 ### 4.2.1 Re-Scale KDE values
 
-```{r}
-wp_functional_ppp.km <- rescale(wp_functional_ppp, 1000, "km")
+From m to km
 
-wp_nonfunctional_ppp.km <- rescale(wp_nonfunctional_ppp, 1000, "km")
+```{r}
+wp_f_ppp.km <- rescale(wp_f_ppp, 1000, "km")
+wp_nf_ppp.km <- rescale(wp_nf_ppp, 1000, "km")
 ```
 
 ::: panel-tabset
 #### Automatic Bandwidth
 
 ```{r}
-kde_wpfunc.ppl <- density(wp_functional_ppp.km,
+kde_wp_f_scale <- density(wp_f_ppp.km,
                           sigma = bw.ppl,
                           edge = TRUE)
 
-kde_wpnonfunc.ppl <- density(wp_nonfunctional_ppp.km,
+kde_wp_nf_scale <- density(wp_f_ppp.km,
                              sigma = bw.ppl,
                              edge = TRUE)
 
 par(mfrow=c(1,2))
-plot(kde_wpfunc.ppl,
-     main = "Functional Water Points",
+plot(kde_wp_f_scale,
+     main = "Functional Water Points (in km)",
      ribside=c("bottom"))
-plot(kde_wpnonfunc.ppl,
-     main = "Non-Functional Water Points",
+plot(kde_wp_nf_scale,
+     main = "Non-Functional Water Points (in km)",
      ribside=c("bottom"))
 ```
 
 #### Adaptive Bandwidth
 
 ```{r}
-kde_wpfunc.km <- adaptive.density(wp_functional_ppp.km,
+kde_wp_f_scale_ad <- adaptive.density(wp_f_ppp.km,
                                   method = "kernel")
 
-kde_wpnonfunc.km <- adaptive.density(wp_nonfunctional_ppp.km,
+kde_wp_nf_scale_ad <- adaptive.density(wp_nf_ppp.km,
                                      method = "kernel")
 
 par(mfrow=c(1,2))
-plot(kde_wpfunc.km,
+plot(kde_wp_f_scale_ad,
      main = "Functional Water Points",
      ribside=c("bottom"))
-plot(kde_wpnonfunc.km,
+plot(kde_wp_nf_scale_ad,
      main = "Non-Functional Water Points",
      ribside=c("bottom"))
 ```
@@ -523,21 +597,21 @@ plot(kde_wpnonfunc.km,
 ## Automatic Bandwidth
 
 ```{r}
-gridded_wpfunc.ppl <- as.SpatialGridDataFrame.im(kde_wpfunc.ppl)
-gridded_wpnonfunc.ppl <- as.SpatialGridDataFrame.im(kde_wpnonfunc.ppl)
+grid_wp_f <- as.SpatialGridDataFrame.im(kde_wp_f_scale)
+grid_wp_nf <- as.SpatialGridDataFrame.im(kde_wp_nf_scale)
 
-spplot(gridded_wpfunc.ppl)
-spplot(gridded_wpnonfunc.ppl)
+spplot(grid_wp_f)
+spplot(grid_wp_nf)
 ```
 
 ## Adaptive Bandwidth
 
 ```{r}
-gridded_wpfunc <- as.SpatialGridDataFrame.im(kde_wpfunc.km)
-gridded_wpnonfunc <- as.SpatialGridDataFrame.im(kde_wpnonfunc.km)
+grid_wp_f_ad <- as.SpatialGridDataFrame.im(kde_wp_f_scale_ad)
+grid_wp_nf_ad <- as.SpatialGridDataFrame.im(kde_wp_nf_scale_ad)
 
-spplot(gridded_wpfunc)
-spplot(gridded_wpnonfunc)
+spplot(grid_wp_f_ad)
+spplot(grid_wp_nf_ad)
 ```
 :::
 
@@ -547,15 +621,15 @@ spplot(gridded_wpnonfunc)
 #### Functional
 
 ```{r}
-kde_wpfunc_raster <- raster(gridded_wpfunc)
-kde_wpfunc_raster
+kde_wp_f_raster <- raster(grid_wp_f)
+kde_wp_f_raster
 ```
 
 #### Non-Functional
 
 ```{r}
-kde_wpnonfunc_raster <- raster(gridded_wpnonfunc)
-kde_wpnonfunc_raster
+kde_wp_nf_raster <- raster(grid_wp_nf)
+kde_wp_nf_raster
 ```
 :::
 
@@ -565,15 +639,15 @@ kde_wpnonfunc_raster
 #### Functional
 
 ```{r}
-projection(kde_wpfunc_raster) <- CRS("+init=EPSG:26391 +datum:WGS84 +units=km")
-kde_wpfunc_raster
+projection(kde_wp_f_raster) <- CRS("+init=EPSG:26391 +datum:WGS84 +units=km")
+kde_wp_f_raster
 ```
 
 #### Non-Functional
 
 ```{r}
-projection(kde_wpnonfunc_raster) <- CRS("+init=EPSG:26391 +datum:WGS84 +units=km")
-kde_wpnonfunc_raster
+projection(kde_wp_nf_raster) <- CRS("+init=EPSG:26391 +datum:WGS84 +units=km")
+kde_wp_nf_raster
 ```
 :::
 
@@ -582,11 +656,12 @@ kde_wpnonfunc_raster
 ```{r}
 #| code-fold: true
 #tmap generation function
+
 density_map <- function(raster_object, map_title) {
   tmap_mode("view")
-  tm_basemap("OpenStreetMap") +
+  #tm_basemap("OpenStreetMap") +
 tm_shape(raster_object) +
-  tm_raster("v", alpha=0.9) +
+  tm_raster("v", alpha=0.9, palette=c("white","blue")) +
   tm_view(set.bounds = c(4,7,5,8),
           set.zoom.limits = c(8, 13))
   } 
@@ -596,13 +671,13 @@ tm_shape(raster_object) +
 ### Functional
 
 ```{r}
-density_map(kde_wpfunc_raster)
+density_map(kde_wp_f_raster)
 ```
 
 ### Non-Functional
 
 ```{r}
-density_map(kde_wpnonfunc_raster)
+density_map(kde_wp_nf_raster)
 ```
 :::
 
@@ -619,7 +694,7 @@ The test hypotheses for Functional Water Point is :
 **H~1~ :** The distribution is not random
 
 ```{r}
-clarkevans.test(wp_functional_ppp,
+clarkevans.test(wp_f_ppp,
                 correction="none",
                 clipregion=NULL,
                 alternative=c("clustered"),
@@ -632,10 +707,10 @@ The test hypotheses for Non-Functional Water Point is :
 
 **H~0~ :** The distribution is random
 
-**H~1~ :** The distribution is not random
+**H~1~ :** The distribution is not random (clustered)
 
 ```{r}
-clarkevans.test(wp_nonfunctional_ppp,
+clarkevans.test(wp_nf_ppp,
                 correction="none",
                 clipregion=NULL,
                 alternative=c("clustered"),
@@ -644,49 +719,84 @@ clarkevans.test(wp_nonfunctional_ppp,
 
 ### 4.3.3 Conclusion
 
-Something
+As the p-value is less than 0.05 is statistically significant and R\<1 for both functional and non-functional water points, we reject the null hypothesis that the distribution is not random and conclude that the **water points are likely clustered**.
 
 # 5.0 2nd Order Spatial Point Pattern Analysis
 
+-   Formulate the null hypothesis and alternative hypothesis and select the confidence level.
+
+-   Perform the test by using appropriate Second order spatial point patterns analysis technique.
+
+-   With reference to the analysis results, draw statistical conclusions.
+
 ## 5.1 Functional Water Points
 
-### 5.1.1 F-Function
+The test hypotheses for Functional Water Point is :
+
+**H~0~ :** The distribution is random
+
+**H~1~ :** The distribution is not random
+
+### 5.1.1 G-Function
 
 ```{r}
-#G_wp_functional = Gest(wp_functional_ppp, correction = "border")
-#plot(G_wp_functional)
+#G_wp_f = Gest(wp_f_ppp, correction = "border")
+#plot(G_wp_f)
 ```
 
-Spatial Randomness Test
+Complete Spatial Randomness Test
 
 ::: panel-tabset
 #### Plot
 
 ```{r}
-#plot(G_wp_functional.csr)
+#plot(G_wp_f.csr, main="G test - Functional")
 ```
 
 #### Simulation
 
 ```{r}
-#G_wp_functional.csr <- envelope(wp_functional_ppp, Gest, nsim = 999)
+#G_wp_f.csr <- envelope(wp_f_ppp, Gest, nsim = 999)
 ```
 :::
 
-### 5.1.2 K-Function
+### 5.1.2 F-Function
 
 ```{r}
-#K_wp_functional = Kest(wp_functional_ppp, correction = "Ripley")
-#plot(K_ck, . -r ~ r, ylab= "K(d)-r", xlab = "d(m)")
+#F_wp_f = Fest(wp_f_ppp, correction = "border")
+#plot(F_wp_f)
 ```
 
-Spatial Randomness
+Complete Spatial Randomness Test
 
 ::: panel-tabset
 #### Plot
 
 ```{r}
-#plot(K_wp_functional.csr, . - r ~ r, xlab="d", ylab="K(d)-r", title="K test - Functional")
+#plot(F_wp_f.csr, main="F test - Functional")
+```
+
+#### Simulation
+
+```{r}
+#F_wp_f.csr <- envelope(wp_f_ppp, Gest, nsim = 999)
+```
+:::
+
+### 5.1.3 K-Function
+
+```{r}
+#K_wp_f = Kest(wp_f_ppp, correction = "Ripley")
+#plot(K_ck, . -r ~ r, ylab= "K(d)-r", xlab = "d(m)")
+```
+
+Complete Spatial Randomness Test
+
+::: panel-tabset
+#### Plot
+
+```{r}
+#plot(K_wp_functional.csr, . - r ~ r, xlab="d", ylab="K(d)-r", main="K test - Functional")
 ```
 
 #### Simulation
@@ -696,20 +806,20 @@ Spatial Randomness
 ```
 :::
 
-### 5.1.3 L-Function
+### 5.1.4 L-Function
 
 ```{r}
-#L_wp_functional = Lest(wp_functional_ppp, correction = "Ripley")
-#plot(L_wp_functional_ppp, . -r ~ r, ylab= "L(d)-r", xlab = "d(m)")
+#L_wp_f = Lest(wp_f_ppp, correction = "Ripley")
+#plot(L_wp_f_ppp, . -r ~ r, ylab= "L(d)-r", xlab = "d(m)")
 ```
 
-Spatial Randomness
+Complete Spatial Randomness Test
 
 ::: panel-tabset
 #### Plot
 
 ```{r}
-#plot(L_wp_functional.csr, . - r ~ r, xlab="d", ylab="L(d)-r")
+#plot(L_wp_functional.csr, . - r ~ r, xlab="d", ylab="L(d)-r", main="L test - Functional")
 ```
 
 #### Simulation
@@ -721,72 +831,101 @@ Spatial Randomness
 
 ## 5.2 Non-Functional Water Points
 
-### 5.2.1 F-Function
+The test hypotheses for Non-Functional Water Point is :
+
+**H~0~ :** The distribution is random
+
+**H~1~ :** The distribution is not random
+
+### 5.2.1 G-Function
 
 ```{r}
-#G_wp_nonfunctional = Gest(wp_functional_ppp, correction = "border")
-#plot(G_wp_nonfunctional)
+#G_wp_nf = Gest(wp_nf_ppp, correction = "border")
+#plot(G_wp_nf)
 ```
 
-Spatial Randomness Test
+Complete Spatial Randomness Test
 
 ::: panel-tabset
 #### Plot
 
 ```{r}
-#plot(G_wp_nonfunctional.csr)
+#plot(G_wp_nf.csr,  main = "G test - Non-functional")
 ```
 
 #### Simulation
 
 ```{r}
-#G_wp_nonfunctional.csr <- envelope(wp_functional_ppp, Gest, nsim = 999)
+#G_wp_nf.csr <- envelope(wp_nf_ppp, Gest, nsim = 999)
 ```
 :::
 
-### 5.1.2 K-Function
+### 5.2.2 F-Function
 
 ```{r}
-#K_wp_nonfunctional = Kest(wp_nonfunctional_ppp, correction = "Ripley")
+#F_wp_nf = Fest(wp_nf_ppp, correction = "border")
+#plot(F_wp_nf)
+```
+
+Complete Spatial Randomness Test
+
+::: panel-tabset
+#### Plot
+
+```{r}
+#plot(F_wp_ff.csr, main="F test - Non-functional")
+```
+
+#### Simulation
+
+```{r}
+#F_wp_nf.csr <- envelope(wp_f_ppp, Gest, nsim = 999)
+```
+:::
+
+### 5.2.3 K-Function
+
+```{r}
+#K_wp_nf = Kest(wp_nf_ppp, correction = "Ripley")
 #plot(K_ck, . -r ~ r, ylab= "K(d)-r", xlab = "d(m)")
 ```
 
-Spatial Randomness
+Complete Spatial Randomness Test
 
 ::: panel-tabset
 #### Plot
 
 ```{r}
-#plot(K_wp_nonfunctional.csr, . - r ~ r, xlab="d", ylab="K(d)-r", title="K test - Functional")
+#plot(K_wp_nf.csr, . - r ~ r, xlab="d", ylab="K(d)-r", main="K test - Non-functional")
 ```
 
 #### Simulation
 
 ```{r}
-#K_wp_nonfunctional.csr <- envelope(wp_functional_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
+#K_wp_nf.csr <- envelope(wp_f_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
 ```
 :::
 
-### 5.1.3 L-Function
+### 5.2.4 L-Function
 
 ```{r}
-#L_wp_nonfunctional = Lest(wp_nonfunctional_ppp, correction = "Ripley")
-#plot(L_wp_nonfunctional_ppp, . -r ~ r, ylab= "L(d)-r", xlab = "d(m)")
+#L_wp_nf = Lest(wp_nf_ppp, correction = "Ripley")
+#plot(L_wp_nf_ppp, . -r ~ r, ylab= "L(d)-r", xlab = "d(m)")
 ```
 
-Spatial Randomness
+Complete Spatial Randomness Test
 
 ::: panel-tabset
 #### Plot
 
 ```{r}
-#plot(L_wp_nonfunctional.csr, . - r ~ r, xlab="d", ylab="L(d)-r")
+#plot(L_wp_nf.csr, . - r ~ r, xlab="d", ylab="L(d)-r", main="L test - Non-functional")
 ```
 
 #### Simulation
 
 ```{r}
-#L_wp_nonfunctional.csr <- envelope(wp_nonfunctional_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)
+#L_wp_nf.csr <- envelope(wp_nf_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)
 ```
 :::
 
@@ -795,6 +934,12 @@ Spatial Randomness
 Something
 
 # 6.0 Spatial Correlation Analysis
+
+-   Formulate the null hypothesis and alternative hypothesis and select the confidence level.
+
+-   Perform the test by using appropriate Second order spatial point patterns analysis technique.
+
+-   With reference to the analysis results, draw statistical conclusions.
 
 ## 6.1 Hypothesis
 
@@ -809,23 +954,16 @@ wt = st_kernel_weights(nb, wp_sf_nga, "gaussian", adaptive = TRUE)
 ```
 
 ```{r}
-functional = wp_sf_nga %>%
-  filter(status_clean %in%
-           c("Functional",
-             "Functional, needs repair",
-             "Function, not in use",
-             "Functional but not in use"))
+f = wp_sf %>%
+  filter(status_clean == "Functional")
 
-A = functional$status_clean
+A = f$status_clean
 ```
 
 ```{r}
-nonfunctional = wp_sf_nga %>%
-  filter(status_clean %in%
-           c("Abandoned/Decommissioned",
-             "Non-Functional, dry",
-             "Non-Functional"))
-B = nonfunctional$status_clean
+nf = wp_sf %>%
+  filter(status_clean == "Non-Functional")
+B = nf$status_clean
 ```
 
 ```{r}
@@ -833,19 +971,21 @@ LCLQ = local_colocation(A, B, nb, wt, 49)
 ```
 
 ```{r}
-LCLQ_wp = cbind(wp_sf_nga, LCLQ)
+LCLQ_wp = cbind(wp_sf, LCLQ)
 ```
 
 ```{r}
 tmap_mode("view")
-tm_shape(NGA)+
-  tm_polygons()+
-tm_shape(LCLQ_wp)+
-  tm_dots(col = c("Abandoned.Decommissioned", "Non.Functional", "Non.Functional..dry"),
+tm_shape(osun) +
+  tm_polygons() +
+  tm_shape(LCLQ_wp) +
+  tm_dots(col = "status_clean", 
           size = 0.01,
           border.col = "black",
           border.lwd = 0.5) +
-  tm_view(set.zoom.limits = c(8, 13))
+  tm_view(set.zoom.limits = c(12, 16))
 ```
 
 ### 6.3 Analysis + Conclusion
+
+To do
