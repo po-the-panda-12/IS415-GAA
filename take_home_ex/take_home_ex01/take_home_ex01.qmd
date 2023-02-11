@@ -149,9 +149,7 @@ glimpse(NGA)
 
 ### 3.2.2 Data Preprocessing
 
-#### 3.2.2.1 Excluding redundant fields
-
-This is because
+#### 3.2.2.1 Exclude redundant fields
 
 ```{r}
 NGA <- NGA %>%
@@ -415,6 +413,7 @@ wp_nonfunctional_ppp = wp_nonfunctional_ppp[NGA_owin]
 View
 
 ```{r}
+#| code-fold: true
 par(mfrow=c(1,2))
 plot(wp_functional_ppp)
 plot(wp_nonfunctional_ppp)
@@ -431,7 +430,7 @@ plot(wp_nonfunctional_ppp)
 ## 4.1 Kernel Density Estimation (KDE)
 
 ::: panel-tabset
-### Automatic
+### Automatic Bandwidth
 
 ```{r}
 kde_wpfunc.mppl <- density(wp_functional_ppp, 
@@ -451,7 +450,7 @@ plot(kde_wpnonfunc.mppl,
      ribside=c("bottom"))
 ```
 
-### Adaptive
+### Adaptive Bandwidth
 
 ```{r}
 kde_wpfunc.m <- adaptive.density(wp_functional_ppp,
@@ -479,7 +478,7 @@ wp_nonfunctional_ppp.km <- rescale(wp_nonfunctional_ppp, 1000, "km")
 ```
 
 ::: panel-tabset
-#### Automatic
+#### Automatic Bandwidth
 
 ```{r}
 kde_wpfunc.ppl <- density(wp_functional_ppp.km,
@@ -499,7 +498,7 @@ plot(kde_wpnonfunc.ppl,
      ribside=c("bottom"))
 ```
 
-#### Adaptive
+#### Adaptive Bandwidth
 
 ```{r}
 kde_wpfunc.km <- adaptive.density(wp_functional_ppp.km,
@@ -521,7 +520,7 @@ plot(kde_wpnonfunc.km,
 ### 4.2.2 Re-Scale KDE values
 
 ::: panel-tabset
-## Automatic
+## Automatic Bandwidth
 
 ```{r}
 gridded_wpfunc.ppl <- as.SpatialGridDataFrame.im(kde_wpfunc.ppl)
@@ -531,7 +530,7 @@ spplot(gridded_wpfunc.ppl)
 spplot(gridded_wpnonfunc.ppl)
 ```
 
-## Adaptive
+## Adaptive Bandwidth
 
 ```{r}
 gridded_wpfunc <- as.SpatialGridDataFrame.im(kde_wpfunc.km)
