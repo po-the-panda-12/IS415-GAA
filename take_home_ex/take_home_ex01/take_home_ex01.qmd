@@ -394,7 +394,7 @@ osun_sp <-as(osun_spat, "SpatialPolygons")
 Peek
 
 ::: panel-tabset
-####  Functional Water Points
+#### Functional Water Points
 
 ```{r}
 wp_f_sp
