@@ -295,21 +295,21 @@ wp_u <- wp_sf %>%
 ```
 
 ::: panel-tabset
-#### Functional
+#### Functional Water Points
 
 ```{r}
 freq(data = wp_f,
      input = 'status_clean')
 ```
 
-#### Non-Functional
+#### Non-Functional Water Points
 
 ```{r}
 freq(data = wp_nf,
      input = 'status_clean')
 ```
 
-#### Unknown
+#### Unknown status Water Points
 
 ```{r}
 freq(data = wp_u,
@@ -364,19 +364,19 @@ osun_spat = as_Spatial(osun)
 Peek
 
 ::: panel-tabset
-#### Functional
+#### Functional Water Points
 
 ```{r}
 wp_f_spat
 ```
 
-#### Non-Functional
+#### Non-Functional Water Points
 
 ```{r}
 wp_nf_spat
 ```
 
-#### NGA
+#### Osun State
 
 ```{r}
 osun_spat
@@ -394,19 +394,19 @@ osun_sp <-as(osun_spat, "SpatialPolygons")
 Peek
 
 ::: panel-tabset
-#### Functional
+####  Functional Water Points
 
 ```{r}
 wp_f_sp
 ```
 
-#### Non-Functional
+#### Non-Functional Water Points
 
 ```{r}
 wp_nf_sp
 ```
 
-#### NGA
+#### Osun State
 
 ```{r}
 osun_sp
@@ -425,8 +425,8 @@ View
 
 ```{r}
 par(mfrow=c(1,2))
-plot(wp_f_ppp, main="Functional")
-plot(wp_nf_ppp, main="Non-functional")
+plot(wp_f_ppp, main="Functional Water Points")
+plot(wp_nf_ppp, main="Non-functional Water Points")
 ```
 
 #### 3.4.3.1 Check for Duplication
@@ -456,8 +456,8 @@ View
 ```{r}
 #| code-fold: true
 par(mfrow=c(1,2))
-plot(wp_f_ppp, main="Functional")
-plot(wp_nf_ppp, main="Non-functional")
+plot(wp_f_ppp, main="Functional Water Points")
+plot(wp_nf_ppp, main="Non-functional Water Points")
 ```
 
 # 4.0 Exploratory Spatial Data Analysis (ESDA)
@@ -876,7 +876,7 @@ To do
 
 To do
 
-# 7.0 **Acknowledgements**
+# 7.0 Acknowledgements
 
 ------------------------------------------------------------------------
 
