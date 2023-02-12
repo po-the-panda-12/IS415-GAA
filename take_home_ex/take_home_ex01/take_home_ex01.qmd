@@ -677,11 +677,11 @@ kde_wp_nf_raster
 #| code-fold: true
 #tmap generation function
 
-density_map <- function(raster_object, map_title) {
+kde <- function(raster_obj, map_title) {
   tmap_mode("view")
   #tm_basemap("OpenStreetMap") +
-tm_shape(raster_object) +
-  tm_raster("v", alpha=0.9, palette=c("white","blue")) +
+tm_shape(raster_obj) +
+  tm_raster("v", alpha=0.9, palette = "YlGnBu") +
   tm_view(set.bounds = c(4,7,5,8),
           set.zoom.limits = c(8, 13))
   } 
@@ -691,13 +691,13 @@ tm_shape(raster_object) +
 ### Functional Water Points
 
 ```{r}
-density_map(kde_wp_f_raster)
+kde(kde_wp_f_raster)
 ```
 
 ### Non-Functional Water Points
 
 ```{r}
-density_map(kde_wp_nf_raster)
+kde(kde_wp_nf_raster)
 ```
 :::
 
