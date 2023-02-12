@@ -756,23 +756,23 @@ The test hypotheses for Functional Water Point is :
 **H~1~ :** The distribution is not random
 
 ```{r}
-#G_wp_f = Gest(wp_f_ppp, correction = "border")
-#plot(G_wp_f)
+G_wp_f = Gest(wp_f_ppp, correction = "border")
+plot(G_wp_f)
 ```
 
 Complete Spatial Randomness Test
 
 ::: panel-tabset
-#### Plot
-
-```{r}
-#plot(G_wp_f.csr, main="G test - Functional")
-```
-
 #### Simulation
 
 ```{r}
-#G_wp_f.csr <- envelope(wp_f_ppp, Gest, nsim = 500)
+G_wp_f.csr <- envelope(wp_f_ppp, Gest, nsim = 500)
+```
+
+#### Plot
+
+```{r}
+plot(G_wp_f.csr, main="G test - Functional")
 ```
 :::
 
@@ -789,23 +789,23 @@ The test hypotheses for Non-Functional Water Point is :
 **H~1~ :** The distribution is not random
 
 ```{r}
-#G_wp_nf = Gest(wp_nf_ppp, correction = "border")
-#plot(G_wp_nf)
+G_wp_nf = Gest(wp_nf_ppp, correction = "border")
+plot(G_wp_nf)
 ```
 
 Complete Spatial Randomness Test
 
 ::: panel-tabset
-#### Plot
-
-```{r}
-#plot(G_wp_nf.csr,  main = "G test - Non-functional")
-```
-
 #### Simulation
 
 ```{r}
-#G_wp_nf.csr <- envelope(wp_nf_ppp, Gest, nsim = 500)
+G_wp_nf.csr <- envelope(wp_nf_ppp, Gest, nsim = 500)
+```
+
+#### Plot
+
+```{r}
+plot(G_wp_nf.csr,  main = "G test - Non-functional")
 ```
 :::
 
@@ -854,46 +854,46 @@ plot(EdeNorth_ppp,
 ### 5.3.2 Ife Central - Functional Water Points
 
 ```{r}
-Ifecentral_G = Gest(IfeCentral_ppp, correction = "border")
-plot(Ifecentral_G)
+Ifecentral_G.csr = Gest(IfeCentral_ppp, correction = "border")
+plot(Ifecentral_G.csr)
 ```
 
 Complete Spatial Randomness Test
 
 ::: panel-tabset
-#### Plot
-
-```{r}
-plot(Ifecentral_G.csr, main="Ife Central G-Function Test")
-```
-
 #### Simulation
 
 ```{r}
 Ifecentral_G.csr <- envelope(IfeCentral_ppp, Gest, nsim=100)
+```
+
+#### Plot
+
+```{r}
+plot(Ifecentral_G.csr, main="Ife Central G-Function Test")
 ```
 :::
 
 ### 5.3.3 Ede North - Non-Functional Water Points
 
 ```{r}
-EdeNorth_G = Gest(EdeNorth_ppp, correction = "border")
-plot(EdeNorth_G)
+EdeNorth_G.csr = Gest(EdeNorth_ppp, correction = "border")
+plot(EdeNorth_G.csr)
 ```
 
 Complete Spatial Randomness Test
 
 ::: panel-tabset
-#### Plot
-
-```{r}
-plot(EdeNorth_G.csr, main="Ede North G-Function Test")
-```
-
 #### Simulation
 
 ```{r}
 EdeNorth_G.csr <- envelope(EdeNorth_ppp, Gest, nsim=100)
+```
+
+#### Plot
+
+```{r}
+plot(EdeNorth_G.csr, main="Ede North G-Function Test")
 ```
 :::
 
@@ -910,9 +910,10 @@ We observe the same that G\^~obs~(r) rises quickly and is greater than G~theo~(r
 Segregate data for plotting. Then convert to spatstat ppp format
 
 ```{r}
+wp_spat <- as_Spatial(wp_sf)
 wp_spat@data$status_clean <-as.factor(wp_spat@data$status_clean)
 wp_spat_ppp <- as(wp_spat, "ppp")
-
+  
 plot(wp_spat_ppp, which.marks = "status_clean")
 ```
 
@@ -942,6 +943,10 @@ Plot
 ```{r}
 plot(wp_spat_ppp_Lcross.csr, xlab="in km")
 ```
+
+**Conclusion**
+
+We reject the null hypothesis that water points are statistically independent at 99% confidence interval. As L\^~obs~(r) is greater than L~theo~(r) and the envelope it means the water points are statistically not independent.
 
 ## 6.4 Local Colocation Analysis
 
@@ -990,7 +995,7 @@ tm_view(set.bounds = c(4,7,5,8),
         bbox = st_bbox(filter(LCLQ_wp, !is.na(`Non.Functional`)))) +
   tm_shape(osun) +
   tm_borders() +
-  tm_shape(LCLQ_waterpoints) +
+  tm_shape(LCLQ_wp) +
   tm_dots(col = c("Non.Functional"), 
           size = "size",
           scale=0.15,
