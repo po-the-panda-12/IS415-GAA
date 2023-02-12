@@ -11,6 +11,8 @@ editor: visual
 
 # 1.0 Overview
 
+------------------------------------------------------------------------
+
 ## 1.1 Background
 
 This analysis aims to apply appropriate spatial point patterns analysis methods to discover the geographical distribution of functional and non-function water points and their co-locations if any in Osun State, Nigeria.
@@ -24,6 +26,8 @@ This analysis aims to apply appropriate spatial point patterns analysis methods 
 -   Spatial Correlation Analysis
 
 # 2.0 Setup
+
+------------------------------------------------------------------------
 
 ## 2.1 Import Packages
 
@@ -44,6 +48,8 @@ pacman::p_load(sf, maptools, raster, spatstat, tmap, kableExtra, tidyverse, funM
 ```
 
 # 3.0 Data Wrangling
+
+------------------------------------------------------------------------
 
 ## 3.1 Datasets Used
 
@@ -456,11 +462,7 @@ plot(wp_nf_ppp, main="Non-functional")
 
 # 4.0 Exploratory Spatial Data Analysis (ESDA)
 
--   Derive kernel density maps of functional and non-functional water points
-
--   Display kernel density maps of Osun State
-
--   Describe spatial patterns displayed by the kernel density maps
+------------------------------------------------------------------------
 
 ## 4.1 Initial Visualization
 
@@ -785,21 +787,17 @@ As there are not many colored patches of Functional Water Points, it means there
 
 # 5.0 2nd Order Spatial Point Pattern Analysis
 
--   Formulate the null hypothesis and alternative hypothesis and select the confidence level.
+Using G-Function for analysis with 95% confidence
 
--   Perform the test by using appropriate Second order spatial point patterns analysis technique.
+------------------------------------------------------------------------
 
--   With reference to the analysis results, draw statistical conclusions.
-
-## 5.1 Functional Water Points
+## 5.1 Test 1 - Functional Water Points
 
 The test hypotheses for Functional Water Point is :
 
 **H~0~ :** The distribution is random
 
 **H~1~ :** The distribution is not random
-
-### 5.1.1 G-Function
 
 ```{r}
 #G_wp_f = Gest(wp_f_ppp, correction = "border")
@@ -822,84 +820,17 @@ Complete Spatial Randomness Test
 ```
 :::
 
-### 5.1.2 F-Function
+### 5.1.1 Conclusion
 
-```{r}
-#F_wp_f = Fest(wp_f_ppp, correction = "border")
-#plot(F_wp_f)
-```
+We reject the null hypothesis that functional water points are randomly distributed at 95% confidence interval. As G\^~obs~(r) rises quickly and is greater than G~theo~(r) and the envelope it means the functional water points are clustered.
 
-Complete Spatial Randomness Test
-
-::: panel-tabset
-#### Plot
-
-```{r}
-#plot(F_wp_f.csr, main="F test - Functional")
-```
-
-#### Simulation
-
-```{r}
-#F_wp_f.csr <- envelope(wp_f_ppp, Gest, nsim = 999)
-```
-:::
-
-### 5.1.3 K-Function
-
-```{r}
-#K_wp_f = Kest(wp_f_ppp, correction = "Ripley")
-#plot(K_ck, . -r ~ r, ylab= "K(d)-r", xlab = "d(m)")
-```
-
-Complete Spatial Randomness Test
-
-::: panel-tabset
-#### Plot
-
-```{r}
-#plot(K_wp_functional.csr, . - r ~ r, xlab="d", ylab="K(d)-r", main="K test - Functional")
-```
-
-#### Simulation
-
-```{r}
-#K_wp_functional.csr <- envelope(wp_functional_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
-```
-:::
-
-### 5.1.4 L-Function
-
-```{r}
-#L_wp_f = Lest(wp_f_ppp, correction = "Ripley")
-#plot(L_wp_f_ppp, . -r ~ r, ylab= "L(d)-r", xlab = "d(m)")
-```
-
-Complete Spatial Randomness Test
-
-::: panel-tabset
-#### Plot
-
-```{r}
-#plot(L_wp_functional.csr, . - r ~ r, xlab="d", ylab="L(d)-r", main="L test - Functional")
-```
-
-#### Simulation
-
-```{r}
-#L_wp_functional.csr <- envelope(wp_functional_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)
-```
-:::
-
-## 5.2 Non-Functional Water Points
+## 5.2 Test 2 - Non-functional Water Points
 
 The test hypotheses for Non-Functional Water Point is :
 
 **H~0~ :** The distribution is random
 
 **H~1~ :** The distribution is not random
-
-### 5.2.1 G-Function
 
 ```{r}
 #G_wp_nf = Gest(wp_nf_ppp, correction = "border")
@@ -922,153 +853,31 @@ Complete Spatial Randomness Test
 ```
 :::
 
-### 5.2.2 F-Function
+### 5.2.1 Conclusion
 
-```{r}
-#F_wp_nf = Fest(wp_nf_ppp, correction = "border")
-#plot(F_wp_nf)
-```
-
-Complete Spatial Randomness Test
-
-::: panel-tabset
-#### Plot
-
-```{r}
-#plot(F_wp_ff.csr, main="F test - Non-functional")
-```
-
-#### Simulation
-
-```{r}
-#F_wp_nf.csr <- envelope(wp_f_ppp, Gest, nsim = 999)
-```
-:::
-
-### 5.2.3 K-Function
-
-```{r}
-#K_wp_nf = Kest(wp_nf_ppp, correction = "Ripley")
-#plot(K_ck, . -r ~ r, ylab= "K(d)-r", xlab = "d(m)")
-```
-
-Complete Spatial Randomness Test
-
-::: panel-tabset
-#### Plot
-
-```{r}
-#plot(K_wp_nf.csr, . - r ~ r, xlab="d", ylab="K(d)-r", main="K test - Non-functional")
-```
-
-#### Simulation
-
-```{r}
-#K_wp_nf.csr <- envelope(wp_f_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
-```
-:::
-
-### 5.2.4 L-Function
-
-```{r}
-#L_wp_nf = Lest(wp_nf_ppp, correction = "Ripley")
-#plot(L_wp_nf_ppp, . -r ~ r, ylab= "L(d)-r", xlab = "d(m)")
-```
-
-Complete Spatial Randomness Test
-
-::: panel-tabset
-#### Plot
-
-```{r}
-#plot(L_wp_nf.csr, . - r ~ r, xlab="d", ylab="L(d)-r", main="L test - Non-functional")
-```
-
-#### Simulation
-
-```{r}
-#L_wp_nf.csr <- envelope(wp_nf_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)
-```
-:::
-
-## 5.3 Conclusion
-
-Something
+We reject the null hypothesis that non-functional water points are randomly distributed at 95% confidence interval. As G\^~obs~(r) rises quickly and is greater than G~theo~(r) and the envelope it means the functional water points are clustered.
 
 # 6.0 Spatial Correlation Analysis
 
--   Formulate the null hypothesis and alternative hypothesis and select the confidence level.
+------------------------------------------------------------------------
 
--   Perform the test by using appropriate Second order spatial point patterns analysis technique.
-
--   With reference to the analysis results, draw statistical conclusions.
-
-## 6.1 Hypothesis
+## 6.1 Data Wrangling
 
 Something
 
-## 6.2 Test
-
 ```{r}
-nb = include_self(st_knn(st_geometry(wp_sf_nga), 6))
-
-wt = st_kernel_weights(nb, wp_sf_nga, "gaussian", adaptive = TRUE)
 ```
 
-```{r}
-nb = include_self(st_knn(st_geometry(wp_sf_nga), 6))
-
-wt = st_kernel_weights(nb, wp_sf_nga, "gaussian", adaptive = TRUE)
-f = wp_sf %>%
-  filter(status_clean == "Functional")
-
-A = f$status_clean
-
-nf = wp_sf %>%
-  filter(status_clean == "Non-Functional")
-B = nf$status_clean
-
-LCLQ = local_colocation(A, B, nb, wt, 49)
-LCLQ_wp = cbind(wp_sf, LCLQ)
-
-
-tmap_mode("view")
-tm_shape(osun) +
-  tm_polygons() +
-  tm_shape(LCLQ_wp) +
-  tm_dots(col = "status_clean", 
-          size = 0.01,
-          border.col = "black",
-          border.lwd = 0.5) +
-  tm_view(set.zoom.limits = c(12, 16))
-```
-
-```{r}
-nf = wp_sf %>%
-  filter(status_clean == "Non-Functional")
-B = nf$status_clean
-```
-
-```{r}
-LCLQ = local_colocation(A, B, nb, wt, 49)
-```
-
-```{r}
-LCLQ_wp = cbind(wp_sf, LCLQ)
-```
-
-```{r}
-tmap_mode("view")
-tm_shape(osun) +
-  tm_polygons() +
-  tm_shape(LCLQ_wp) +
-  tm_dots(col = "status_clean", 
-          size = 0.01,
-          border.col = "black",
-          border.lwd = 0.5) +
-  tm_view(set.zoom.limits = c(12, 16))
-```
-
-### 6.3 Analysis + Conclusion
+## 6.2 Density Analysis
 
 To do
+
+## 6.2 Test Correlation
+
+To do
+
+# 7.0 **Acknowledgements**
+
+------------------------------------------------------------------------
+
+I'd like to thank Professor Kam for his insights and resource materials provided under IS415 Geospatial Analytics and Applications.
