@@ -27,11 +27,17 @@ This analysis aims to apply appropriate spatial point patterns analysis methods 
 
 ## 2.1 Import Packages
 
--   sf
+-   sf - Used for handling geospatial data
 
--   tidyVerse
+-   tidyVerse - Used for data transformation and presentation
 
 -   tmap, maptools, kableExtra - Used for visualizing dataframes and plots
+
+-   spatstat - Used for point-pattern analysis
+
+-   sfdep - Used for functions not in spdep
+
+-   raster - Used to handle gridded spatial data
 
 ```{r}
 pacman::p_load(sf, maptools, raster, spatstat, tmap, kableExtra, tidyverse, funModeling, sfdep)
@@ -130,6 +136,8 @@ kable(datasets, caption="Datasets Used") %>%
 
 ### 3.2.1 Load Data
 
+Import Geospatial data and filter out Osun State. Transform WGS 48 coordinate system to projected coordinate system with Nigeria's ESPG - 26293
+
 ::: panel-tabset
 #### Import
 
@@ -188,6 +196,8 @@ plot(st_geometry(osun), main="Osun State")
 
 ### 3.3.1 Load Data
 
+Import Aspatial data and filter out Osun State.
+
 ::: panel-tabset
 #### Import
 
@@ -207,7 +217,7 @@ glimpse(wp)
 
 #### 3.3.2.1 Create sfc object column
 
-First convert wkt field into sfc field. Then convert it into sf object.
+Convert well known text (wkt) field into simple feature column (sfc) field
 
 ```{r}
 wp$Geometry = st_as_sfc(wp$`New Georeferenced Column`)
@@ -216,14 +226,20 @@ wp$Geometry
 
 #### 3.3.2.2 Create Simple Feature DataFrame
 
+Store sfc as single feature (sf) object
+
 ```{r}
 wp_sf <- st_sf(wp, crs=4326)
+```
 
+#### 3.3.2.3 Transform Projection System
+
+```{r}
 wp_sf <- wp_sf %>%
   st_transform(crs = 26392)
 ```
 
-#### 3.3.2.3 Handle Missing Data
+#### 3.3.2.4 Handle Missing Data
 
 ```{r}
 freq(data = wp_sf,
@@ -297,7 +313,7 @@ freq(data = wp_u,
 
 ### 3.3.4 Point-in-Polygon Count
 
-Extract number of total, functional, nonfunctional and unknown water points
+Extract number of total, functional, nonfunctional and unknown water points in each local government area (LGA)
 
 ```{r}
 wp <- osun %>% 
@@ -361,7 +377,7 @@ osun_spat
 ```
 :::
 
-### 3.4.2 Convert sp Spatial\* to generic sp format
+### 3.4.2 Convert sp Spatial\* class to generic sp format
 
 ```{r}
 wp_f_sp <- as(wp_f_spat, "SpatialPoints")
@@ -413,7 +429,7 @@ plot(wp_nf_ppp, main="Non-functional")
 any(duplicated(wp_f_ppp)); any(duplicated(wp_nf_ppp)) 
 ```
 
-No duplicates means no jittering needed
+No duplicates 🤝 no jittering
 
 ### 3.4.4 Create Owin object
 
@@ -460,8 +476,8 @@ wp_f_1 <- tm_shape(wp) +
           palette = "Blues") +
   tm_borders(lwd = 0.1,
              alpha = 1) +
-  tm_layout(main.title = "Functional Water Points by LGA",
-            legend.outside = FALSE)
+  tm_layout(title = "Functional Water Points by LGA",
+            legend.outside = TRUE)
 
 wp_f_2 <- tm_shape(wp) +
   tm_fill("wp_nf",
@@ -470,8 +486,8 @@ wp_f_2 <- tm_shape(wp) +
           palette = "Blues") +
   tm_borders(lwd = 0.1,
              alpha = 1) +
-  tm_layout(main.title = "Non-functional Water Points by LGA",
-            legend.outside = FALSE)
+  tm_layout(title = "Non-functional Water Points by LGA",
+            legend.outside = TRUE)
 
 
 tmap_arrange(wp_f_1, wp_f_2, nrow = 1)
@@ -483,12 +499,12 @@ tmap_arrange(wp_f_1, wp_f_2, nrow = 1)
 #| code-fold: true
 tmap_mode("view") + 
 tm_basemap("OpenStreetMap") +
-tm_shape(wp_functional) +
+tm_shape(wp_f) +
  tm_dots(col = "status_clean",
          pal = "blue",
          border.col = "black",
          title = "Functional") +
-tm_shape(wp_nonfunctional) +
+tm_shape(wp_nf) +
  tm_dots(col = "status_clean",
          pal = "purple",
          border.col = "black",
@@ -499,6 +515,8 @@ tm_shape(wp_nonfunctional) +
 :::
 
 ## 4.1 Kernel Density Estimation (KDE)
+
+Sigma = `bw.ppl()` is used as there are multiple clusters and would be more prominent than `bw.diggle()`
 
 ::: panel-tabset
 ### Automatic Bandwidth
@@ -583,15 +601,15 @@ kde_wp_nf_scale_ad <- adaptive.density(wp_nf_ppp.km,
 
 par(mfrow=c(1,2))
 plot(kde_wp_f_scale_ad,
-     main = "Functional Water Points",
+     main = "Functional Water Points (in km)",
      ribside=c("bottom"))
 plot(kde_wp_nf_scale_ad,
-     main = "Non-Functional Water Points",
+     main = "Non-Functional Water Points (in km)",
      ribside=c("bottom"))
 ```
 :::
 
-### 4.2.2 Re-Scale KDE values
+### 4.2.2 Convert KDE to Grid Object
 
 ::: panel-tabset
 ## Automatic Bandwidth
@@ -618,14 +636,14 @@ spplot(grid_wp_nf_ad)
 ### 4.2.3 Convert grid object to Raster
 
 ::: panel-tabset
-#### Functional
+#### Functional Water Points
 
 ```{r}
 kde_wp_f_raster <- raster(grid_wp_f)
 kde_wp_f_raster
 ```
 
-#### Non-Functional
+#### Non-Functional Water Points
 
 ```{r}
 kde_wp_nf_raster <- raster(grid_wp_nf)
@@ -636,14 +654,14 @@ kde_wp_nf_raster
 ### 4.2.4 Assign Projection System
 
 ::: panel-tabset
-#### Functional
+#### Functional Water Points
 
 ```{r}
 projection(kde_wp_f_raster) <- CRS("+init=EPSG:26391 +datum:WGS84 +units=km")
 kde_wp_f_raster
 ```
 
-#### Non-Functional
+#### Non-Functional Water Points
 
 ```{r}
 projection(kde_wp_nf_raster) <- CRS("+init=EPSG:26391 +datum:WGS84 +units=km")
@@ -668,13 +686,13 @@ tm_shape(raster_object) +
 ```
 
 ::: panel-tabset
-### Functional
+### Functional Water Points
 
 ```{r}
 density_map(kde_wp_f_raster)
 ```
 
-### Non-Functional
+### Non-Functional Water Points
 
 ```{r}
 density_map(kde_wp_nf_raster)
@@ -720,6 +738,50 @@ clarkevans.test(wp_nf_ppp,
 ### 4.3.3 Conclusion
 
 As the p-value is less than 0.05 is statistically significant and R\<1 for both functional and non-functional water points, we reject the null hypothesis that the distribution is not random and conclude that the **water points are likely clustered**.
+
+## 4.4 Local Colocation of Water Points
+
+Remove status 'unknown' water points
+
+```{r}
+wp_sf_clean <- wp_sf %>%  filter(!status_clean=='unknown')
+```
+
+```{r}
+nb = include_self(st_knn(st_geometry(wp_sf_clean), 6)) 
+#6 nearbest neighbors
+
+wt = st_kernel_weights(nb, wp_sf_clean, "gaussian", adaptive = TRUE)
+f = wp_sf_clean %>%
+  filter(status_clean == "Functional")
+
+A = f$status_clean
+
+nf = wp_sf_clean %>%
+  filter(status_clean == "Non-Functional")
+B = nf$status_clean
+
+LCLQ = local_colocation(A, B, nb, wt, 49)
+LCLQ_wp = cbind(wp_sf_clean, LCLQ)
+```
+
+View
+
+```{r}
+#| code-fold: true
+tmap_mode("view")
+tm_shape(osun) +
+  tm_polygons() +
+  tm_shape(LCLQ_wp) +
+  tm_dots(col = c("Non.Functional"), 
+          size = 0.01,
+          border.col = "black",
+          border.lwd = 0.5) +
+  tm_view(set.bounds = c(4,7,5,8),
+          set.zoom.limits = c(8, 13))
+```
+
+As there are not many colored patches of Functional Water Points, it means there are few Non-Functional Water Points in the same neighborhood.
 
 # 5.0 2nd Order Spatial Point Pattern Analysis
 
@@ -954,10 +1016,31 @@ wt = st_kernel_weights(nb, wp_sf_nga, "gaussian", adaptive = TRUE)
 ```
 
 ```{r}
+nb = include_self(st_knn(st_geometry(wp_sf_nga), 6))
+
+wt = st_kernel_weights(nb, wp_sf_nga, "gaussian", adaptive = TRUE)
 f = wp_sf %>%
   filter(status_clean == "Functional")
 
 A = f$status_clean
+
+nf = wp_sf %>%
+  filter(status_clean == "Non-Functional")
+B = nf$status_clean
+
+LCLQ = local_colocation(A, B, nb, wt, 49)
+LCLQ_wp = cbind(wp_sf, LCLQ)
+
+
+tmap_mode("view")
+tm_shape(osun) +
+  tm_polygons() +
+  tm_shape(LCLQ_wp) +
+  tm_dots(col = "status_clean", 
+          size = 0.01,
+          border.col = "black",
+          border.lwd = 0.5) +
+  tm_view(set.zoom.limits = c(12, 16))
 ```
 
 ```{r}
