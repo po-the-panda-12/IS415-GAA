@@ -16,5 +16,38 @@ editor: visual
 ## 2.1 Installing and Loading the R Packages
 
 ```{r}
-pacman::p_load(sf, tmap, spdep, tidyverse)
+pacman::p_load(sf, tmap, sfdep, tidyverse)
+#keep tidyverse at the end for dependency checking
+```
+
+## 2.2 The Data
+
+-   Hunan, a geospatial data set in ESRI shapefile format, and
+
+-   Hunan_2012, an attribute data set in csv format.
+
+### 2.2.1 Import Geospatial Data
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+### 2.2.2 Import attribute table
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+### 2.2.3 Combine both data frames using left join
+
+```{r}
+hunan <- left_join(hunan,hunan2012)%>%
+  select(1:4, 7, 15)
+```
+
+### 2.2.3 Choropleth Map
+
+```{r}
+
 ```

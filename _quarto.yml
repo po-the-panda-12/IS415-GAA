@@ -34,7 +34,7 @@ website:
           - text: "In-class Exercise 5"
             href: in-class_ex/in-class_ex05/in-class_ex05.qmd
           - text: "In-class Exercise 6"
-          href: in-class_ex/in-class_ex06/in-class_ex06.qmd
+            href: in-class_ex/in-class_ex06/in-class_ex06.qmd
               
               
             
