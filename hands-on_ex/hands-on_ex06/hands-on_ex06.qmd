@@ -1,0 +1,179 @@
+---
+title: "Hands-on Exercise 5: Spatial Weights and Applications"
+date: "13 February 2023"
+date-modified: "`r Sys.Date()`"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+---
+
+# 1.0 Overview
+
+-   import geospatial data using appropriate function(s) of **sf** package,
+
+-   import csv file using appropriate function of **readr** package,
+
+-   perform relational join using appropriate join function of **dplyr** package,
+
+-   compute spatial weights using appropriate functions of **spdep** package, and
+
+-   calculate spatially lagged variables using appropriate functions of **spdep** package.
+
+# 2.1 Study Area and Dataset
+
+-   Hunan county boundary layer. This is a geospatial data set in ESRI shapefile format.
+
+-   Hunan_2012.csv: This csv file contains selected Hunan\'s local development indicators in 2012.
+
+## 2.2.1 Load Packages
+
+```{r}
+pacman::p_load(sf, spdep, tmap, tidyverse, knitr)
+```
+
+# 3.0 Import Data
+
+## 3.1 Geospatial Data
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+## 3.2 Aspatial Data
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+## 3.3 Perform Relational Join
+
+```{r}
+hunan <- left_join(hunan,hunan2012)%>%
+  select(1:4, 7, 15)
+```
+
+# 4.0 Visualise Regional Development Indicator
+
+```{r}
+basemap <- tm_shape(hunan) +
+  tm_polygons() +
+  tm_text("NAME_3", size=0.5)
+
+gdppc <- qtm(hunan, "GDPPC")
+tmap_arrange(basemap, gdppc, asp=1, ncol=2)
+```
+
+# 5.0 Compute Contiguity Spatial Weights
+
+## 5.1 QUEEN based neighbors
+
+### 5.1.1 Calculation
+
+```{r}
+wm_q <- poly2nb(hunan, queen=TRUE)
+summary(wm_q)
+```
+
+**Neighbors of first polygon**
+
+```{r}
+wm_q[[1]]
+```
+
+**Retrieve county name by polygon ID**
+
+```{r}
+hunan$County[1]
+```
+
+**County names of neighbors of first polygon**
+
+```{r}
+hunan$NAME_3[c(2,3,4,57,85)]
+#hunan$NAME_3[wm_q[[1]]]
+```
+
+**Retrieve GDPPC of nearest neighbors or first polygon**
+
+```{r}
+nb1 <- wm_q[[1]]
+nb1 <- hunan$GDPPC[nb1]
+nb1
+```
+
+**Complete weight matrix**
+
+```{r}
+str(wm_q)
+```
+
+#### 5.1.1.1 Plot
+
+```{r}
+plot(hunan$geometry, border="lightgrey")
+plot(wm_q, coords, pch = 19, cex = 0.6, add = TRUE, col= "red")
+```
+
+## 5.2 ROOK based neighbors
+
+```{r}
+wm_r <- poly2nb(hunan, queen=FALSE)
+summary(wm_r)
+```
+
+### 5.2.3 Visualise contiguity weights
+
+Calculate polygon centroids and move them into the connectivity graph
+
+```{r}
+
+longitude <- map_dbl(hunan$geometry, ~st_centroid(.x)[[1]]) #first value per centroid
+latitude <- map_dbl(hunan$geometry, ~st_centroid(.x)[[2]]) #second value per centroid
+
+coords <- cbind(longitude, latitude)
+head(coords)
+```
+
+#### 5.2.3.1 Plot
+
+```{r}
+plot(hunan$geometry, border="lightgrey")
+plot(wm_r, coords, pch = 19, cex = 0.6, add = TRUE, col = "red")
+```
+
+#### 5.2.3.2 Comparison between QUEEN and ROOK based maps
+
+```{r}
+par(mfrow=c(1,2))
+plot(hunan$geometry, border="lightgrey")
+plot(wm_q, coords, pch = 19, cex = 0.6, add = TRUE, col= "red", main="Queen Contiguity")
+plot(hunan$geometry, border="lightgrey")
+plot(wm_r, coords, pch = 19, cex = 0.6, add = TRUE, col = "red", main="Rook Contiguity")
+```
+
+# 6.0 Compute distance based neighbours
+
+Identify neighbors of region points by Euclidean distance with lower d1 and upper d2 bounds controlled bounds = argument. (Reference - WGS84 folder)
+
+## 6.1 Determine cut-off distance
+
+```{r}
+#coords <- coordinates(hunan)
+k1 <- knn2nb(knearneigh(coords))
+k1dists <- unlist(nbdists(k1, coords, longlat = TRUE))
+summary(k1dists)
+```
+
+## 6.2 Compute fixed distance weight matrix
+
+```{r}
+wm_d62 <- dnearneigh(coords, 0, 62, longlat = TRUE)
+wm_d62
+```
+
+```{r}
+str(wm_d62)
+```

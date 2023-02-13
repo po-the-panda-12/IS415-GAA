@@ -1,5 +1,5 @@
 ---
-title: "Hands-on Exercise 3: 2nd Order Spatial Point Patterns Analysis Methods"
+title: "Hands-on Exercise 4: 2nd Order Spatial Point Patterns Analysis Methods"
 date: "31 January 2023"
 execute: 
   eval: true
@@ -73,7 +73,7 @@ tmap_mode('plot')
 
 ## Geospatial Data wrangling
 
-### Converting sf data frames to sp\'s Spatial\* class
+### Converting sf data frames to sp's Spatial\* class
 
 ```{r}
 childcare <- as_Spatial(childcare_sf)
@@ -114,7 +114,7 @@ childcare_sp
 sg_sp
 ```
 
-### Converting the generic sp format into spatstat\'s ppp format
+### Converting the generic sp format into spatstat's ppp format
 
 ```{r}
 childcare_ppp <- as(childcare_sp, "ppp")
