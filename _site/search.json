@@ -1054,6 +1054,55 @@
     "href": "in-class_ex/in-class_ex06/in-class_ex06.html#the-data",
     "title": "In-Class Exercise 5:",
     "section": "2.2 The Data",
-    "text": "2.2 The Data\n\nHunan, a geospatial data set in ESRI shapefile format, and\nHunan_2012, an attribute data set in csv format.\n\n\n2.2.1 Import Geospatial Data\n\nhunan <- st_read(dsn = \"data/geospatial\", \n                 layer = \"Hunan\")\n\nReading layer `Hunan' from data source \n  `/Users/shambhavigoenka/Desktop/School/Geo/IS415-GAA/in-class_ex/in-class_ex06/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 88 features and 7 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812\nGeodetic CRS:  WGS 84\n\n\n\n\n2.2.2 Import attribute table\n\nhunan2012 <- read_csv(\"data/aspatial/Hunan_2012.csv\")\n\n\n\n2.2.3 Combine both data frames using left join\n\nhunan <- left_join(hunan,hunan2012)%>%\n  select(1:4, 7, 15)\n\n\n\n2.2.3 Choropleth Map"
+    "text": "2.2 The Data\n\nHunan, a geospatial data set in ESRI shapefile format, and\nHunan_2012, an attribute data set in csv format.\n\n\n2.2.1 Import Geospatial Data\n\nhunan <- st_read(dsn = \"data/geospatial\", \n                 layer = \"Hunan\")\n\nReading layer `Hunan' from data source \n  `/Users/shambhavigoenka/Desktop/School/Geo/IS415-GAA/in-class_ex/in-class_ex06/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 88 features and 7 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812\nGeodetic CRS:  WGS 84\n\n\n\n\n2.2.2 Import attribute table\n\nhunan2012 <- read_csv(\"data/aspatial/Hunan_2012.csv\")\n\n\n\n2.2.3 Combine both data frames using left join\n\n\n\n\n\n\nIn order to retain the geospatial properties, the left data frame must be the sf data.frame(i.e. hunan)\n\n\n\n\n\n\n\nhunan_GDPPC <- left_join(hunan,hunan2012)%>%\n  select(1:4, 7, 15) #name, id, name, engtype, 7 - county, 15 - gdppc\n\n\n\n2.2.3 Choropleth Map\n\ntmap_mode(\"plot\")\ntm_shape(hunan_GDPPC) + \n  tm_fill(\"GDPPC\",\n          style = \"quantile\",\n          palette = \"Blues\",\n          title = \"GDPPC\") + \n  tm_layout(main.title = \"Distribution of GDP per capita by district, Hunan Province\",\n            main.title.position = \"center\",\n            main.title.size = 1.2,\n            legend.height = 0.45,\n            legend.width = 0.35,\n            frame = TRUE) + \n  tm_borders(alpha = 0.5) + \n  # tm_text(\"NAME_3\", size=0.5) + \n  tm_compass(type = \"8star\", size = 2) + \n  tm_scale_bar() + #decimal degree projection turns into km using great circle calculation \n  tm_grid(alpha = 0.2)"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#identify-area-neighbors",
+    "href": "in-class_ex/in-class_ex06/in-class_ex06.html#identify-area-neighbors",
+    "title": "In-Class Exercise 5:",
+    "section": "2.3 Identify area neighbors",
+    "text": "2.3 Identify area neighbors\n\n2.3.1 Contiguity Spatial Weights\nRedundant in later steps = 2.6\nDerive neighbor’s list using Queen’s method\n\n# -- st version\ncn_queen <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry), #default is queen\n         .before = 1) #place as first column\n\n#wm_q <- poly2nd(hunan_GDPPC, queen = TRUE) -- sp version\n\nDerive neighbor’s list using Rook’s method\n\ncn_rook <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry), #default is queen\n         queen = FALSE,\n         .before = 1) #place as first column\n\n\n#geo <- sf::st_geometry(huann)\n#nb <- st_knn(geo)"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#k-nearest-neighbors-method",
+    "href": "in-class_ex/in-class_ex06/in-class_ex06.html#k-nearest-neighbors-method",
+    "title": "In-Class Exercise 5:",
+    "section": "2.4 K-nearest neighbors method",
+    "text": "2.4 K-nearest neighbors method"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#distance-band-method",
+    "href": "in-class_ex/in-class_ex06/in-class_ex06.html#distance-band-method",
+    "title": "In-Class Exercise 5:",
+    "section": "2.5 Distance band method",
+    "text": "2.5 Distance band method\nFixed distance criterion - lower = 0, upper = whatever"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#compute-contiguity-weights",
+    "href": "in-class_ex/in-class_ex06/in-class_ex06.html#compute-contiguity-weights",
+    "title": "In-Class Exercise 5:",
+    "section": "2.6 Compute contiguity weights",
+    "text": "2.6 Compute contiguity weights\n\n2.6.1 Contiguity weights: Queen’s method\n\nwm_q <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry),\n         wt = st_weights(nb),\n         .before = 1)\n\n\n\n2.6.2 Contiguity weights: Rook’s method\n\nwm_r <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry),\n         queen = FALSE,\n         wt = st_weights(nb),\n         .before = 1)"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#computing",
+    "href": "in-class_ex/in-class_ex06/in-class_ex06.html#computing",
+    "title": "In-Class Exercise 5:",
+    "section": "2.7 Computing",
+    "text": "2.7 Computing"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#compute-local-morans-i",
+    "href": "in-class_ex/in-class_ex06/in-class_ex06.html#compute-local-morans-i",
+    "title": "In-Class Exercise 5:",
+    "section": "2.8 Compute local Moran’s I",
+    "text": "2.8 Compute local Moran’s I"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#visualise-local-morans-i",
+    "href": "in-class_ex/in-class_ex06/in-class_ex06.html#visualise-local-morans-i",
+    "title": "In-Class Exercise 5:",
+    "section": "2.9 Visualise local Moran’s I",
+    "text": "2.9 Visualise local Moran’s I"
   }
 ]

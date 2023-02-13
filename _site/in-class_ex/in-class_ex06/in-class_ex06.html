@@ -234,6 +234,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#combine-both-data-frames-using-left-join" id="toc-combine-both-data-frames-using-left-join" class="nav-link" data-scroll-target="#combine-both-data-frames-using-left-join">2.2.3 Combine both data frames using left join</a></li>
   <li><a href="#choropleth-map" id="toc-choropleth-map" class="nav-link" data-scroll-target="#choropleth-map">2.2.3 Choropleth Map</a></li>
   </ul></li>
+  <li><a href="#identify-area-neighbors" id="toc-identify-area-neighbors" class="nav-link" data-scroll-target="#identify-area-neighbors">2.3 Identify area neighbors</a>
+  <ul class="collapse">
+  <li><a href="#contiguity-spatial-weights" id="toc-contiguity-spatial-weights" class="nav-link" data-scroll-target="#contiguity-spatial-weights">2.3.1 Contiguity Spatial Weights</a></li>
+  </ul></li>
+  <li><a href="#k-nearest-neighbors-method" id="toc-k-nearest-neighbors-method" class="nav-link" data-scroll-target="#k-nearest-neighbors-method">2.4 K-nearest neighbors method</a></li>
+  <li><a href="#distance-band-method" id="toc-distance-band-method" class="nav-link" data-scroll-target="#distance-band-method">2.5 Distance band method</a></li>
+  <li><a href="#compute-contiguity-weights" id="toc-compute-contiguity-weights" class="nav-link" data-scroll-target="#compute-contiguity-weights">2.6 Compute contiguity weights</a>
+  <ul class="collapse">
+  <li><a href="#contiguity-weights-queens-method" id="toc-contiguity-weights-queens-method" class="nav-link" data-scroll-target="#contiguity-weights-queens-method">2.6.1 Contiguity weights: Queen’s method</a></li>
+  <li><a href="#contiguity-weights-rooks-method" id="toc-contiguity-weights-rooks-method" class="nav-link" data-scroll-target="#contiguity-weights-rooks-method">2.6.2 Contiguity weights: Rook’s method</a></li>
+  </ul></li>
+  <li><a href="#computing" id="toc-computing" class="nav-link" data-scroll-target="#computing">2.7 Computing</a></li>
+  <li><a href="#compute-local-morans-i" id="toc-compute-local-morans-i" class="nav-link" data-scroll-target="#compute-local-morans-i">2.8 Compute local Moran’s I</a></li>
+  <li><a href="#visualise-local-morans-i" id="toc-visualise-local-morans-i" class="nav-link" data-scroll-target="#visualise-local-morans-i">2.9 Visualise local Moran’s I</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -313,19 +327,116 @@ Geodetic CRS:  WGS 84</code></pre>
 </section>
 <section id="combine-both-data-frames-using-left-join" class="level3">
 <h3 class="anchored" data-anchor-id="combine-both-data-frames-using-left-join">2.2.3 Combine both data frames using left join</h3>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+In order to retain the geospatial properties, the left data frame must be the sf data.frame(i.e.&nbsp;hunan)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>hunan <span class="ot">&lt;-</span> <span class="fu">left_join</span>(hunan,hunan2012)<span class="sc">%&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">15</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>hunan_GDPPC <span class="ot">&lt;-</span> <span class="fu">left_join</span>(hunan,hunan2012)<span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">15</span>) <span class="co">#name, id, name, engtype, 7 - county, 15 - gdppc</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="choropleth-map" class="level3">
 <h3 class="anchored" data-anchor-id="choropleth-map">2.2.3 Choropleth Map</h3>
 <div class="cell">
-
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(hunan_GDPPC) <span class="sc">+</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"GDPPC"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> <span class="st">"Blues"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">title =</span> <span class="st">"GDPPC"</span>) <span class="sc">+</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Distribution of GDP per capita by district, Hunan Province"</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.size =</span> <span class="fl">1.2</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.height =</span> <span class="fl">0.45</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.width =</span> <span class="fl">0.35</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">frame =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span> </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># tm_text("NAME_3", size=0.5) + </span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_compass</span>(<span class="at">type =</span> <span class="st">"8star"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_scale_bar</span>() <span class="sc">+</span> <span class="co">#decimal degree projection turns into km using great circle calculation </span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_grid</span>(<span class="at">alpha =</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="in-class_ex06_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
-
-
+</div>
 </section>
+</section>
+<section id="identify-area-neighbors" class="level2">
+<h2 class="anchored" data-anchor-id="identify-area-neighbors">2.3 Identify area neighbors</h2>
+<section id="contiguity-spatial-weights" class="level3">
+<h3 class="anchored" data-anchor-id="contiguity-spatial-weights">2.3.1 Contiguity Spatial Weights</h3>
+<p>Redundant in later steps = 2.6</p>
+<p>Derive neighbor’s list using Queen’s method</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -- st version</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>cn_queen <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry), <span class="co">#default is queen</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>) <span class="co">#place as first column</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#wm_q &lt;- poly2nd(hunan_GDPPC, queen = TRUE) -- sp version</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Derive neighbor’s list using Rook’s method</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cn_rook <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry), <span class="co">#default is queen</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">queen =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>) <span class="co">#place as first column</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#geo &lt;- sf::st_geometry(huann)</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#nb &lt;- st_knn(geo)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="k-nearest-neighbors-method" class="level2">
+<h2 class="anchored" data-anchor-id="k-nearest-neighbors-method">2.4 K-nearest neighbors method</h2>
+</section>
+<section id="distance-band-method" class="level2">
+<h2 class="anchored" data-anchor-id="distance-band-method">2.5 Distance band method</h2>
+<p>Fixed distance criterion - lower = 0, upper = whatever</p>
+</section>
+<section id="compute-contiguity-weights" class="level2">
+<h2 class="anchored" data-anchor-id="compute-contiguity-weights">2.6 Compute contiguity weights</h2>
+<section id="contiguity-weights-queens-method" class="level3">
+<h3 class="anchored" data-anchor-id="contiguity-weights-queens-method">2.6.1 Contiguity weights: Queen’s method</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>wm_q <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry),</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="contiguity-weights-rooks-method" class="level3">
+<h3 class="anchored" data-anchor-id="contiguity-weights-rooks-method">2.6.2 Contiguity weights: Rook’s method</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>wm_r <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">queen =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="computing" class="level2">
+<h2 class="anchored" data-anchor-id="computing">2.7 Computing</h2>
+</section>
+<section id="compute-local-morans-i" class="level2">
+<h2 class="anchored" data-anchor-id="compute-local-morans-i">2.8 Compute local Moran’s I</h2>
+</section>
+<section id="visualise-local-morans-i" class="level2">
+<h2 class="anchored" data-anchor-id="visualise-local-morans-i">2.9 Visualise local Moran’s I</h2>
+
+
 </section>
 </section>
 
