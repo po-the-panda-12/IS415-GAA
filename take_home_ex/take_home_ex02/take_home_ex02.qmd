@@ -1,0 +1,133 @@
+---
+title: "Take Home Exercise 2"
+date: "21 February 2023"
+date-modified: "`r Sys.Date()`"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+---
+
+# 1.0 Overview
+
+------------------------------------------------------------------------
+
+## 1.1 Background
+
+## 1.2 Task
+
+-   Choropleth Mapping and Analysis
+
+-   Local Gi\* Analysis
+
+-   Emerging Hot Spot Analysis (EHSA)
+
+# 2.0 Setup
+
+------------------------------------------------------------------------
+
+## 2.1 Import Packages
+
+-   sf - Used for handling geospatial data
+
+-   tidyVerse - Used for data transformation and presentation
+
+-   tmap, maptools, kableExtra - Used for visualizing dataframes and plots
+
+-   spatstat - Used for point-pattern analysis
+
+-   sfdep - Used for functions not in spdep
+
+-   raster - Used to handle gridded spatial data
+
+```{r}
+pacman::p_load(sf, maptools, tmap, kableExtra, tidyverse)
+```
+
+# 3.0 Data Wrangling
+
+------------------------------------------------------------------------
+
+## 3.1 Datasets Used
+
+```{r}
+#| code-fold: true
+# initialise a dataframe of our geospatial and aspatial data details
+datasets <- data.frame(
+  Type=c("Geospatial",
+         "Aspatial"),
+  Name=c("[Batas Desa Provinsi DKI Jakarta](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html)",
+         "[Standar Kelurahan Data Corona (Monthly)](https://riwayat-file-covid-19-dki-jakarta-jakartagis.hub.arcgis.com/)"),
+  Format=c("Shapefile", 
+           ".xlsx"),
+  Description=c("Sub-districts in DKI Jakarta",
+                "Sub-district level data of daily COVID-19 cases in DKI Jakarta  
+                between March 2020~July 2021")
+  )
+
+# with reference to this guide on kableExtra:
+# https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
+# kable_material is the name of the kable theme
+# 'hover' for to highlight row when hovering, 'scale_down' to adjust table to fit page width
+library(knitr)
+library(kableExtra)
+kable(head(datasets), caption="Datasets Used") %>%
+  kable_material("hover", latex_options="scale_down")
+```
+
+## 3.2 Geospatial Data
+
+### 3.2.1 Load Data
+
+Import Geospatial data and filter out Osun State. Transform WGS 48 coordinate system to projected coordinate system with Nigeria's ESPG - 26293
+
+::: panel-tabset
+Import
+
+```{r}
+bd_jakarta <- st_read(dsn="data/geospatial",
+                      layer="BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA")
+```
+
+Glimpse
+
+```{r}
+glimpse(bd_jakarta)
+```
+:::
+
+### 3.2.2 Data Preprocessing
+
+#### 3.2.2.1 Exclude redundant fields
+
+```{r}
+#bd_jakarta <- bd_jakarta %>%
+#  select(c(3:4, 8:9))
+```
+
+#### 3.2.2.2 Invalid Geometries
+
+```{r}
+length(which(st_is_valid(bd_jakarta) == FALSE))
+```
+
+Everything is valid
+
+#### 3.2.2.3 Checking for Duplicate Names
+
+```{r}
+#osun$ADM2_EN[duplicated(osun$ADM2_EN)==TRUE]
+```
+
+#### 3.2.2.4 Handle Missing Values
+
+```{r}
+bd_jakarta[rowSums(is.na(bd_jakarta))!=0,]
+```
+
+Remove NA values
+
+```{r}
+bd_jakarta <- na.omit(bd_jakarta,c("DESA_KELUR"))
+```

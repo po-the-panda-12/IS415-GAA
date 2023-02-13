@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2023-02-21">
+
+<title>IS415-GAA - Take Home Exercise 2</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script src="../../site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="../../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">IS415-GAA</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Hands-on Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex01/hands-on_ex01.html">
+ <span class="dropdown-text">Hands-on Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex02/hands-on_ex02.html">
+ <span class="dropdown-text">Hands-on Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex04/hands-on_ex04.html">
+ <span class="dropdown-text">Hands-on Exercise 4</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex06/hands-on_ex06.html">
+ <span class="dropdown-text">Hands-on Exercise 6</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">In-Class Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../in-class_ex/in-class_ex02/in-class_ex02.html">
+ <span class="dropdown-text">In-class Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../in-class_ex/in-class_ex03/in-class_ex03.html">
+ <span class="dropdown-text">In-class Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../in-class_ex/in-class_ex04/in-class_ex04.html">
+ <span class="dropdown-text">In-class Exercise 4</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../in-class_ex/in-class_ex05/in-class_ex05.html">
+ <span class="dropdown-text">In-class Exercise 5</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../in-class_ex/in-class_ex06/in-class_ex06.html">
+ <span class="dropdown-text">In-class Exercise 6</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Take-home Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../take_home_ex/take_home_ex01/take_home_ex01.html">
+ <span class="dropdown-text">Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../take_home_ex/take_home_ex02/take_home_ex02.html">
+ <span class="dropdown-text">Exercise 2</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1.0 Overview</a>
+  <ul class="collapse">
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">1.1 Background</a></li>
+  <li><a href="#task" id="toc-task" class="nav-link" data-scroll-target="#task">1.2 Task</a></li>
+  </ul></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">2.0 Setup</a>
+  <ul class="collapse">
+  <li><a href="#import-packages" id="toc-import-packages" class="nav-link" data-scroll-target="#import-packages">2.1 Import Packages</a></li>
+  </ul></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">3.0 Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#datasets-used" id="toc-datasets-used" class="nav-link" data-scroll-target="#datasets-used">3.1 Datasets Used</a></li>
+  <li><a href="#geospatial-data" id="toc-geospatial-data" class="nav-link" data-scroll-target="#geospatial-data">3.2 Geospatial Data</a>
+  <ul class="collapse">
+  <li><a href="#load-data" id="toc-load-data" class="nav-link" data-scroll-target="#load-data">3.2.1 Load Data</a></li>
+  <li><a href="#data-preprocessing" id="toc-data-preprocessing" class="nav-link" data-scroll-target="#data-preprocessing">3.2.2 Data Preprocessing</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Take Home Exercise 2</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 21, 2023</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">February 13, 2023</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<section id="overview" class="level1">
+<h1>1.0 Overview</h1>
+<hr>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">1.1 Background</h2>
+</section>
+<section id="task" class="level2">
+<h2 class="anchored" data-anchor-id="task">1.2 Task</h2>
+<ul>
+<li><p>Choropleth Mapping and Analysis</p></li>
+<li><p>Local Gi* Analysis</p></li>
+<li><p>Emerging Hot Spot Analysis (EHSA)</p></li>
+</ul>
+</section>
+</section>
+<section id="setup" class="level1">
+<h1>2.0 Setup</h1>
+<hr>
+<section id="import-packages" class="level2">
+<h2 class="anchored" data-anchor-id="import-packages">2.1 Import Packages</h2>
+<ul>
+<li><p>sf - Used for handling geospatial data</p></li>
+<li><p>tidyVerse - Used for data transformation and presentation</p></li>
+<li><p>tmap, maptools, kableExtra - Used for visualizing dataframes and plots</p></li>
+<li><p>spatstat - Used for point-pattern analysis</p></li>
+<li><p>sfdep - Used for functions not in spdep</p></li>
+<li><p>raster - Used to handle gridded spatial data</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, maptools, tmap, kableExtra, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="data-wrangling" class="level1">
+<h1>3.0 Data Wrangling</h1>
+<hr>
+<section id="datasets-used" class="level2">
+<h2 class="anchored" data-anchor-id="datasets-used">3.1 Datasets Used</h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># initialise a dataframe of our geospatial and aspatial data details</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>datasets <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Type=</span><span class="fu">c</span>(<span class="st">"Geospatial"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Aspatial"</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Name=</span><span class="fu">c</span>(<span class="st">"[Batas Desa Provinsi DKI Jakarta](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html)"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>         <span class="st">"[Standar Kelurahan Data Corona (Monthly)](https://riwayat-file-covid-19-dki-jakarta-jakartagis.hub.arcgis.com/)"</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">Format=</span><span class="fu">c</span>(<span class="st">"Shapefile"</span>, </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>           <span class="st">".xlsx"</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">Description=</span><span class="fu">c</span>(<span class="st">"Sub-districts in DKI Jakarta"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Sub-district level data of daily COVID-19 cases in DKI Jakarta  </span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="st">                between March 2020~July 2021"</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># with reference to this guide on kableExtra:</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># kable_material is the name of the kable theme</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 'hover' for to highlight row when hovering, 'scale_down' to adjust table to fit page width</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(datasets), <span class="at">caption=</span><span class="st">"Datasets Used"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_material</span>(<span class="st">"hover"</span>, <span class="at">latex_options=</span><span class="st">"scale_down"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+
+<table class=" lightable-material lightable-hover" style="font-family: &quot;Source Sans Pro&quot;, helvetica, sans-serif; margin-left: auto; margin-right: auto;">
+<caption>Datasets Used</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Type </th>
+   <th style="text-align:left;"> Name </th>
+   <th style="text-align:left;"> Format </th>
+   <th style="text-align:left;"> Description </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Geospatial </td>
+   <td style="text-align:left;"> [Batas Desa Provinsi DKI Jakarta](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html) </td>
+   <td style="text-align:left;"> Shapefile </td>
+   <td style="text-align:left;"> Sub-districts in DKI Jakarta </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Aspatial </td>
+   <td style="text-align:left;"> [Standar Kelurahan Data Corona (Monthly)](https://riwayat-file-covid-19-dki-jakarta-jakartagis.hub.arcgis.com/) </td>
+   <td style="text-align:left;"> .xlsx </td>
+   <td style="text-align:left;"> Sub-district level data of daily COVID-19 cases in DKI Jakarta  
+                between March 2020~July 2021 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</section>
+<section id="geospatial-data" class="level2">
+<h2 class="anchored" data-anchor-id="geospatial-data">3.2 Geospatial Data</h2>
+<section id="load-data" class="level3">
+<h3 class="anchored" data-anchor-id="load-data">3.2.1 Load Data</h3>
+<p>Import Geospatial data and filter out Osun State. Transform WGS 48 coordinate system to projected coordinate system with Nigeria’s ESPG - 26293</p>
+<div class="panel-tabset">
+<p>Import</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>bd_jakarta <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">layer=</span><span class="st">"BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA' from data source 
+  `/Users/shambhavigoenka/Desktop/School/Geo/IS415-GAA/take_home_ex/take_home_ex02/data/geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 269 features and 161 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 106.3831 ymin: -6.370815 xmax: 106.9728 ymax: -5.184322
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+<p>Glimpse</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(bd_jakarta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 269
+Columns: 162
+$ OBJECT_ID  &lt;dbl&gt; 25477, 25478, 25397, 25400, 25378, 25379, 25390, 25382, 253…
+$ KODE_DESA  &lt;chr&gt; "3173031006", "3173031007", "3171031003", "3171031006", "31…
+$ DESA       &lt;chr&gt; "KEAGUNGAN", "GLODOK", "HARAPAN MULIA", "CEMPAKA BARU", "PU…
+$ KODE       &lt;dbl&gt; 317303, 317303, 317103, 317103, 310101, 310101, 317102, 310…
+$ PROVINSI   &lt;chr&gt; "DKI JAKARTA", "DKI JAKARTA", "DKI JAKARTA", "DKI JAKARTA",…
+$ KAB_KOTA   &lt;chr&gt; "JAKARTA BARAT", "JAKARTA BARAT", "JAKARTA PUSAT", "JAKARTA…
+$ KECAMATAN  &lt;chr&gt; "TAMAN SARI", "TAMAN SARI", "KEMAYORAN", "KEMAYORAN", "KEPU…
+$ DESA_KELUR &lt;chr&gt; "KEAGUNGAN", "GLODOK", "HARAPAN MULIA", "CEMPAKA BARU", "PU…
+$ JUMLAH_PEN &lt;dbl&gt; 21609, 9069, 29085, 41913, 6947, 7059, 15793, 5891, 33383, …
+$ JUMLAH_KK  &lt;dbl&gt; 7255, 3273, 9217, 13766, 2026, 2056, 5599, 1658, 11276, 128…
+$ LUAS_WILAY &lt;dbl&gt; 0.36, 0.37, 0.53, 0.97, 0.93, 0.95, 1.76, 1.14, 0.47, 1.31,…
+$ KEPADATAN  &lt;dbl&gt; 60504, 24527, 54465, 42993, 7497, 7401, 8971, 5156, 71628, …
+$ PERPINDAHA &lt;dbl&gt; 102, 25, 131, 170, 17, 26, 58, 13, 113, 178, 13, 87, 56, 12…
+$ JUMLAH_MEN &lt;dbl&gt; 68, 52, 104, 151, 14, 32, 36, 10, 60, 92, 5, 83, 21, 70, 93…
+$ PERUBAHAN  &lt;dbl&gt; 20464, 8724, 27497, 38323, 6853, 6993, 15006, 5807, 31014, …
+$ WAJIB_KTP  &lt;dbl&gt; 16027, 7375, 20926, 30264, 4775, 4812, 12559, 3989, 24784, …
+$ SILAM      &lt;dbl&gt; 15735, 1842, 26328, 36813, 6941, 7057, 7401, 5891, 23057, 2…
+$ KRISTEN    &lt;dbl&gt; 2042, 2041, 1710, 3392, 6, 0, 3696, 0, 4058, 5130, 1, 3061,…
+$ KHATOLIK   &lt;dbl&gt; 927, 1460, 531, 1082, 0, 0, 1602, 0, 2100, 2575, 0, 1838, 7…
+$ HINDU      &lt;dbl&gt; 15, 9, 42, 127, 0, 0, 622, 0, 25, 27, 0, 9, 115, 47, 382, 7…
+$ BUDHA      &lt;dbl&gt; 2888, 3716, 469, 495, 0, 2, 2462, 0, 4134, 4740, 5, 1559, 3…
+$ KONGHUCU   &lt;dbl&gt; 2, 1, 5, 1, 0, 0, 10, 0, 9, 10, 0, 4, 1, 1, 4, 0, 2, 0, 0, …
+$ KEPERCAYAA &lt;dbl&gt; 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 2, 0, 22, 0, 3, 3, 0, 0, 0…
+$ PRIA       &lt;dbl&gt; 11049, 4404, 14696, 21063, 3547, 3551, 7833, 2954, 16887, 1…
+$ WANITA     &lt;dbl&gt; 10560, 4665, 14389, 20850, 3400, 3508, 7960, 2937, 16496, 1…
+$ BELUM_KAWI &lt;dbl&gt; 10193, 4240, 14022, 20336, 3366, 3334, 7578, 2836, 15860, 1…
+$ KAWIN      &lt;dbl&gt; 10652, 4364, 13450, 19487, 3224, 3404, 7321, 2791, 15945, 1…
+$ CERAI_HIDU &lt;dbl&gt; 255, 136, 430, 523, 101, 80, 217, 44, 381, 476, 39, 305, 10…
+$ CERAI_MATI &lt;dbl&gt; 509, 329, 1183, 1567, 256, 241, 677, 220, 1197, 993, 79, 90…
+$ U0         &lt;dbl&gt; 1572, 438, 2232, 3092, 640, 648, 802, 585, 2220, 2399, 376,…
+$ U5         &lt;dbl&gt; 1751, 545, 2515, 3657, 645, 684, 995, 588, 2687, 2953, 331,…
+$ U10        &lt;dbl&gt; 1703, 524, 2461, 3501, 620, 630, 1016, 513, 2653, 2754, 309…
+$ U15        &lt;dbl&gt; 1493, 521, 2318, 3486, 669, 671, 1106, 548, 2549, 2666, 328…
+$ U20        &lt;dbl&gt; 1542, 543, 2113, 3098, 619, 609, 1081, 491, 2313, 2515, 290…
+$ U25        &lt;dbl&gt; 1665, 628, 2170, 3024, 639, 582, 1002, 523, 2446, 2725, 325…
+$ U30        &lt;dbl&gt; 1819, 691, 2363, 3188, 564, 592, 1236, 478, 2735, 3122, 329…
+$ U35        &lt;dbl&gt; 1932, 782, 2595, 3662, 590, 572, 1422, 504, 3034, 3385, 317…
+$ U40        &lt;dbl&gt; 1828, 675, 2371, 3507, 480, 486, 1200, 397, 2689, 3037, 250…
+$ U45        &lt;dbl&gt; 1600, 607, 2250, 3391, 421, 457, 1163, 365, 2470, 2597, 206…
+$ U50        &lt;dbl&gt; 1408, 619, 1779, 2696, 346, 369, 1099, 288, 2129, 2282, 134…
+$ U55        &lt;dbl&gt; 1146, 602, 1379, 1909, 252, 318, 979, 235, 1843, 1930, 129,…
+$ U60        &lt;dbl&gt; 836, 614, 1054, 1397, 197, 211, 880, 162, 1386, 1394, 75, 9…
+$ U65        &lt;dbl&gt; 587, 555, 654, 970, 122, 114, 747, 111, 958, 932, 50, 706, …
+$ U70        &lt;dbl&gt; 312, 311, 411, 631, 69, 55, 488, 65, 554, 573, 38, 412, 129…
+$ U75        &lt;dbl&gt; 415, 414, 420, 704, 74, 61, 577, 38, 717, 642, 37, 528, 125…
+$ TIDAK_BELU &lt;dbl&gt; 3426, 1200, 4935, 7328, 1306, 1318, 2121, 973, 5075, 6089, …
+$ BELUM_TAMA &lt;dbl&gt; 1964, 481, 2610, 3763, 730, 676, 1278, 732, 3241, 3184, 383…
+$ TAMAT_SD   &lt;dbl&gt; 2265, 655, 2346, 2950, 1518, 2054, 1169, 1266, 4424, 3620, …
+$ SLTP       &lt;dbl&gt; 3660, 1414, 3167, 5138, 906, 1357, 2236, 852, 5858, 6159, 5…
+$ SLTA       &lt;dbl&gt; 8463, 3734, 12172, 16320, 2040, 1380, 5993, 1570, 12448, 14…
+$ DIPLOMA_I  &lt;dbl&gt; 81, 23, 84, 179, 22, 15, 43, 36, 85, 83, 4, 63, 27, 79, 110…
+$ DIPLOMA_II &lt;dbl&gt; 428, 273, 1121, 1718, 101, 59, 573, 97, 604, 740, 25, 734, …
+$ DIPLOMA_IV &lt;dbl&gt; 1244, 1241, 2477, 4181, 314, 191, 2199, 357, 1582, 1850, 83…
+$ STRATA_II  &lt;dbl&gt; 74, 46, 166, 315, 10, 8, 168, 8, 63, 92, 5, 174, 125, 122, …
+$ STRATA_III &lt;dbl&gt; 4, 2, 7, 21, 0, 1, 13, 0, 3, 9, 0, 16, 8, 7, 75, 49, 65, 14…
+$ BELUM_TIDA &lt;dbl&gt; 3927, 1388, 5335, 8105, 1788, 1627, 2676, 1129, 5985, 6820,…
+$ APARATUR_P &lt;dbl&gt; 81, 10, 513, 931, 246, 75, 156, 160, 132, 79, 23, 145, 369,…
+$ TENAGA_PEN &lt;dbl&gt; 70, 43, 288, 402, 130, 93, 81, 123, 123, 73, 45, 109, 30, 1…
+$ WIRASWASTA &lt;dbl&gt; 8974, 3832, 10662, 14925, 788, 728, 6145, 819, 12968, 14714…
+$ PERTANIAN  &lt;dbl&gt; 1, 0, 1, 3, 2, 2, 1, 3, 2, 5, 1, 1, 0, 0, 2, 5, 2, 1, 13, 4…
+$ NELAYAN    &lt;dbl&gt; 0, 0, 2, 0, 960, 1126, 1, 761, 1, 2, 673, 0, 0, 0, 0, 0, 2,…
+$ AGAMA_DAN  &lt;dbl&gt; 6, 6, 5, 40, 0, 0, 49, 2, 10, 11, 0, 54, 15, 16, 21, 14, 17…
+$ PELAJAR_MA &lt;dbl&gt; 4018, 1701, 6214, 9068, 1342, 1576, 3135, 1501, 6823, 6866,…
+$ TENAGA_KES &lt;dbl&gt; 28, 29, 80, 142, 34, 26, 60, 11, 48, 55, 16, 68, 89, 93, 28…
+$ PENSIUNAN  &lt;dbl&gt; 57, 50, 276, 498, 20, 7, 59, 14, 56, 75, 2, 97, 53, 146, 57…
+$ LAINNYA    &lt;dbl&gt; 4447, 2010, 5709, 7799, 1637, 1799, 3430, 1368, 7235, 7206,…
+$ GENERATED  &lt;chr&gt; "30 Juni 2019", "30 Juni 2019", "30 Juni 2019", "30 Juni 20…
+$ KODE_DES_1 &lt;chr&gt; "3173031006", "3173031007", "3171031003", "3171031006", "31…
+$ BELUM_     &lt;dbl&gt; 3099, 1032, 4830, 7355, 1663, 1704, 2390, 1213, 5330, 5605,…
+$ MENGUR_    &lt;dbl&gt; 4447, 2026, 5692, 7692, 1576, 1731, 3500, 1323, 7306, 7042,…
+$ PELAJAR_   &lt;dbl&gt; 3254, 1506, 6429, 8957, 1476, 1469, 3185, 1223, 6993, 6858,…
+$ PENSIUNA_1 &lt;dbl&gt; 80, 65, 322, 603, 24, 8, 70, 20, 75, 97, 2, 132, 67, 165, 6…
+$ PEGAWAI_   &lt;dbl&gt; 48, 5, 366, 612, 223, 72, 65, 143, 73, 48, 15, 89, 91, 174,…
+$ TENTARA    &lt;dbl&gt; 4, 0, 41, 57, 3, 0, 74, 1, 20, 12, 2, 11, 90, 340, 41, 52, …
+$ KEPOLISIAN &lt;dbl&gt; 10, 1, 16, 42, 11, 8, 2, 9, 17, 7, 3, 9, 165, 15, 17, 28, 1…
+$ PERDAG_    &lt;dbl&gt; 31, 5, 1, 3, 6, 1, 2, 4, 3, 1, 4, 0, 1, 2, 9, 2, 8, 2, 5, 9…
+$ PETANI     &lt;dbl&gt; 0, 0, 1, 2, 0, 1, 1, 0, 1, 1, 1, 2, 0, 0, 1, 2, 0, 1, 6, 1,…
+$ PETERN_    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ NELAYAN_1  &lt;dbl&gt; 1, 0, 1, 0, 914, 1071, 0, 794, 0, 1, 663, 0, 0, 0, 0, 0, 2,…
+$ INDUSTR_   &lt;dbl&gt; 7, 3, 4, 3, 1, 3, 0, 0, 1, 7, 0, 0, 2, 2, 1, 3, 12, 1, 8, 4…
+$ KONSTR_    &lt;dbl&gt; 3, 0, 2, 6, 3, 8, 1, 6, 1, 5, 10, 0, 2, 5, 7, 4, 7, 1, 6, 2…
+$ TRANSP_    &lt;dbl&gt; 2, 0, 7, 4, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 6, 3, 2, 1, 2, 5,…
+$ KARYAW_    &lt;dbl&gt; 6735, 3034, 7347, 10185, 237, 264, 4319, 184, 9405, 10844, …
+$ KARYAW1    &lt;dbl&gt; 9, 2, 74, 231, 4, 0, 16, 1, 13, 10, 1, 24, 17, 29, 187, 246…
+$ KARYAW1_1  &lt;dbl&gt; 0, 0, 5, 15, 0, 0, 0, 1, 0, 1, 0, 0, 2, 4, 7, 9, 3, 1, 6, 5…
+$ KARYAW1_12 &lt;dbl&gt; 23, 4, 25, 35, 141, 50, 16, 157, 6, 9, 40, 11, 11, 15, 22, …
+$ BURUH      &lt;dbl&gt; 515, 155, 971, 636, 63, 218, 265, 55, 1085, 652, 17, 357, 2…
+$ BURUH_     &lt;dbl&gt; 1, 0, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 2, 1, 0, 1, 1,…
+$ BURUH1     &lt;dbl&gt; 0, 0, 1, 0, 1, 25, 0, 2, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+$ BURUH1_1   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,…
+$ PEMBANT_   &lt;dbl&gt; 1, 1, 4, 1, 1, 0, 7, 0, 5, 1, 0, 6, 1, 10, 11, 9, 8, 3, 4, …
+$ TUKANG     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,…
+$ TUKANG_1   &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ TUKANG_12  &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ TUKANG__13 &lt;dbl&gt; 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,…
+$ TUKANG__14 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ TUKANG__15 &lt;dbl&gt; 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,…
+$ TUKANG__16 &lt;dbl&gt; 7, 4, 10, 14, 0, 0, 2, 0, 7, 8, 0, 8, 1, 0, 3, 2, 2, 0, 17,…
+$ TUKANG__17 &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ PENATA     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,…
+$ PENATA_    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ PENATA1_1  &lt;dbl&gt; 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0,…
+$ MEKANIK    &lt;dbl&gt; 11, 1, 10, 8, 0, 0, 4, 0, 7, 8, 0, 9, 0, 15, 10, 10, 3, 0, …
+$ SENIMAN_   &lt;dbl&gt; 4, 0, 12, 28, 0, 0, 2, 0, 3, 4, 0, 9, 6, 7, 14, 13, 17, 22,…
+$ TABIB      &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,…
+$ PARAJI_    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ PERANCA_   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1, 0, 1, 2, 0, 0,…
+$ PENTER_    &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0,…
+$ IMAM_M     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ PENDETA    &lt;dbl&gt; 2, 4, 5, 33, 0, 0, 20, 0, 10, 8, 0, 30, 14, 14, 18, 12, 1, …
+$ PASTOR     &lt;dbl&gt; 0, 1, 0, 1, 0, 0, 8, 0, 0, 0, 0, 23, 0, 0, 0, 0, 2, 0, 0, 0…
+$ WARTAWAN   &lt;dbl&gt; 7, 1, 16, 27, 0, 0, 4, 0, 8, 6, 0, 9, 5, 9, 26, 30, 11, 7, …
+$ USTADZ     &lt;dbl&gt; 6, 1, 1, 5, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,…
+$ JURU_M     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0,…
+$ PROMOT     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ ANGGOTA_   &lt;dbl&gt; 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 2, 1, 2, 1, 0, 0,…
+$ ANGGOTA1   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1,…
+$ ANGGOTA1_1 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ PRESIDEN   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ WAKIL_PRES &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,…
+$ ANGGOTA1_2 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,…
+$ ANGGOTA1_3 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,…
+$ DUTA_B     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,…
+$ GUBERNUR   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,…
+$ WAKIL_GUBE &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ BUPATI     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ WAKIL_BUPA &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ WALIKOTA   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ WAKIL_WALI &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ ANGGOTA1_4 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 1,…
+$ ANGGOTA1_5 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,…
+$ DOSEN      &lt;dbl&gt; 3, 2, 23, 36, 1, 2, 11, 0, 3, 5, 0, 14, 6, 28, 69, 73, 58, …
+$ GURU       &lt;dbl&gt; 72, 40, 272, 378, 118, 72, 69, 116, 126, 71, 36, 97, 23, 10…
+$ PILOT      &lt;dbl&gt; 1, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 1, 0, 0, 0,…
+$ PENGACARA_ &lt;dbl&gt; 4, 1, 8, 22, 0, 0, 5, 0, 5, 4, 0, 4, 3, 12, 24, 26, 40, 13,…
+$ NOTARIS    &lt;dbl&gt; 0, 0, 3, 5, 0, 0, 4, 0, 0, 0, 0, 5, 0, 5, 10, 3, 7, 1, 0, 4…
+$ ARSITEK    &lt;dbl&gt; 1, 0, 2, 3, 0, 0, 2, 0, 0, 0, 0, 4, 1, 2, 7, 3, 9, 2, 0, 4,…
+$ AKUNTA_    &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 2, 0, 3, 1,…
+$ KONSUL_    &lt;dbl&gt; 1, 0, 2, 11, 0, 0, 4, 0, 0, 0, 0, 6, 2, 3, 10, 8, 12, 2, 1,…
+$ DOKTER     &lt;dbl&gt; 16, 32, 35, 68, 0, 1, 63, 0, 27, 32, 1, 63, 48, 60, 236, 12…
+$ BIDAN      &lt;dbl&gt; 3, 1, 9, 18, 12, 8, 1, 3, 3, 3, 7, 3, 10, 10, 7, 2, 3, 2, 1…
+$ PERAWAT    &lt;dbl&gt; 7, 0, 25, 44, 12, 10, 3, 6, 12, 20, 6, 7, 26, 16, 21, 20, 9…
+$ APOTEK_    &lt;dbl&gt; 0, 0, 2, 3, 1, 0, 0, 0, 1, 2, 0, 1, 2, 3, 3, 3, 3, 1, 0, 1,…
+$ PSIKIATER  &lt;dbl&gt; 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 3, 2, 1, 0, 0, 0,…
+$ PENYIA_    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,…
+$ PENYIA1    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,…
+$ PELAUT     &lt;dbl&gt; 0, 0, 6, 16, 1, 1, 0, 14, 2, 4, 1, 2, 4, 2, 10, 13, 2, 0, 3…
+$ PENELITI   &lt;dbl&gt; 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 0, 2, 0,…
+$ SOPIR      &lt;dbl&gt; 65, 3, 94, 123, 0, 1, 61, 0, 76, 79, 0, 63, 44, 101, 71, 59…
+$ PIALAN     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ PARANORMAL &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,…
+$ PEDAGA_    &lt;dbl&gt; 379, 126, 321, 562, 11, 10, 412, 15, 202, 225, 0, 271, 212,…
+$ PERANG_    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,…
+$ KEPALA_    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ BIARAW_    &lt;dbl&gt; 0, 1, 0, 0, 0, 0, 22, 0, 3, 0, 0, 2, 1, 0, 4, 0, 17, 1, 0, …
+$ WIRASWAST_ &lt;dbl&gt; 1370, 611, 1723, 3099, 131, 119, 1128, 259, 2321, 2677, 79,…
+$ LAINNYA_12 &lt;dbl&gt; 94, 57, 82, 122, 12, 10, 41, 6, 89, 158, 24, 37, 15, 94, 12…
+$ LUAS_DESA  &lt;dbl&gt; 25476, 25477, 25396, 25399, 25377, 25378, 25389, 25381, 253…
+$ KODE_DES_3 &lt;chr&gt; "3173031006", "3173031007", "3171031003", "3171031006", "31…
+$ DESA_KEL_1 &lt;chr&gt; "KEAGUNGAN", "GLODOK", "HARAPAN MULIA", "CEMPAKA BARU", "PU…
+$ KODE_12    &lt;dbl&gt; 317303, 317303, 317103, 317103, 310101, 310101, 317102, 310…
+$ geometry   &lt;MULTIPOLYGON [°]&gt; MULTIPOLYGON (((106.8164 -6..., MULTIPOLYGON (…</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="data-preprocessing" class="level3">
+<h3 class="anchored" data-anchor-id="data-preprocessing">3.2.2 Data Preprocessing</h3>
+<section id="exclude-redundant-fields" class="level4">
+<h4 class="anchored" data-anchor-id="exclude-redundant-fields">3.2.2.1 Exclude redundant fields</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#bd_jakarta &lt;- bd_jakarta %&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#  select(c(3:4, 8:9))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="invalid-geometries" class="level4">
+<h4 class="anchored" data-anchor-id="invalid-geometries">3.2.2.2 Invalid Geometries</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">which</span>(<span class="fu">st_is_valid</span>(bd_jakarta) <span class="sc">==</span> <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+<p>Everything is valid</p>
+</section>
+<section id="checking-for-duplicate-names" class="level4">
+<h4 class="anchored" data-anchor-id="checking-for-duplicate-names">3.2.2.3 Checking for Duplicate Names</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#osun$ADM2_EN[duplicated(osun$ADM2_EN)==TRUE]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="handle-missing-values" class="level4">
+<h4 class="anchored" data-anchor-id="handle-missing-values">3.2.2.4 Handle Missing Values</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>bd_jakarta[<span class="fu">rowSums</span>(<span class="fu">is.na</span>(bd_jakarta))<span class="sc">!=</span><span class="dv">0</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 2 features and 161 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 106.8412 ymin: -6.154036 xmax: 106.8612 ymax: -6.144973
+Geodetic CRS:  WGS 84
+    OBJECT_ID KODE_DESA             DESA   KODE    PROVINSI KAB_KOTA KECAMATAN
+243     25645  31888888     DANAU SUNTER 318888 DKI JAKARTA     &lt;NA&gt;      &lt;NA&gt;
+244     25646  31888888 DANAU SUNTER DLL 318888 DKI JAKARTA     &lt;NA&gt;      &lt;NA&gt;
+    DESA_KELUR JUMLAH_PEN JUMLAH_KK LUAS_WILAY KEPADATAN PERPINDAHA JUMLAH_MEN
+243       &lt;NA&gt;          0         0          0         0          0          0
+244       &lt;NA&gt;          0         0          0         0          0          0
+    PERUBAHAN WAJIB_KTP SILAM KRISTEN KHATOLIK HINDU BUDHA KONGHUCU KEPERCAYAA
+243         0         0     0       0        0     0     0        0          0
+244         0         0     0       0        0     0     0        0          0
+    PRIA WANITA BELUM_KAWI KAWIN CERAI_HIDU CERAI_MATI U0 U5 U10 U15 U20 U25
+243    0      0          0     0          0          0  0  0   0   0   0   0
+244    0      0          0     0          0          0  0  0   0   0   0   0
+    U30 U35 U40 U45 U50 U55 U60 U65 U70 U75 TIDAK_BELU BELUM_TAMA TAMAT_SD SLTP
+243   0   0   0   0   0   0   0   0   0   0          0          0        0    0
+244   0   0   0   0   0   0   0   0   0   0          0          0        0    0
+    SLTA DIPLOMA_I DIPLOMA_II DIPLOMA_IV STRATA_II STRATA_III BELUM_TIDA
+243    0         0          0          0         0          0          0
+244    0         0          0          0         0          0          0
+    APARATUR_P TENAGA_PEN WIRASWASTA PERTANIAN NELAYAN AGAMA_DAN PELAJAR_MA
+243          0          0          0         0       0         0          0
+244          0          0          0         0       0         0          0
+    TENAGA_KES PENSIUNAN LAINNYA GENERATED KODE_DES_1 BELUM_ MENGUR_ PELAJAR_
+243          0         0       0      &lt;NA&gt;       &lt;NA&gt;      0       0        0
+244          0         0       0      &lt;NA&gt;       &lt;NA&gt;      0       0        0
+    PENSIUNA_1 PEGAWAI_ TENTARA KEPOLISIAN PERDAG_ PETANI PETERN_ NELAYAN_1
+243          0        0       0          0       0      0       0         0
+244          0        0       0          0       0      0       0         0
+    INDUSTR_ KONSTR_ TRANSP_ KARYAW_ KARYAW1 KARYAW1_1 KARYAW1_12 BURUH BURUH_
+243        0       0       0       0       0         0          0     0      0
+244        0       0       0       0       0         0          0     0      0
+    BURUH1 BURUH1_1 PEMBANT_ TUKANG TUKANG_1 TUKANG_12 TUKANG__13 TUKANG__14
+243      0        0        0      0        0         0          0          0
+244      0        0        0      0        0         0          0          0
+    TUKANG__15 TUKANG__16 TUKANG__17 PENATA PENATA_ PENATA1_1 MEKANIK SENIMAN_
+243          0          0          0      0       0         0       0        0
+244          0          0          0      0       0         0       0        0
+    TABIB PARAJI_ PERANCA_ PENTER_ IMAM_M PENDETA PASTOR WARTAWAN USTADZ JURU_M
+243     0       0        0       0      0       0      0        0      0      0
+244     0       0        0       0      0       0      0        0      0      0
+    PROMOT ANGGOTA_ ANGGOTA1 ANGGOTA1_1 PRESIDEN WAKIL_PRES ANGGOTA1_2
+243      0        0        0          0        0          0          0
+244      0        0        0          0        0          0          0
+    ANGGOTA1_3 DUTA_B GUBERNUR WAKIL_GUBE BUPATI WAKIL_BUPA WALIKOTA WAKIL_WALI
+243          0      0        0          0      0          0        0          0
+244          0      0        0          0      0          0        0          0
+    ANGGOTA1_4 ANGGOTA1_5 DOSEN GURU PILOT PENGACARA_ NOTARIS ARSITEK AKUNTA_
+243          0          0     0    0     0          0       0       0       0
+244          0          0     0    0     0          0       0       0       0
+    KONSUL_ DOKTER BIDAN PERAWAT APOTEK_ PSIKIATER PENYIA_ PENYIA1 PELAUT
+243       0      0     0       0       0         0       0       0      0
+244       0      0     0       0       0         0       0       0      0
+    PENELITI SOPIR PIALAN PARANORMAL PEDAGA_ PERANG_ KEPALA_ BIARAW_ WIRASWAST_
+243        0     0      0          0       0       0       0       0          0
+244        0     0      0          0       0       0       0       0          0
+    LAINNYA_12 LUAS_DESA KODE_DES_3 DESA_KEL_1 KODE_12
+243          0         0       &lt;NA&gt;       &lt;NA&gt;       0
+244          0         0       &lt;NA&gt;       &lt;NA&gt;       0
+                          geometry
+243 MULTIPOLYGON (((106.8612 -6...
+244 MULTIPOLYGON (((106.8504 -6...</code></pre>
+</div>
+</div>
+<p>Remove NA values</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>bd_jakarta <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(bd_jakarta,<span class="fu">c</span>(<span class="st">"DESA_KELUR"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section>
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
