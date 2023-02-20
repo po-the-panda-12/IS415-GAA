@@ -1,6 +1,6 @@
 ---
 title: "Take Home Exercise 2"
-date: "21 February 2023"
+date: "18 February 2023"
 date-modified: "`r Sys.Date()`"
 execute: 
   eval: true
@@ -83,14 +83,14 @@ kable(head(datasets), caption="Datasets Used") %>%
 Import Geospatial data and filter out Osun State. Transform WGS 48 coordinate system to projected coordinate system with Nigeria's ESPG - 26293
 
 ::: panel-tabset
-Import
+#### Import
 
 ```{r}
 bd_jakarta <- st_read(dsn="data/geospatial",
                       layer="BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA")
 ```
 
-Glimpse
+#### Glimpse
 
 ```{r}
 glimpse(bd_jakarta)
@@ -129,5 +129,322 @@ bd_jakarta[rowSums(is.na(bd_jakarta))!=0,]
 Remove NA values
 
 ```{r}
-bd_jakarta <- na.omit(bd_jakarta,c("DESA_KELUR"))
+#bd_jakarta <- na.omit(bd_jakarta,c("DESA_KELUR"))
+bd_jakarta <- na.exclude(bd_jakarta)
+```
+
+### 3.2.3 Check CRS
+
+```{r}
+st_crs(bd_jakarta)
+```
+
+Transform the CRS to DGN95, ESPG code 23845
+
+```{r}
+bd_jakarta <- st_transform(bd_jakarta, 23845)
+
+st_crs(bd_jakarta)
+```
+
+### 3.2.4 Remove outer islands
+
+```{r}
+# KEPULAUAN SERIBU means thousand islands
+bd_jakarta <- filter(bd_jakarta, KAB_KOTA != "KEPULAUAN SERIBU")
+bd_jakarta
+```
+
+### 3.2.5 Retain first 9 fields
+
+Why??
+
+```{r}
+bd_jakarta <- bd_jakarta[, 0:9]
+```
+
+### 3.2.6 Rename columns post translation
+
+```{r}
+bd_jakarta <- bd_jakarta %>% 
+  dplyr::rename(
+    Object_ID=OBJECT_ID,
+    Province=PROVINSI, 
+    City=KAB_KOTA, 
+    District=KECAMATAN, 
+    Village_Code=KODE_DESA, 
+    Village=DESA, 
+    Sub_District=DESA_KELUR,
+    Code=KODE, 
+    Total_Population=JUMLAH_PEN
+    )
+```
+
+### 3.2.7 EDA
+
+Number of unique sub-districts
+
+```{r}
+length(unique(bd_jakarta$"Sub_District"))
+```
+
+View by city divisions
+
+```{r}
+tm_shape(bd_jakarta) + 
+  tm_polygons("City")
+```
+
+## 3.3 Aspatial Data
+
+### 3.3.1 Load Data
+
+```{r}
+# Load the readxl library
+library(readxl)
+
+# Set the working directory to the folder containing the Excel files
+setwd("data/aspatial/") 
+
+# Get a list of all Excel files in the directory
+files <- list.files(pattern = ".xlsx")
+
+# Loop through the files and read each one into a data frame
+for (file in files) {
+  assign(gsub(".xlsx", "", file), read_excel(file))
+}
+```
+
+### 3.3.2 Modify data frames
+
+```{r}
+mutate_df<-function(data){
+ df_name <- deparse(substitute(data))
+ modified<-data |> 
+   mutate(date=df_name,
+          .before=1) |> 
+   select(date, 
+          `KODE KELURAHAN`, 
+          `WILAYAH KOTA`, 
+          KECAMATAN, 
+          KELURAHAN, 
+          `BELUM VAKSIN`, 
+          `TOTAL VAKSIN\r\nDIBERIKAN`) |> 
+   rename(village_code=`KODE KELURAHAN`, 
+          city_region =`WILAYAH KOTA`, 
+          subdistrict=`KECAMATAN`, 
+          ward=`KELURAHAN`, 
+          total_vaccination= `TOTAL VAKSIN\r\nDIBERIKAN`, 
+          not_vaccinated=`BELUM VAKSIN`) |> 
+  mutate(total_population=not_vaccinated+total_vaccination) |> 
+  mutate(vaccination_rate=total_vaccination/total_population)
+ return(modified)
+}
+```
+
+```{r}
+
+July_2021<-mutate_df(`Juli`)
+August_2021<-mutate_df(`Agustus`)
+September_2021<-mutate_df(`September`)
+October_2021<-mutate_df(`Oktober`)
+November_2021<-mutate_df(`November`)
+December_2021<-mutate_df(`Desember`)
+January_2022<-mutate_df(`Januari`)
+February_2022<-mutate_df(`Februari`)
+March_2022<-mutate_df(`Maret`)
+April_2022<-mutate_df(`April`)
+May_2022<-mutate_df(`Mei`)
+June_2022<-mutate_df(`Juni`)
+
+```
+
+### 3.3.3 Join vaccination data
+
+```{r}
+df <- rbind(July_2021, August_2021, September_2021, October_2021, November_2021, December_2021, January_2022, February_2022, March_2022, April_2022, May_2022, June_2022) |> 
+  na.exclude(TRUE) 
+```
+
+### 3.3.4 Join with geospatial data
+
+```{r}
+unique(df$city_region)
+```
+
+```{r}
+df <- df|> 
+   filter(city_region != "KAB.ADM.KEP.SERIBU")
+
+
+unique(df$city_region) 
+```
+
+## 3.4 Combined Data Wrangling
+
+```{r}
+combined_df <- left_join(df, geoJAR, by = c("village_code" = "Village_Code")) |> 
+  st_as_sf()
+
+class(combined_df)
+```
+
+```{r}
+combined_df<- combined_df |>
+  mutate(date=as.factor(date))
+```
+
+# 4.0 Choropleth Mapping
+
+```{r}
+ls<-list("Juli ", "Agustus", "September", "Oktober", "November", "Desember", "Januari", "Februari", "Maret", "April", "Mei", "Juni")
+```
+
+```{r}
+plot<-function(dataframe, title){
+  tmap_mode("plot")
+tm_shape(filter(combined_df, date %in% dataframe)) +
+  tm_fill("vaccination_rate",
+          n= 6,
+          style = "jenks",
+          palette="Blues")+
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title= title, 
+            main.title.position="center",
+            main.title.size=1.2,
+            legend.height=0.45,
+            legend.width = 0.35,
+            frame=TRUE)+
+    tm_scale_bar()+
+    tm_grid(alpha=0.2)
+}
+plot("July 2021", "Vaccination rate in July 2021")
+```
+
+```{r}
+tmap_mode("plot")
+tmap_arrange(plot("Juli", "Vaccination rate in July 2021"),
+             plot("Agustus", "Vaccination rate in August 2021"),
+             plot("September", "Vaccination rate in September 2021"),
+             plot("Oktober", "Vaccination rate in October 2021"),
+             plot("November", "Vaccination rate in November 2021"),
+             plot("Desember", "Vaccination rate in December 2021"),
+             plot("Januari", "Vaccination rate in January 2022"),
+             plot("Februari", "Vaccination rate in February 2022"),
+             plot("Maret", "Vaccination rate in March 2022"),
+             plot("April", "Vaccination rate in April 2022"),
+             plot("Mei", "Vaccination rate in May 2022"),
+             plot("Juni", "Vaccination rate in Jun3 2022"))
+```
+
+```{r}
+library(shiny)
+library(tmap)
+
+date <- c("Juli ", "Agustus", "September", "Oktober", "November", "Desember", "Januari", "Februari", "Maret", "April", "Mei", "Juni")
+
+# Define the UI
+ui <- fluidPage(
+  selectInput(
+    "date",
+    label="pick a month",
+    choices=date,
+    selected="July 2021",
+    multiple=FALSE
+  ),
+  # Create a tmap output element
+  tmapOutput("my_map")
+)
+
+# Define the server
+server <- function(input, output) {
+  # Render the tmap in the output element
+  output$my_map <- renderTmap({
+    df<- combined_df |> 
+      filter(date %in% input$date)
+    # Create the tmap
+    tm_shape(df) +
+  tm_fill("vaccination_rate",
+          style="quantile",
+          palette="Blues")
+  })
+}
+
+# Run the app
+shinyApp(ui, server)
+```
+
+# 5.0 Local Gi\* Analysis
+
+Filter
+
+```{r}
+filtered<-combined_df |> 
+  filter(date=="July 2021")
+```
+
+## 5.1 Compute contiguity weights: Queen\'s method
+
+```{r}
+wm_q <- filtered |> 
+  mutate(nb = st_contiguity(geometry),
+         wt = st_weights(nb,
+                         style = "W"),
+         .before = 1)
+```
+
+## 5.2 Deriving fixed distance weights
+
+```{r}
+geo <- sf::st_geometry(filtered)
+nb <- st_knn(geo, longlat = TRUE)
+dists <- unlist(st_nb_dists(geo, nb))
+```
+
+```{r}
+sum_dists<-summary(dists)
+```
+
+## 5.3 Compute fixed distance weights
+
+```{r}
+wm_fd <- filtered %>%
+  mutate(nb = st_dist_band(geometry,
+                           upper = 3600
+                             ),
+               wt = st_weights(nb),
+               .before = 1)
+```
+
+## 5.4 Create function
+
+## 5.5 Local Spatial Autocorrelation
+
+## 5.6 Compute local moran\'s I
+
+```{r}
+filtered
+```
+
+```{r}
+fips <- order(wm_fd$village_code)
+localMI <- local_moran(wm_fd$vaccination_rate,
+                       wm_fd$nb, 
+                       wm_fd$wt)
+head(localMI)
+```
+
+## 5.7 Print results in a list
+
+```{r}
+head(printCoefmat(data.frame(
+  localMI[fips,], 
+  row.names=combined_df$village_code[fips]),
+  check.names=FALSE))
+```
+
+## 5.8 Map the local Moran's I
+
+```{r}
+
 ```
