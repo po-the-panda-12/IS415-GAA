@@ -1074,8 +1074,8 @@
     "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#distance-band-method",
     "href": "in-class_ex/in-class_ex06/in-class_ex06.html#distance-band-method",
     "title": "In-Class Exercise 6: Choropleth Mapping",
-    "section": "2.5 Distance band method",
-    "text": "2.5 Distance band method\nFixed distance criterion - lower = 0, upper = whatever"
+    "section": "5.1 Distance band method",
+    "text": "5.1 Distance band method\nFixed distance criterion - lower = 0, upper = whatever\n\ngeo <- sf::st_geometry(hunan_GDPPC)\nnb <- st_knn(geo, longlat = TRUE)\ndists <- unlist(st_nb_dists(geo, nb))\n\n\nsummary(dists)\n\n   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n  21.56   29.11   36.89   37.34   43.21   65.80 \n\n\nMaximum nearest neighbor distance is 65.80km so threshold of 66km means there will be at least one neighbor\n\nwm_fd <- hunan_GDPPC %>%\n  mutate(nb = st_dist_band(geometry,\n                           upper = 66),\n               wt = st_weights(nb),\n               .before = 1)"
   },
   {
     "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#compute-contiguity-weights",
@@ -1349,5 +1349,33 @@
     "title": "In-Class Exercise 7: Global Measures of Spatial Association",
     "section": "4.1 Deriving contiguity weights: Rooks method",
     "text": "4.1 Deriving contiguity weights: Rooks method"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#contiguity-spatial-weights",
+    "href": "in-class_ex/in-class_ex06/in-class_ex06.html#contiguity-spatial-weights",
+    "title": "In-Class Exercise 6: Choropleth Mapping",
+    "section": "3.1 Contiguity Spatial Weights",
+    "text": "3.1 Contiguity Spatial Weights\nRedundant in later steps = 4.1\n\n3.1.1 Derive neighbor’s list using Queen’s method\n\n# -- st version\nnb_queen <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry), #default is queen\n         .before = 1) #place as first column\n\n#wm_q <- poly2nd(hunan_GDPPC, queen = TRUE) -- sp version\n\n\n\n3.1.2 Derive neighbor’s list using Rook’s method\n\nnb_rook <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry), #default is queen\n         queen = FALSE,\n         .before = 1) #place as first column\n\n\n\n3.1.3 Identifying higher order neighbors\nQueen Method\n\nnb2_queen <-  hunan_GDPPC %>% \n  mutate(nb = st_contiguity(geometry),\n         nb2 = st_nb_lag_cumul(nb, 2),\n         .before = 1)"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#contiguity-spatial-weights-1",
+    "href": "in-class_ex/in-class_ex06/in-class_ex06.html#contiguity-spatial-weights-1",
+    "title": "In-Class Exercise 6: Choropleth Mapping",
+    "section": "4.1 Contiguity Spatial Weights",
+    "text": "4.1 Contiguity Spatial Weights\n\n4.1.1 Derive neighbor’s list using Queen’s method\n\nwm_q <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry),\n         wt = st_weights(nb,\n                         style = \"W\"),\n         .before = 1) \n\n\n\n4.1.2 Derive neighbor’s list using Rook’s method\n\nwm_r <- hunan %>%\n  mutate(nb = st_contiguity(geometry,\n                            queen = FALSE),\n         wt = st_weights(nb),\n         .before = 1)"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#adaptive-distance-method",
+    "href": "in-class_ex/in-class_ex06/in-class_ex06.html#adaptive-distance-method",
+    "title": "In-Class Exercise 6: Choropleth Mapping",
+    "section": "5.2 Adaptive Distance Method",
+    "text": "5.2 Adaptive Distance Method\n\nwm_ad <- hunan_GDPPC %>% \n  mutate(nb = st_knn(geometry,\n                     k=8),\n         wt = st_weights(nb),\n               .before = 1)"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex06/in-class_ex06.html#inverse-distance-method",
+    "href": "in-class_ex/in-class_ex06/in-class_ex06.html#inverse-distance-method",
+    "title": "In-Class Exercise 6: Choropleth Mapping",
+    "section": "5.3 Inverse Distance Method",
+    "text": "5.3 Inverse Distance Method\n\nwm_idw <- hunan_GDPPC %>%\n  mutate(nb = st_contiguity(geometry),\n         wts = st_inverse_distance(nb, geometry,\n                                   scale = 1,\n                                   alpha = 1),\n         .before = 1)"
   }
 ]

@@ -76,61 +76,110 @@ tm_shape(hunan_GDPPC) +
 
 ```
 
-## 2.3 Identify area neighbors
+# 3.0 Identify area neighbors
 
-### 2.3.1 Contiguity Spatial Weights
+## 3.1 Contiguity Spatial Weights
 
-Redundant in later steps = 2.6
+Redundant in later steps = 4.1
 
-Derive neighbor's list using Queen's method
+### 3.1.1 Derive neighbor's list using Queen's method
 
 ```{r}
 # -- st version
-cn_queen <- hunan_GDPPC %>%
+nb_queen <- hunan_GDPPC %>%
   mutate(nb = st_contiguity(geometry), #default is queen
          .before = 1) #place as first column
 
 #wm_q <- poly2nd(hunan_GDPPC, queen = TRUE) -- sp version
 ```
 
-Derive neighbor's list using Rook's method
+### 3.1.2 Derive neighbor's list using Rook's method
 
 ```{r}
-cn_rook <- hunan_GDPPC %>%
+nb_rook <- hunan_GDPPC %>%
   mutate(nb = st_contiguity(geometry), #default is queen
          queen = FALSE,
          .before = 1) #place as first column
 ```
 
-```{r}
-#geo <- sf::st_geometry(huann)
-#nb <- st_knn(geo)
+### 3.1.3 Identifying higher order neighbors
 
+**Queen Method**
+
+```{r}
+nb2_queen <-  hunan_GDPPC %>% 
+  mutate(nb = st_contiguity(geometry),
+         nb2 = st_nb_lag_cumul(nb, 2),
+         .before = 1)
 ```
 
-## 2.4 K-nearest neighbors method
+# 4.0 K-nearest neighbors method
 
-## 2.5 Distance band method
+## 4.1 Contiguity Spatial Weights
 
-Fixed distance criterion - lower = 0, upper = whatever
-
-## 2.6 Compute contiguity weights
-
-### 2.6.1 Contiguity weights: Queen's method
+### 4.1.1 Derive neighbor's list using Queen's method
 
 ```{r}
 wm_q <- hunan_GDPPC %>%
   mutate(nb = st_contiguity(geometry),
-         wt = st_weights(nb),
-         .before = 1)
+         wt = st_weights(nb,
+                         style = "W"),
+         .before = 1) 
 ```
 
-### 2.6.2 Contiguity weights: Rook's method
+### 4.1.2 Derive neighbor's list using Rook's method
 
 ```{r}
-wm_r <- hunan_GDPPC %>%
-  mutate(nb = st_contiguity(geometry),
-         queen = FALSE,
+wm_r <- hunan %>%
+  mutate(nb = st_contiguity(geometry,
+                            queen = FALSE),
          wt = st_weights(nb),
+         .before = 1) 
+```
+
+# 5.0 Distance-based Weights
+
+## 5.1 Distance band method
+
+Fixed distance criterion - lower = 0, upper = whatever
+
+```{r}
+geo <- sf::st_geometry(hunan_GDPPC)
+nb <- st_knn(geo, longlat = TRUE)
+dists <- unlist(st_nb_dists(geo, nb))
+```
+
+```{r}
+summary(dists)
+```
+
+Maximum nearest neighbor distance is 65.80km so threshold of 66km means there will be at least one neighbor
+
+```{r}
+wm_fd <- hunan_GDPPC %>%
+  mutate(nb = st_dist_band(geometry,
+                           upper = 66),
+               wt = st_weights(nb),
+               .before = 1)
+```
+
+## 5.2 Adaptive Distance Method
+
+```{r}
+wm_ad <- hunan_GDPPC %>% 
+  mutate(nb = st_knn(geometry,
+                     k=8),
+         wt = st_weights(nb),
+               .before = 1)
+```
+
+## 5.3 Inverse Distance Method
+
+```{r}
+wm_idw <- hunan_GDPPC %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
          .before = 1)
 ```

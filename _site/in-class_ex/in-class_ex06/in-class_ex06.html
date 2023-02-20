@@ -246,17 +246,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#combine-both-data-frames-using-left-join" id="toc-combine-both-data-frames-using-left-join" class="nav-link" data-scroll-target="#combine-both-data-frames-using-left-join">2.2.3 Combine both data frames using left join</a></li>
   <li><a href="#choropleth-map" id="toc-choropleth-map" class="nav-link" data-scroll-target="#choropleth-map">2.2.3 Choropleth Map</a></li>
   </ul></li>
-  <li><a href="#identify-area-neighbors" id="toc-identify-area-neighbors" class="nav-link" data-scroll-target="#identify-area-neighbors">2.3 Identify area neighbors</a>
-  <ul class="collapse">
-  <li><a href="#contiguity-spatial-weights" id="toc-contiguity-spatial-weights" class="nav-link" data-scroll-target="#contiguity-spatial-weights">2.3.1 Contiguity Spatial Weights</a></li>
   </ul></li>
-  <li><a href="#k-nearest-neighbors-method" id="toc-k-nearest-neighbors-method" class="nav-link" data-scroll-target="#k-nearest-neighbors-method">2.4 K-nearest neighbors method</a></li>
-  <li><a href="#distance-band-method" id="toc-distance-band-method" class="nav-link" data-scroll-target="#distance-band-method">2.5 Distance band method</a></li>
-  <li><a href="#compute-contiguity-weights" id="toc-compute-contiguity-weights" class="nav-link" data-scroll-target="#compute-contiguity-weights">2.6 Compute contiguity weights</a>
+  <li><a href="#identify-area-neighbors" id="toc-identify-area-neighbors" class="nav-link" data-scroll-target="#identify-area-neighbors">3.0 Identify area neighbors</a>
   <ul class="collapse">
-  <li><a href="#contiguity-weights-queens-method" id="toc-contiguity-weights-queens-method" class="nav-link" data-scroll-target="#contiguity-weights-queens-method">2.6.1 Contiguity weights: Queen’s method</a></li>
-  <li><a href="#contiguity-weights-rooks-method" id="toc-contiguity-weights-rooks-method" class="nav-link" data-scroll-target="#contiguity-weights-rooks-method">2.6.2 Contiguity weights: Rook’s method</a></li>
+  <li><a href="#contiguity-spatial-weights" id="toc-contiguity-spatial-weights" class="nav-link" data-scroll-target="#contiguity-spatial-weights">3.1 Contiguity Spatial Weights</a>
+  <ul class="collapse">
+  <li><a href="#derive-neighbors-list-using-queens-method" id="toc-derive-neighbors-list-using-queens-method" class="nav-link" data-scroll-target="#derive-neighbors-list-using-queens-method">3.1.1 Derive neighbor’s list using Queen’s method</a></li>
+  <li><a href="#derive-neighbors-list-using-rooks-method" id="toc-derive-neighbors-list-using-rooks-method" class="nav-link" data-scroll-target="#derive-neighbors-list-using-rooks-method">3.1.2 Derive neighbor’s list using Rook’s method</a></li>
+  <li><a href="#identifying-higher-order-neighbors" id="toc-identifying-higher-order-neighbors" class="nav-link" data-scroll-target="#identifying-higher-order-neighbors">3.1.3 Identifying higher order neighbors</a></li>
   </ul></li>
+  </ul></li>
+  <li><a href="#k-nearest-neighbors-method" id="toc-k-nearest-neighbors-method" class="nav-link" data-scroll-target="#k-nearest-neighbors-method">4.0 K-nearest neighbors method</a>
+  <ul class="collapse">
+  <li><a href="#contiguity-spatial-weights-1" id="toc-contiguity-spatial-weights-1" class="nav-link" data-scroll-target="#contiguity-spatial-weights-1">4.1 Contiguity Spatial Weights</a>
+  <ul class="collapse">
+  <li><a href="#derive-neighbors-list-using-queens-method-1" id="toc-derive-neighbors-list-using-queens-method-1" class="nav-link" data-scroll-target="#derive-neighbors-list-using-queens-method-1">4.1.1 Derive neighbor’s list using Queen’s method</a></li>
+  <li><a href="#derive-neighbors-list-using-rooks-method-1" id="toc-derive-neighbors-list-using-rooks-method-1" class="nav-link" data-scroll-target="#derive-neighbors-list-using-rooks-method-1">4.1.2 Derive neighbor’s list using Rook’s method</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#distance-based-weights" id="toc-distance-based-weights" class="nav-link" data-scroll-target="#distance-based-weights">5.0 Distance-based Weights</a>
+  <ul class="collapse">
+  <li><a href="#distance-band-method" id="toc-distance-band-method" class="nav-link" data-scroll-target="#distance-band-method">5.1 Distance band method</a></li>
+  <li><a href="#adaptive-distance-method" id="toc-adaptive-distance-method" class="nav-link" data-scroll-target="#adaptive-distance-method">5.2 Adaptive Distance Method</a></li>
+  <li><a href="#inverse-distance-method" id="toc-inverse-distance-method" class="nav-link" data-scroll-target="#inverse-distance-method">5.3 Inverse Distance Method</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -380,63 +392,118 @@ In order to retain the geospatial properties, the left data frame must be the sf
 </div>
 </section>
 </section>
-<section id="identify-area-neighbors" class="level2">
-<h2 class="anchored" data-anchor-id="identify-area-neighbors">2.3 Identify area neighbors</h2>
-<section id="contiguity-spatial-weights" class="level3">
-<h3 class="anchored" data-anchor-id="contiguity-spatial-weights">2.3.1 Contiguity Spatial Weights</h3>
-<p>Redundant in later steps = 2.6</p>
-<p>Derive neighbor’s list using Queen’s method</p>
+</section>
+<section id="identify-area-neighbors" class="level1">
+<h1>3.0 Identify area neighbors</h1>
+<section id="contiguity-spatial-weights" class="level2">
+<h2 class="anchored" data-anchor-id="contiguity-spatial-weights">3.1 Contiguity Spatial Weights</h2>
+<p>Redundant in later steps = 4.1</p>
+<section id="derive-neighbors-list-using-queens-method" class="level3">
+<h3 class="anchored" data-anchor-id="derive-neighbors-list-using-queens-method">3.1.1 Derive neighbor’s list using Queen’s method</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -- st version</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>cn_queen <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>nb_queen <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry), <span class="co">#default is queen</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>) <span class="co">#place as first column</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#wm_q &lt;- poly2nd(hunan_GDPPC, queen = TRUE) -- sp version</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Derive neighbor’s list using Rook’s method</p>
+</section>
+<section id="derive-neighbors-list-using-rooks-method" class="level3">
+<h3 class="anchored" data-anchor-id="derive-neighbors-list-using-rooks-method">3.1.2 Derive neighbor’s list using Rook’s method</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cn_rook <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span></span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>nb_rook <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry), <span class="co">#default is queen</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">queen =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>) <span class="co">#place as first column</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="identifying-higher-order-neighbors" class="level3">
+<h3 class="anchored" data-anchor-id="identifying-higher-order-neighbors">3.1.3 Identifying higher order neighbors</h3>
+<p><strong>Queen Method</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#geo &lt;- sf::st_geometry(huann)</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#nb &lt;- st_knn(geo)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>nb2_queen <span class="ot">&lt;-</span>  hunan_GDPPC <span class="sc">%&gt;%</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">nb2 =</span> <span class="fu">st_nb_lag_cumul</span>(nb, <span class="dv">2</span>),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
-<section id="k-nearest-neighbors-method" class="level2">
-<h2 class="anchored" data-anchor-id="k-nearest-neighbors-method">2.4 K-nearest neighbors method</h2>
 </section>
-<section id="distance-band-method" class="level2">
-<h2 class="anchored" data-anchor-id="distance-band-method">2.5 Distance band method</h2>
-<p>Fixed distance criterion - lower = 0, upper = whatever</p>
-</section>
-<section id="compute-contiguity-weights" class="level2">
-<h2 class="anchored" data-anchor-id="compute-contiguity-weights">2.6 Compute contiguity weights</h2>
-<section id="contiguity-weights-queens-method" class="level3">
-<h3 class="anchored" data-anchor-id="contiguity-weights-queens-method">2.6.1 Contiguity weights: Queen’s method</h3>
+<section id="k-nearest-neighbors-method" class="level1">
+<h1>4.0 K-nearest neighbors method</h1>
+<section id="contiguity-spatial-weights-1" class="level2">
+<h2 class="anchored" data-anchor-id="contiguity-spatial-weights-1">4.1 Contiguity Spatial Weights</h2>
+<section id="derive-neighbors-list-using-queens-method-1" class="level3">
+<h3 class="anchored" data-anchor-id="derive-neighbors-list-using-queens-method-1">4.1.1 Derive neighbor’s list using Queen’s method</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>wm_q <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry),</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb),</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">style =</span> <span class="st">"W"</span>),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="contiguity-weights-rooks-method" class="level3">
-<h3 class="anchored" data-anchor-id="contiguity-weights-rooks-method">2.6.2 Contiguity weights: Rook’s method</h3>
+<section id="derive-neighbors-list-using-rooks-method-1" class="level3">
+<h3 class="anchored" data-anchor-id="derive-neighbors-list-using-rooks-method-1">4.1.2 Derive neighbor’s list using Rook’s method</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>wm_r <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry),</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">queen =</span> <span class="cn">FALSE</span>,</span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>wm_r <span class="ot">&lt;-</span> hunan <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">queen =</span> <span class="cn">FALSE</span>),</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb),</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="distance-based-weights" class="level1">
+<h1>5.0 Distance-based Weights</h1>
+<section id="distance-band-method" class="level2">
+<h2 class="anchored" data-anchor-id="distance-band-method">5.1 Distance band method</h2>
+<p>Fixed distance criterion - lower = 0, upper = whatever</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>geo <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_geometry</span>(hunan_GDPPC)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>nb <span class="ot">&lt;-</span> <span class="fu">st_knn</span>(geo, <span class="at">longlat =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>dists <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">st_nb_dists</span>(geo, nb))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dists)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  21.56   29.11   36.89   37.34   43.21   65.80 </code></pre>
+</div>
+</div>
+<p>Maximum nearest neighbor distance is 65.80km so threshold of 66km means there will be at least one neighbor</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>wm_fd <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_dist_band</span>(geometry,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">upper =</span> <span class="dv">66</span>),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">wt =</span> <span class="fu">st_weights</span>(nb),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="adaptive-distance-method" class="level2">
+<h2 class="anchored" data-anchor-id="adaptive-distance-method">5.2 Adaptive Distance Method</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>wm_ad <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_knn</span>(geometry,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">k=</span><span class="dv">8</span>),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="inverse-distance-method" class="level2">
+<h2 class="anchored" data-anchor-id="inverse-distance-method">5.3 Inverse Distance Method</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>wm_idw <span class="ot">&lt;-</span> hunan_GDPPC <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">wts =</span> <span class="fu">st_inverse_distance</span>(nb, geometry,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">scale =</span> <span class="dv">1</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">alpha =</span> <span class="dv">1</span>),</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
-</section>
 </section>
 </section>
 
