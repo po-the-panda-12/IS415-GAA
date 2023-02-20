@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2023-02-13">
 
-<title>IS415-GAA - In-Class Exercise 5:</title>
+<title>IS415-GAA - In-Class Exercise 6: Choropleth Mapping</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -157,8 +157,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
  <span class="dropdown-text">Hands-on Exercise 1</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex02/hands-on_ex02.html">
- <span class="dropdown-text">Hands-on Exercise 2</span></a>
+    <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex03/hands-on_ex03.html">
+ <span class="dropdown-text">Hands-on Exercise 3</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex04/hands-on_ex04.html">
@@ -167,6 +167,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
         <li>
     <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex06/hands-on_ex06.html">
  <span class="dropdown-text">Hands-on Exercise 6</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex07/hands-on_ex07.html">
+ <span class="dropdown-text">Hands-on Exercise 7</span></a>
   </li>  
     </ul>
   </li>
@@ -195,6 +199,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="dropdown-item" href="../../in-class_ex/in-class_ex06/in-class_ex06.html">
  <span class="dropdown-text">In-class Exercise 6</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../in-class_ex/in-class_ex07/in-class_ex07.html">
+ <span class="dropdown-text">In-class Exercise 7</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -205,6 +213,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
         <li>
     <a class="dropdown-item" href="../../take_home_ex/take_home_ex01/take_home_ex01.html">
  <span class="dropdown-text">Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../take_home_ex/take_home_ex02/take_home_ex02.html">
+ <span class="dropdown-text">Exercise 2</span></a>
   </li>  
     </ul>
   </li>
@@ -245,9 +257,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#contiguity-weights-queens-method" id="toc-contiguity-weights-queens-method" class="nav-link" data-scroll-target="#contiguity-weights-queens-method">2.6.1 Contiguity weights: Queen’s method</a></li>
   <li><a href="#contiguity-weights-rooks-method" id="toc-contiguity-weights-rooks-method" class="nav-link" data-scroll-target="#contiguity-weights-rooks-method">2.6.2 Contiguity weights: Rook’s method</a></li>
   </ul></li>
-  <li><a href="#computing" id="toc-computing" class="nav-link" data-scroll-target="#computing">2.7 Computing</a></li>
-  <li><a href="#compute-local-morans-i" id="toc-compute-local-morans-i" class="nav-link" data-scroll-target="#compute-local-morans-i">2.8 Compute local Moran’s I</a></li>
-  <li><a href="#visualise-local-morans-i" id="toc-visualise-local-morans-i" class="nav-link" data-scroll-target="#visualise-local-morans-i">2.9 Visualise local Moran’s I</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -257,7 +266,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">In-Class Exercise 5:</h1>
+<h1 class="title">In-Class Exercise 6: Choropleth Mapping</h1>
 </div>
 
 
@@ -275,7 +284,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">February 13, 2023</p>
+      <p class="date-modified">February 20, 2023</p>
     </div>
   </div>
     
@@ -425,18 +434,9 @@ In order to retain the geospatial properties, the left data frame must be the sf
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb),</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
-</section>
-<section id="computing" class="level2">
-<h2 class="anchored" data-anchor-id="computing">2.7 Computing</h2>
-</section>
-<section id="compute-local-morans-i" class="level2">
-<h2 class="anchored" data-anchor-id="compute-local-morans-i">2.8 Compute local Moran’s I</h2>
-</section>
-<section id="visualise-local-morans-i" class="level2">
-<h2 class="anchored" data-anchor-id="visualise-local-morans-i">2.9 Visualise local Moran’s I</h2>
 
 
+</section>
 </section>
 </section>
 

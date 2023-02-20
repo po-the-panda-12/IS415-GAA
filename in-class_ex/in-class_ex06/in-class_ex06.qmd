@@ -1,5 +1,5 @@
 ---
-title: "In-Class Exercise 5: "
+title: "In-Class Exercise 6: Choropleth Mapping"
 date: "13 February 2023"
 date-modified: "`r Sys.Date()`"
 execute: 
@@ -134,9 +134,3 @@ wm_r <- hunan_GDPPC %>%
          wt = st_weights(nb),
          .before = 1)
 ```
-
-## 2.7 Computing
-
-## 2.8 Compute local Moran's I
-
-## 2.9 Visualise local Moran's I

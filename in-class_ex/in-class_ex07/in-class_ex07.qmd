@@ -1,0 +1,65 @@
+---
+title: "In-Class Exercise 7: Global Measures of Spatial Association"
+date: "20 February 2023"
+date-modified: "`r Sys.Date()`"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+---
+
+# 1.0 Overview
+
+# 2.0 Setup
+
+## 2.1 Installing and Loading the R Packages
+
+```{r}
+pacman::p_load(sf, tmap, sfdep, tidyverse)
+#keep tidyverse at the end for dependency checking
+```
+
+## 2.2 The Data
+
+-   Hunan, a geospatial data set in ESRI shapefile format, and
+
+-   Hunan_2012, an attribute data set in csv format.
+
+### 2.2.1 Import Geospatial Data
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+### 2.2.2 Import attribute table
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+### 2.2.3 Combine both data frames using left join
+
+```{r}
+hunan_GDPPC <- left_join(hunan,hunan2012)%>%
+  select(1:4, 7, 15) #name, id, name, engtype, 7 - county, 15 - gdppc
+```
+
+# 3.0 Computing local Moran's I
+
+## 3.1 Compute local Moran's I
+
+## 3.2 Visualise local Moran's I
+
+## 3.3 Visualise local Moran's p-values
+
+## 3.4 Visualise local Moran's I and p-values
+
+# 4.0 Visualising local Moran's I
+
+## 4.1 Deriving contiguity weights: Rooks method
+
+# 5.0 Distance-based Weights
+
+# 4.0 Deriving adaptive distance weights
