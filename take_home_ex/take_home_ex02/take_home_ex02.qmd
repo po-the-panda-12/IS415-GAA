@@ -42,7 +42,7 @@ editor: visual
 -   raster - Used to handle gridded spatial data
 
 ```{r}
-pacman::p_load(sf, maptools, tmap, kableExtra, tidyverse)
+pacman::p_load(sf, maptools, tmap, kableExtra, readxl, lubridate, tidyverse)
 ```
 
 # 3.0 Data Wrangling
@@ -50,6 +50,11 @@ pacman::p_load(sf, maptools, tmap, kableExtra, tidyverse)
 ------------------------------------------------------------------------
 
 ## 3.1 Datasets Used
+
+| Type        | Name                                          |
+|-------------|-----------------------------------------------|
+| Geopsatial  | BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA |
+| Aspatial    | DKI Jakarta Provincial Vaccination Open Data  |
 
 ```{r}
 #| code-fold: true
@@ -74,6 +79,9 @@ library(knitr)
 library(kableExtra)
 kable(head(datasets), caption="Datasets Used") %>%
   kable_material("hover", latex_options="scale_down")
+
+#cleanup
+rm(datasets)
 ```
 
 ## 3.2 Geospatial Data
@@ -95,18 +103,17 @@ bd_jakarta <- st_read(dsn="data/geospatial",
 ```{r}
 glimpse(bd_jakarta)
 ```
+
+#### View
+
+```{r}
+plot(st_geometry(bd_jakarta))
+```
 :::
 
 ### 3.2.2 Data Preprocessing
 
-#### 3.2.2.1 Exclude redundant fields
-
-```{r}
-#bd_jakarta <- bd_jakarta %>%
-#  select(c(3:4, 8:9))
-```
-
-#### 3.2.2.2 Invalid Geometries
+#### 3.2.2.1 Invalid Geometries
 
 ```{r}
 length(which(st_is_valid(bd_jakarta) == FALSE))
@@ -114,10 +121,44 @@ length(which(st_is_valid(bd_jakarta) == FALSE))
 
 Everything is valid
 
-#### 3.2.2.3 Checking for Duplicate Names
+#### 3.2.2.2 Exclude redundant fields
+
+Exclude all data except Object ID, Village Code, Village name, Code, Province, City District, Sub-district, Kelur Village, Total Population and geometry of the regions.
+
+**\-\-- Remove province as there is only one \-\--**
 
 ```{r}
-#osun$ADM2_EN[duplicated(osun$ADM2_EN)==TRUE]
+bd_jakarta <- bd_jakarta [, 0:9]
+```
+
+#### 3.2.2.3 Rename from Bahasa Indonesia to English
+
+| Index | Original Name | Translated Name        |
+|-------|---------------|------------------------|
+| 1     | OBJECT_ID     | Object_ID (no need???) |
+| 2     | KODE_DESA     | Village_Code           |
+| 3     | DESA          | Village                |
+| 4     | KODE          | Code                   |
+| 5     | PROVINSI      | Province               |
+| 6     | KAB_KOTA      | City                   |
+| 7     | KECAMATAN     | District               |
+| 8     | DESA_KELUR    | Sub_District           |
+| 9     | JUMLAH_PEN    | Total_Population       |
+
+```{r}
+#| code-fold: true
+bd_jakarta <- bd_jakarta %>% 
+  dplyr::rename(
+    Object_ID=OBJECT_ID,
+    Province=PROVINSI, #province
+    City=KAB_KOTA, #city district
+    District=KECAMATAN, #sub district 
+    Village_Code=KODE_DESA, #village code
+    Village=DESA, #village name 
+    Sub_District=DESA_KELUR,#village kelur
+    Code=KODE, #code
+    Total_Population=JUMLAH_PEN #num pens
+    )
 ```
 
 #### 3.2.2.4 Handle Missing Values
@@ -126,14 +167,15 @@ Everything is valid
 bd_jakarta[rowSums(is.na(bd_jakarta))!=0,]
 ```
 
-Remove NA values
+There are 9 missing values.
+
+**Remove all rows with missing values**
 
 ```{r}
-#bd_jakarta <- na.omit(bd_jakarta,c("DESA_KELUR"))
-bd_jakarta <- na.exclude(bd_jakarta)
+bd_jakarta <- na.omit(bd_jakarta)
 ```
 
-### 3.2.3 Check CRS
+### 3.2.3 Transform Coordinate System
 
 ```{r}
 st_crs(bd_jakarta)
@@ -149,121 +191,195 @@ st_crs(bd_jakarta)
 
 ### 3.2.4 Remove outer islands
 
+Based on first glance in [View], there are several small islands surrounding the mainland. As this is not relevant to the analysis, they shall be omitted.
+
 ```{r}
 # KEPULAUAN SERIBU means thousand islands
-bd_jakarta <- filter(bd_jakarta, KAB_KOTA != "KEPULAUAN SERIBU")
-bd_jakarta
+bd_jakarta <- filter(bd_jakarta, City != "KEPULAUAN SERIBU")
 ```
 
-### 3.2.5 Retain first 9 fields
-
-Why??
+### 3.2.5 Data Summary
 
 ```{r}
-bd_jakarta <- bd_jakarta[, 0:9]
+#| code-fold: true
+c = length(unique(bd_jakarta$"City"))
+d = length(unique(bd_jakarta$"District"))
+sd = length(unique(bd_jakarta$"Sub_District"))
+
+cat("There are", c, "unique cities,", d, "unique districts, and", sd, "unique sub-districs")
+
+rm(c,d,sd)
 ```
 
-### 3.2.6 Rename columns post translation
+There a 5 unique cities, 42 unique districts and 261 unique sub-districts.
+
+#### 3.2.5.1 View distribution 
+
+::: panel-tabset
+#### Districts per City
 
 ```{r}
-bd_jakarta <- bd_jakarta %>% 
-  dplyr::rename(
-    Object_ID=OBJECT_ID,
-    Province=PROVINSI, 
-    City=KAB_KOTA, 
-    District=KECAMATAN, 
-    Village_Code=KODE_DESA, 
-    Village=DESA, 
-    Sub_District=DESA_KELUR,
-    Code=KODE, 
-    Total_Population=JUMLAH_PEN
-    )
+#| code-fold: true
+df_grp_cities = bd_jakarta %>% group_by(City)  %>%
+                    summarise(total_districts = n(),
+                              .groups = 'drop')
 ```
-
-### 3.2.7 EDA
-
-Number of unique sub-districts
 
 ```{r}
-length(unique(bd_jakarta$"Sub_District"))
+#| code-fold: true
+ggplot(df_grp_cities, aes(x=City, y=total_districts), fill=City) + 
+  geom_bar(stat = "identity",
+           color="black",
+           fill="lightblue4") + 
+  ggtitle("Number of Districts by City") +
+  xlab("City Name") +
+  ylab("No. of Districts") 
+
+#cleanup  
+rm(df_grp_cities)
 ```
 
-View by city divisions
+#### Sub-districts per District
+
+```{r}
+#| code-fold: true
+df_grp_districs = bd_jakarta %>% group_by(District)  %>%
+                    summarise(total_sub_districts = n(),
+                              .groups = 'drop')
+```
+
+```{r}
+#| code-fold: true
+ggplot(df_grp_districs, aes(x=District, y=total_sub_districts)) + 
+  geom_bar(stat = "identity",
+           color="black",
+           fill="lightblue3") + 
+  scale_x_discrete(guide = guide_axis(n.dodge=2))+
+  ggtitle("Number of Sub-districts by District") +
+  xlab("District Name") +
+  ylab("No. of Sub-districts") 
+
+#cleanup  
+rm(df_grp_districs)
+```
+:::
+
+#### 3.2.5.2 View by City Divisions
 
 ```{r}
 tm_shape(bd_jakarta) + 
   tm_polygons("City")
 ```
 
+#### 3.2.5.2 View by Population
+
+::: panel-tabset
+#### Distribution
+
+```{r}
+ggplot(bd_jakarta, aes(x=Total_Population)) + 
+  geom_histogram(bins = 10,
+                color="black",
+                fill="indianred")
+```
+
+#### Map
+
+Quantile Classification
+
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+tm_shape(bd_jakarta) + 
+  tm_fill("Total_Population",
+          style = "quantile",
+          palette = "OrRd") + 
+  tm_layout(main.title = "Distribution by Population") + 
+  tm_borders(alpha = 0.5) 
+```
+:::
+
 ## 3.3 Aspatial Data
 
 ### 3.3.1 Load Data
 
+All files were downloaded as "Data Vaksinasi Berbasis Kelurahan (\<last date of month\> \<Indonesian month name\> \<year\>).xlsx" were locally renamed as "\<last date of month\> \<English month name\> \<year\>.xlsx"
+
 ```{r}
-# Load the readxl library
-library(readxl)
+#get list of aspatial data files
+folder_path <- "data/aspatial"
+files <- list.files(folder_path, pattern = ".xlsx", full.names = TRUE)
+```
 
-# Set the working directory to the folder containing the Excel files
-setwd("data/aspatial/") 
+```{r}
+#combines files into vacc_df
+vacc_df <- data.frame()
 
-# Get a list of all Excel files in the directory
-files <- list.files(pattern = ".xlsx")
-
-# Loop through the files and read each one into a data frame
 for (file in files) {
-  assign(gsub(".xlsx", "", file), read_excel(file))
+  sheet_name <- "Data Kelurahan"
+  date <- dmy(str_extract(file, "\\d{2} [[:alpha:]]+ \\d{4}"))
+  data <- read_excel(file, sheet = "Data Kelurahan")
+  data$date <- date
+   vacc_df <- bind_rows( vacc_df, data)
 }
+
+rm(data) #cleanup
 ```
 
-### 3.3.2 Modify data frames
+### 3.3.2  Data Preprocessing
+
+#### 3.3.2.1 Exclude redundant fields
 
 ```{r}
-mutate_df<-function(data){
- df_name <- deparse(substitute(data))
- modified<-data |> 
-   mutate(date=df_name,
-          .before=1) |> 
-   select(date, 
-          `KODE KELURAHAN`, 
-          `WILAYAH KOTA`, 
-          KECAMATAN, 
-          KELURAHAN, 
-          `BELUM VAKSIN`, 
-          `TOTAL VAKSIN\r\nDIBERIKAN`) |> 
-   rename(village_code=`KODE KELURAHAN`, 
-          city_region =`WILAYAH KOTA`, 
-          subdistrict=`KECAMATAN`, 
-          ward=`KELURAHAN`, 
-          total_vaccination= `TOTAL VAKSIN\r\nDIBERIKAN`, 
-          not_vaccinated=`BELUM VAKSIN`) |> 
-  mutate(total_population=not_vaccinated+total_vaccination) |> 
-  mutate(vaccination_rate=total_vaccination/total_population)
- return(modified)
-}
+vacc_df <-  vacc_df %>%
+  select(1:6, 28)
 ```
 
+#### 3.3.2.2 Rename from Bahasa Indonesia to English
+
+| Index | Original Name  | Translated Name            |
+|-------|----------------|----------------------------|
+| 1     | ID             | ID                         |
+| 2     | Name_provinsi  | Province                   |
+| 3     | name_kota      | City                       |
+| 4     | nama_kecamatan | District                   |
+| 5     | nama_kelurahan | Sub-District               |
+| 6     | Meninggal      | Cumulative Death Cases     |
+| 7     | POSITIF        | Cumulative Confirmed Cases |
+| 8     | Date           | Date                       |
+
 ```{r}
-
-July_2021<-mutate_df(`Juli`)
-August_2021<-mutate_df(`Agustus`)
-September_2021<-mutate_df(`September`)
-October_2021<-mutate_df(`Oktober`)
-November_2021<-mutate_df(`November`)
-December_2021<-mutate_df(`Desember`)
-January_2022<-mutate_df(`Januari`)
-February_2022<-mutate_df(`Februari`)
-March_2022<-mutate_df(`Maret`)
-April_2022<-mutate_df(`April`)
-May_2022<-mutate_df(`Mei`)
-June_2022<-mutate_df(`Juni`)
-
+#| code-fold: true
+vacc_df <- vacc_df %>% 
+  dplyr::rename(
+    Family_Code = "KODE KELURAHAN",
+    City = "WILAYAH KOTA",
+    District=KECAMATAN, 
+    Sub_District= KELURAHAN,
+    Target=SASARAN, 
+    Yet_to_be_Vaccinated="BELUM VAKSIN",
+    )
 ```
 
-### 3.3.3 Join vaccination data
+#### 3.3.2.3 Handle Missing Values
 
 ```{r}
-df <- rbind(July_2021, August_2021, September_2021, October_2021, November_2021, December_2021, January_2022, February_2022, March_2022, April_2022, May_2022, June_2022) |> 
-  na.exclude(TRUE) 
+vacc_df[rowSums(is.na(vacc_df))!=0,]
+```
+
+Remove all rows with Family Code missing ---why?\--
+
+```{r}
+vacc_df <- na.omit(vacc_df,c("Family_code"))
+```
+
+## 3.4 Combined Data Wrangling
+
+### 3.4.1 Join vaccination data
+
+```{r}
+df <- left_join(bd_jakarta, vacc_df,
+                              by=c("Sub_District"="Sub_District"))
 ```
 
 ### 3.3.4 Join with geospatial data
@@ -383,7 +499,7 @@ filtered<-combined_df |>
   filter(date=="July 2021")
 ```
 
-## 5.1 Compute contiguity weights: Queen\'s method
+## 5.1 Compute contiguity weights: Queen's method
 
 ```{r}
 wm_q <- filtered |> 
@@ -420,7 +536,7 @@ wm_fd <- filtered %>%
 
 ## 5.5 Local Spatial Autocorrelation
 
-## 5.6 Compute local moran\'s I
+## 5.6 Compute local moran's I
 
 ```{r}
 filtered
