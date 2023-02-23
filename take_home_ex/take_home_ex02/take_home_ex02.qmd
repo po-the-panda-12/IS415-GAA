@@ -56,39 +56,11 @@ pacman::p_load(sf, maptools, tmap, kableExtra, readxl, lubridate, tidyr, tidyver
 | Geopsatial  | BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA |
 | Aspatial    | DKI Jakarta Provincial Vaccination Open Data  |
 
-```{r}
-#| code-fold: true
-# initialise a dataframe of our geospatial and aspatial data details
-datasets <- data.frame(
-  Type=c("Geospatial",
-         "Aspatial"),
-  Name=c("[Batas Desa Provinsi DKI Jakarta](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html)",
-         "[Standar Kelurahan Data Corona (Monthly)](https://riwayat-file-covid-19-dki-jakarta-jakartagis.hub.arcgis.com/)"),
-  Format=c("Shapefile", 
-           ".xlsx"),
-  Description=c("Sub-districts in DKI Jakarta",
-                "Sub-district level data of daily COVID-19 cases in DKI Jakarta  
-                between March 2020~July 2021")
-  )
-
-# with reference to this guide on kableExtra:
-# https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
-# kable_material is the name of the kable theme
-# 'hover' for to highlight row when hovering, 'scale_down' to adjust table to fit page width
-library(knitr)
-library(kableExtra)
-kable(head(datasets), caption="Datasets Used") %>%
-  kable_material("hover", latex_options="scale_down")
-
-#cleanup
-rm(datasets)
-```
-
 ## 3.2 Geospatial Data
 
 ### 3.2.1 Load Data
 
-Import Geospatial data and filter out Osun State. Transform WGS 48 coordinate system to projected coordinate system with Nigeria's ESPG - 26293
+Import Geospatial data and filter out Jakarta. Transform WGS 48 coordinate system to projected coordinate system with Nigeria's ESPG - 26293
 
 ::: panel-tabset
 #### Import
@@ -223,10 +195,7 @@ There a 5 unique cities, 42 unique districts and 261 unique sub-districts.
 df_grp_municipality = bd_jakarta %>% group_by(Municipality)  %>%
                     summarise(total_districts = n(),
                               .groups = 'drop')
-```
-
-```{r}
-#| code-fold: true
+                              
 ggplot(df_grp_municipality, aes(x=Municipality, y=total_districts), fill=Municipality) + 
   geom_bar(stat = "identity",
            color="black",
@@ -246,15 +215,12 @@ rm(df_grp_municipality)
 df_grp_districs = bd_jakarta %>% group_by(District)  %>%
                     summarise(total_sub_districts = n(),
                               .groups = 'drop')
-```
 
-```{r}
-#| code-fold: true
 ggplot(df_grp_districs, aes(x=District, y=total_sub_districts)) + 
   geom_bar(stat = "identity",
            color="black",
            fill="lightblue3") + 
-  scale_x_discrete(guide = guide_axis(n.dodge=2))+
+  scale_x_discrete(guide = guide_axis(n.dodge=5))+
   ggtitle("Number of Sub-districts by District") +
   xlab("District Name") +
   ylab("No. of Sub-districts") 
@@ -285,14 +251,14 @@ ggplot(bd_jakarta, aes(x=Total_Population)) +
 
 #### Map
 
-Quantile Classification
+Equal Interval Classification
 
 ```{r}
 #| code-fold: true
 tmap_mode("plot")
 tm_shape(bd_jakarta) + 
   tm_fill("Total_Population",
-          style = "quantile",
+          style = "equal",
           palette = "OrRd") + 
   tm_layout(main.title = "Distribution by Population") + 
   tm_borders(alpha = 0.5) 
@@ -487,67 +453,94 @@ rm(p1, p2) #cleanup
 
 Grey Missing data from 3.4.1 has been handled.
 
-```{r}
-write_rds(df, "Data/rds/df.rds")
-```
-
 # 4.0 Choropleth Mapping
 
 ------------------------------------------------------------------------
 
+```{r}
+
+```
+
 ## 4.1 Compute Vaccination Rates
+
+Add Vaccination Rate column to main dataframe (df)
 
 ```{r}
 df <- df %>%
   mutate(vaccination_rate = ((Total_Population-Not_Yet_Vaccinated)/Total_Population)*100)
 ```
 
+Create table vacc_rate_df that groups vaccination rate by sub-district and date
+
+```{r}
+vacc_rate_df <- df %>%
+  st_drop_geometry  %>% #remove geometry for pivot
+  group_by(Sub_District, Date) %>%
+  summarise(vaccination_rate) %>%
+  
+  ungroup() %>% 
+  pivot_wider(names_from = Date, #use pivot table to rearrange
+              values_from = vaccination_rate) %>%
+  
+  left_join(bd_jakarta, by=c("Sub_District"="Sub_District")) #add geometry back
+```
+
+**View**
+
+```{r}
+head(vacc_rate_df)
+```
+
+Convert to sf object for plotting
+
+```{r}
+vacc_rate_df <- st_as_sf(vacc_rate_df)
+```
+
 ## 4.2 Visualise monthly vaccination rates
 
 ```{r}
 #| code-fold: true
-#get list of all dates 
-all_dates <- list()
-for (file in files) {
-  all_dates <- append(all_dates, str_extract(file, "\\d{2} [[:alpha:]]+ \\d{4}"))
-}
+#helper function for plots
+#Can use fisher too
 
-rm(file) #cleanup
+
+plot <- function(varname) {
+  tm_shape(vacc_rate_df) +
+    tm_polygons() +
+  tm_shape(vacc_rate_df) +
+    tm_fill(varname, 
+          n= 6,
+          style = "jenks", 
+          palette="RdPu",
+          title = "Vaccination Rate (%)") +
+    tm_layout(main.title = paste("Vaccination rate by", paste(month(ymd(varname), label=TRUE), year(ymd(varname)))),
+          main.title.position = "center",
+          frame = TRUE) +
+    tm_borders(alpha = 0.5)
+}
+```
+
+**Plot**
+
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+tmap_arrange(plot("2021-07-31"), plot("2021-08-31"), plot("2021-09-30"),plot("2021-10-31"))
 ```
 
 ```{r}
 #| code-fold: true
-#helper function for plots
-#Alternatively can use fisher instead of jenks
+tmap_mode("plot")
+tmap_arrange(plot("2021-11-30"), plot("2021-12-31"), plot("2022-01-31"), plot("2022-02-27"))
 
-plot<-function(dt) {
-  tm_shape(filter(df, dmy(dt) %in% df$Date)) +
-    tm_fill("vaccination_rate",
-            n= 6,
-            style = "jenks",
-            palette="RdPu")+
-    tm_borders(alpha = 0.5) +
-    tm_layout(main.title= paste("Vaccination rate by", substring(dt,4,nchar(dt))),
-              frame=TRUE)+
-      tm_grid(alpha=0.2)
-}
 ```
-
-::: tabset-dropdown
-July 2021
 
 ```{r}
+#| code-fold: true
 tmap_mode("plot")
-plot(all_dates[9])
+tmap_arrange(plot("2022-03-31"), plot("2022-04-30"), plot("2022-05-31"), plot("2022-06-30"))
 ```
-
-August 2021
-
-```{r}
-tmap_mode("plot")
-plot(all_dates[6])
-```
-:::
 
 The vaccination rate increases over the year for all regions. The municipality / districts xxx start with the highest vaccination rates then other regions like xxx catch up.
 
@@ -620,21 +613,43 @@ breakpoints = c(48, 65, 72, 82, 86, 92)
 ```{r}
 #| code-fold: true
 #helper function for plotting
-# plot <- function(n_df, varname) {
-#   tm_shape(df) +
-#     tm_polygons() +
-#   tm_shape(n_df) +
-#     tm_fill(varname, 
-#           breaks= breakpoints,
-#           title = "Vaccination Rate") +
-#     tm_layout(main.title = varname,
-#           main.title.position = "center",
-#           frame = TRUE) +
-#     tm_borders(alpha = 0.5)
-# }
+plot <- function(varname) {
+  tm_shape(vacc_rate_df) +
+    tm_polygons() +
+  tm_shape(vacc_rate_df) +
+    tm_fill(varname, 
+          breaks= breakpoints,
+          palette="RdPu",
+          title = "Vaccination Rate") +
+    tm_layout(main.title = paste("Vaccination rate by", paste(month(ymd(varname), label=TRUE), year(ymd(varname)))),
+          main.title.position = "center",
+          frame = TRUE) +
+    tm_borders(alpha = 0.5)
+}
 ```
 
-\-\--bunch of plots\-\--
+**Plot**
+
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+tmap_arrange(plot("2021-07-31"), plot("2021-08-31"), plot("2021-09-30"),plot("2021-10-31"))
+```
+
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+tmap_arrange(plot("2021-11-30"), plot("2021-12-31"), plot("2022-01-31"), plot("2022-02-27"))
+
+```
+
+```{r}
+#| code-fold: true
+tmap_mode("plot")
+tmap_arrange(plot("2022-03-31"), plot("2022-04-30"), plot("2022-05-31"), plot("2022-06-30"))
+```
+
+\-\-\-\-\-\-\-\-\-\-\-\-\--
 
 At the beginning, low rates in xxx, rates are good now.
 
