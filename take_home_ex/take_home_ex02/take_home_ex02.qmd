@@ -42,7 +42,7 @@ editor: visual
 -   raster - Used to handle gridded spatial data
 
 ```{r}
-pacman::p_load(sf, maptools, tmap, kableExtra, readxl, lubridate, tidyverse)
+pacman::p_load(sf, maptools, tmap, kableExtra, readxl, lubridate, tidyr, tidyverse)
 ```
 
 # 3.0 Data Wrangling
@@ -123,51 +123,43 @@ Everything is valid
 
 #### 3.2.2.2 Exclude redundant fields
 
-Exclude all data except Object ID, Village Code, Village name, Code, Province, City District, Sub-district, Kelur Village, Total Population and geometry of the regions.
-
-**\-\-- Remove province as there is only one \-\--**
+Exclude all data except Municipality, District name, District Code, Sub-district Code, Sub-district name, Total Population and geometry of the regions.
 
 ```{r}
-bd_jakarta <- bd_jakarta [, 0:9]
+bd_jakarta <- bd_jakarta %>%
+  select(2:4, 6:7, 9,)
 ```
 
 #### 3.2.2.3 Rename from Bahasa Indonesia to English
 
-| Index | Original Name | Translated Name        |
-|-------|---------------|------------------------|
-| 1     | OBJECT_ID     | Object_ID (no need???) |
-| 2     | KODE_DESA     | Village_Code           |
-| 3     | DESA          | Village                |
-| 4     | KODE          | Code                   |
-| 5     | PROVINSI      | Province               |
-| 6     | KAB_KOTA      | City                   |
-| 7     | KECAMATAN     | District               |
-| 8     | DESA_KELUR    | Sub_District           |
-| 9     | JUMLAH_PEN    | Total_Population       |
+| Index | Original Name | Translated Name   |
+|-------|---------------|-------------------|
+| 2     | KODE_DESA     | Sub_District_Code |
+| 3     | DESA          | Sub_District      |
+| 4     | KODE          | District_Code     |
+| 6     | KAB_KOTA      | Municipality      |
+| 7     | KECAMATAN     | District          |
+| 9     | JUMLAH_PEN    | Total_Population  |
 
 ```{r}
 #| code-fold: true
 bd_jakarta <- bd_jakarta %>% 
   dplyr::rename(
-    Object_ID=OBJECT_ID,
-    Province=PROVINSI, #province
-    City=KAB_KOTA, #city district
-    District=KECAMATAN, #sub district 
-    Village_Code=KODE_DESA, #village code
-    Village=DESA, #village name 
-    Sub_District=DESA_KELUR,#village kelur
-    Code=KODE, #code
-    Total_Population=JUMLAH_PEN #num pens
+    Municipality=KAB_KOTA,
+    District=KECAMATAN,
+    District_Code=KODE,
+    Sub_District=DESA,
+    Sub_District_Code=KODE_DESA,
+    Total_Population=JUMLAH_PEN
     )
 ```
 
 #### 3.2.2.4 Handle Missing Values
 
 ```{r}
-bd_jakarta[rowSums(is.na(bd_jakarta))!=0,]
+#| code-fold: true
+cat("There are", sum(is.na(bd_jakarta)), "missing values in", paste(names(which(colSums(is.na(bd_jakarta))>0)), collapse = ", "))
 ```
-
-There are 9 missing values.
 
 **Remove all rows with missing values**
 
@@ -183,11 +175,19 @@ st_crs(bd_jakarta)
 
 Transform the CRS to DGN95, ESPG code 23845
 
+::: panel-tabset
+#### Transform
+
 ```{r}
 bd_jakarta <- st_transform(bd_jakarta, 23845)
+```
 
+#### View
+
+```{r}
 st_crs(bd_jakarta)
 ```
+:::
 
 ### 3.2.4 Remove outer islands
 
@@ -195,18 +195,18 @@ Based on first glance in [View], there are several small islands surrounding the
 
 ```{r}
 # KEPULAUAN SERIBU means thousand islands
-bd_jakarta <- filter(bd_jakarta, City != "KEPULAUAN SERIBU")
+bd_jakarta <- filter(bd_jakarta, Municipality != "KEPULAUAN SERIBU")
 ```
 
 ### 3.2.5 Data Summary
 
 ```{r}
 #| code-fold: true
-c = length(unique(bd_jakarta$"City"))
+c = length(unique(bd_jakarta$"Municipality"))
 d = length(unique(bd_jakarta$"District"))
 sd = length(unique(bd_jakarta$"Sub_District"))
 
-cat("There are", c, "unique cities,", d, "unique districts, and", sd, "unique sub-districs")
+cat("There are", c, "unique municipalities,", d, "unique districts, and", sd, "unique sub-districs")
 
 rm(c,d,sd)
 ```
@@ -216,27 +216,27 @@ There a 5 unique cities, 42 unique districts and 261 unique sub-districts.
 #### 3.2.5.1 View distribution 
 
 ::: panel-tabset
-#### Districts per City
+#### Districts per Municipality
 
 ```{r}
 #| code-fold: true
-df_grp_cities = bd_jakarta %>% group_by(City)  %>%
+df_grp_municipality = bd_jakarta %>% group_by(Municipality)  %>%
                     summarise(total_districts = n(),
                               .groups = 'drop')
 ```
 
 ```{r}
 #| code-fold: true
-ggplot(df_grp_cities, aes(x=City, y=total_districts), fill=City) + 
+ggplot(df_grp_municipality, aes(x=Municipality, y=total_districts), fill=Municipality) + 
   geom_bar(stat = "identity",
            color="black",
            fill="lightblue4") + 
-  ggtitle("Number of Districts by City") +
-  xlab("City Name") +
+  ggtitle("Number of Districts by Municipality") +
+  xlab("Municipality Name") +
   ylab("No. of Districts") 
 
 #cleanup  
-rm(df_grp_cities)
+rm(df_grp_municipality)
 ```
 
 #### Sub-districts per District
@@ -264,11 +264,11 @@ rm(df_grp_districs)
 ```
 :::
 
-#### 3.2.5.2 View by City Divisions
+#### 3.2.5.2 View by Municipality Divisions
 
 ```{r}
 tm_shape(bd_jakarta) + 
-  tm_polygons("City")
+  tm_polygons("Municipality")
 ```
 
 #### 3.2.5.2 View by Population
@@ -309,6 +309,8 @@ All files were downloaded as "Data Vaksinasi Berbasis Kelurahan (\<last date of 
 #get list of aspatial data files
 folder_path <- "data/aspatial"
 files <- list.files(folder_path, pattern = ".xlsx", full.names = TRUE)
+
+rm(folder_path) #cleanup
 ```
 
 ```{r}
@@ -316,61 +318,72 @@ files <- list.files(folder_path, pattern = ".xlsx", full.names = TRUE)
 vacc_df <- data.frame()
 
 for (file in files) {
-  sheet_name <- "Data Kelurahan"
-  date <- dmy(str_extract(file, "\\d{2} [[:alpha:]]+ \\d{4}"))
-  data <- read_excel(file, sheet = "Data Kelurahan")
-  data$date <- date
-   vacc_df <- bind_rows( vacc_df, data)
+  data <- read_excel(file, sheet = "Data Kelurahan") #sub-district
+  data$Date <- dmy(str_extract(file, "\\d{2} [[:alpha:]]+ \\d{4}")) #add date column
+  vacc_df <- bind_rows(vacc_df, data)
 }
 
-rm(data) #cleanup
+rm(file, data) #cleanup
 ```
 
 ### 3.3.2  Data Preprocessing
 
 #### 3.3.2.1 Exclude redundant fields
 
+Exclude all values except Municipality name, Sub-district name, Sub-district code, Target number, Number not yet vaccinated, Total vaccines administered and Date.
+
 ```{r}
 vacc_df <-  vacc_df %>%
-  select(1:6, 28)
+  select(1:2, 4:6, 9, 28)
 ```
 
 #### 3.3.2.2 Rename from Bahasa Indonesia to English
 
-| Index | Original Name  | Translated Name            |
-|-------|----------------|----------------------------|
-| 1     | ID             | ID                         |
-| 2     | Name_provinsi  | Province                   |
-| 3     | name_kota      | City                       |
-| 4     | nama_kecamatan | District                   |
-| 5     | nama_kelurahan | Sub-District               |
-| 6     | Meninggal      | Cumulative Death Cases     |
-| 7     | POSITIF        | Cumulative Confirmed Cases |
-| 8     | Date           | Date                       |
+| Index | Original Name          | Translated Name            |
+|-------|------------------------|----------------------------|
+| 1     | KODE KELURAHAN         | Sub_District_Code          |
+| 2     | WILAYAH KOTA           | Municipality               |
+| 4     | KELURAHAN              | Sub_District               |
+| 5     | SANSARAN               | Target                     |
+| 6     | BELUM VAKSIN           | Not_Yet_Vaccinated         |
+| 9     | TOTAL VAKSIN DIBERIKAN | Total_Vaccine_Administered |
 
 ```{r}
 #| code-fold: true
 vacc_df <- vacc_df %>% 
   dplyr::rename(
-    Family_Code = "KODE KELURAHAN",
-    City = "WILAYAH KOTA",
-    District=KECAMATAN, 
-    Sub_District= KELURAHAN,
-    Target=SASARAN, 
-    Yet_to_be_Vaccinated="BELUM VAKSIN",
+    Municipality="WILAYAH KOTA",
+    Sub_District="KELURAHAN",
+    Sub_District_Code="KODE KELURAHAN",
+    Target="SASARAN", 
+    Not_Yet_Vaccinated="BELUM VAKSIN", 
+    Total_Vaccine_Administered="TOTAL VAKSIN\r\nDIBERIKAN"
     )
 ```
 
 #### 3.3.2.3 Handle Missing Values
 
 ```{r}
-vacc_df[rowSums(is.na(vacc_df))!=0,]
+#| code-fold: true
+cat("There are", sum(is.na(vacc_df)), "missing values in", paste(names(which(colSums(is.na(vacc_df))>0)), collapse = ", "))
 ```
 
-Remove all rows with Family Code missing ---why?\--
+Remove all rows with missing values
 
 ```{r}
-vacc_df <- na.omit(vacc_df,c("Family_code"))
+vacc_df <- na.omit(vacc_df)
+```
+
+### 3.3.3 Remove outer islands
+
+```{r}
+vacc_df <- filter(vacc_df, Municipality != "KAB.ADM.KEP.SERIBU")
+```
+
+Remove column Municipality as there is no further need for it in this data frame
+
+```{r}
+vacc_df = vacc_df[,!(names(vacc_df) %in% "Municipality")]
 ```
 
 ## 3.4 Combined Data Wrangling
@@ -379,157 +392,294 @@ vacc_df <- na.omit(vacc_df,c("Family_code"))
 
 ```{r}
 df <- left_join(bd_jakarta, vacc_df,
-                              by=c("Sub_District"="Sub_District"))
+         by=c("Sub_District_Code"="Sub_District_Code",
+              "Sub_District"="Sub_District"))
 ```
 
-### 3.3.4 Join with geospatial data
+**Visualise**
 
 ```{r}
-unique(df$city_region)
+#| code-fold: true
+p1 = tm_shape(df)+
+  tm_fill("Target") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title="Target")
+  
+p2 = tm_shape(df)+
+  tm_fill("Total_Vaccine_Administered") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title="Total Vaccines Administered")
+
+
+tmap_arrange(p1, p2)
+rm(p1, p2) #cleanup
 ```
 
+While Target and Total Vaccines Administered seem highly correlated, there several grey Missing patches which will be addressed below
+
+### 3.4.2 Standardise Data
+
+Although missing values from the geospatial and aspatial data have already been omitted, there is a "Missing" data in the above visualisation. This is because there are discrepancies between the sub-district names in the two datasets.
+
+**View Discrepancies**
+
 ```{r}
-df <- df|> 
-   filter(city_region != "KAB.ADM.KEP.SERIBU")
+#| code-fold: true
+cases_subdistrict <- c(vacc_df$Sub_District)
+bd_subdistrict <- c(bd_jakarta$Sub_District)
+
+aspatial_list <- sort(unique(cases_subdistrict[!(cases_subdistrict %in% bd_subdistrict)]))
+aspatial_list <- c(aspatial_list[1:3], aspatial_list[6], aspatial_list[5], aspatial_list[7:9], aspatial_list[4]) #rearrgane - hardcoded
+
+geospatial_list <- sort(unique(bd_subdistrict[!(bd_subdistrict %in% cases_subdistrict)]))
 
 
-unique(df$city_region) 
+spelling <- data.frame(
+  Aspatial_Cases=aspatial_list,
+  Geospatial_BD=geospatial_list
+  )
+
+# with dataframe a input, outputs a kable
+library(knitr)
+library(kableExtra)
+kable(spelling, caption="Mismatched Records") %>%
+  kable_material("hover", latex_options="scale_down")
+  
+rm(cases_subdistrict, bd_subdistrict, spelling) #cleanup
 ```
 
-## 3.4 Combined Data Wrangling
+**Rename geospatial data with aspatial data values**
 
 ```{r}
-combined_df <- left_join(df, geoJAR, by = c("village_code" = "Village_Code")) |> 
-  st_as_sf()
+for (i in 1:9) {
+  bd_jakarta$Sub_District[bd_jakarta$Sub_District == geospatial_list[i]] <- aspatial_list[i]
+}
 
-class(combined_df)
+rm(aspatial_list, geospatial_list, i) #cleanup
 ```
 
+### 3.4.3 Join vaccination data (again)
+
 ```{r}
-combined_df<- combined_df |>
-  mutate(date=as.factor(date))
+df <- left_join(bd_jakarta, vacc_df,
+        by=c("Sub_District_Code"="Sub_District_Code",
+              "Sub_District"="Sub_District"))
+```
+
+**Visualise**
+
+```{r}
+#| code-fold: true
+p1 = tm_shape(df)+
+  tm_fill("Target") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title="Target")
+  
+p2 = tm_shape(df)+
+  tm_fill("Total_Vaccine_Administered") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title="Total Vaccines Administered")
+
+
+tmap_arrange(p1, p2)
+rm(p1, p2) #cleanup
+```
+
+Grey Missing data from 3.4.1 has been handled.
+
+```{r}
+write_rds(df, "Data/rds/df.rds")
 ```
 
 # 4.0 Choropleth Mapping
 
+------------------------------------------------------------------------
+
+## 4.1 Compute Vaccination Rates
+
 ```{r}
-ls<-list("Juli ", "Agustus", "September", "Oktober", "November", "Desember", "Januari", "Februari", "Maret", "April", "Mei", "Juni")
+df <- df %>%
+  mutate(vaccination_rate = ((Total_Population-Not_Yet_Vaccinated)/Total_Population)*100)
+```
+
+## 4.2 Visualise monthly vaccination rates
+
+```{r}
+#| code-fold: true
+#get list of all dates 
+all_dates <- list()
+for (file in files) {
+  all_dates <- append(all_dates, str_extract(file, "\\d{2} [[:alpha:]]+ \\d{4}"))
+}
+
+rm(file) #cleanup
 ```
 
 ```{r}
-plot<-function(dataframe, title){
-  tmap_mode("plot")
-tm_shape(filter(combined_df, date %in% dataframe)) +
-  tm_fill("vaccination_rate",
-          n= 6,
-          style = "jenks",
-          palette="Blues")+
-  tm_borders(alpha = 0.5) +
-  tm_layout(main.title= title, 
-            main.title.position="center",
-            main.title.size=1.2,
-            legend.height=0.45,
-            legend.width = 0.35,
-            frame=TRUE)+
-    tm_scale_bar()+
-    tm_grid(alpha=0.2)
+#| code-fold: true
+#helper function for plots
+#Alternatively can use fisher instead of jenks
+
+plot<-function(dt) {
+  tm_shape(filter(df, dmy(dt) %in% df$Date)) +
+    tm_fill("vaccination_rate",
+            n= 6,
+            style = "jenks",
+            palette="RdPu")+
+    tm_borders(alpha = 0.5) +
+    tm_layout(main.title= paste("Vaccination rate by", substring(dt,4,nchar(dt))),
+              frame=TRUE)+
+      tm_grid(alpha=0.2)
 }
-plot("July 2021", "Vaccination rate in July 2021")
 ```
+
+::: tabset-dropdown
+July 2021
 
 ```{r}
 tmap_mode("plot")
-tmap_arrange(plot("Juli", "Vaccination rate in July 2021"),
-             plot("Agustus", "Vaccination rate in August 2021"),
-             plot("September", "Vaccination rate in September 2021"),
-             plot("Oktober", "Vaccination rate in October 2021"),
-             plot("November", "Vaccination rate in November 2021"),
-             plot("Desember", "Vaccination rate in December 2021"),
-             plot("Januari", "Vaccination rate in January 2022"),
-             plot("Februari", "Vaccination rate in February 2022"),
-             plot("Maret", "Vaccination rate in March 2022"),
-             plot("April", "Vaccination rate in April 2022"),
-             plot("Mei", "Vaccination rate in May 2022"),
-             plot("Juni", "Vaccination rate in Jun3 2022"))
+plot(all_dates[9])
+```
+
+August 2021
+
+```{r}
+tmap_mode("plot")
+plot(all_dates[6])
+```
+:::
+
+The vaccination rate increases over the year for all regions. The municipality / districts xxx start with the highest vaccination rates then other regions like xxx catch up.
+
+## 4.3 Observations from Jenks based Mapping
+
+**For lowest vaccination rates,**
+
+```{r}
+#| code-fold: true
+#temporary dataset
+temp_low <- df %>%
+  group_by(Date) %>%
+  filter(vaccination_rate == min(vaccination_rate)) %>% 
+  arrange(Date)
+
+#plot
+ggplot(temp_low, aes(x=Date, y=vaccination_rate)) +
+  geom_point(aes(color=temp_low$Sub_District)) + 
+  ggtitle("Lowest Vaccination Rates over the Year by Sub-district")
+```
+
+Not only does the minimum vaccination rate increase over year, but the sub-district Bale Kambang has a sharp increase in its rate and no longer has the lowest vaccination rate by July 2022.
+
+**For highest vaccination rates,**
+
+```{r}
+#| code-fold: true
+#temporary dataset
+temp_high <- df %>%
+  group_by(Date) %>%
+  filter(vaccination_rate == max(vaccination_rate)) %>% 
+  arrange(Date)
+
+#plot
+ggplot(temp_high, aes(x=Date, y=vaccination_rate)) +
+  geom_point(aes(color=temp_high$Sub_District)) + 
+  ggtitle("Highest Vaccination Rates over the Year by Sub-district")
+```
+
+The sub-district Halim Perdana Kusumah has the highest vaccination rate for the most part.
+
+The vaccination rate by July 31, 2021 for this sub-district at 72.08% is much higher than that of Bale Kambang which was at 48.23%. This difference of 23.85% gets smoothed down to 8.77% by June 30, 2022.
+
+```{r}
+temp <- data.frame(temp_low$Date, temp_low$vaccination_rate, temp_high$vaccination_rate) 
+
+colors <- c("Lowest" = "orange", "Highest" = "steelblue")
+
+ggplot(temp, aes(x=temp_low.Date)) + 
+  geom_line(aes(y=temp_low.vaccination_rate, color="Lowest"), size = 1.2) + 
+  geom_line(aes(y=temp_high.vaccination_rate, color="Highest"), size = 1.2) + 
+  ggtitle("Highest and Lowest Vaccination Rates over the Year by Sub-district") + 
+  labs(y = "Vaccination Rate (%)",
+      color = "Vaccination Rate") +
+  scale_color_manual(values = colors)
+  
+rm(temp, temp_low, temp_high, colors)
+```
+
+## 4.4 Spatio-Temporal Mapping with custom breakpoints
+
+View how the vaccination rate increases in all regions over the year based on Jenks defined breakpoints.
+
+With the lowest and highest vaccination rates over the year being 48.23% and 91.87%, the Jenks breakpoints are defined as follows
+
+```{r}
+breakpoints = c(48, 65, 72, 82, 86, 92)
 ```
 
 ```{r}
-library(shiny)
-library(tmap)
-
-date <- c("Juli ", "Agustus", "September", "Oktober", "November", "Desember", "Januari", "Februari", "Maret", "April", "Mei", "Juni")
-
-# Define the UI
-ui <- fluidPage(
-  selectInput(
-    "date",
-    label="pick a month",
-    choices=date,
-    selected="July 2021",
-    multiple=FALSE
-  ),
-  # Create a tmap output element
-  tmapOutput("my_map")
-)
-
-# Define the server
-server <- function(input, output) {
-  # Render the tmap in the output element
-  output$my_map <- renderTmap({
-    df<- combined_df |> 
-      filter(date %in% input$date)
-    # Create the tmap
-    tm_shape(df) +
-  tm_fill("vaccination_rate",
-          style="quantile",
-          palette="Blues")
-  })
-}
-
-# Run the app
-shinyApp(ui, server)
+#| code-fold: true
+#helper function for plotting
+# plot <- function(n_df, varname) {
+#   tm_shape(df) +
+#     tm_polygons() +
+#   tm_shape(n_df) +
+#     tm_fill(varname, 
+#           breaks= breakpoints,
+#           title = "Vaccination Rate") +
+#     tm_layout(main.title = varname,
+#           main.title.position = "center",
+#           frame = TRUE) +
+#     tm_borders(alpha = 0.5)
+# }
 ```
+
+\-\--bunch of plots\-\--
+
+At the beginning, low rates in xxx, rates are good now.
+
+During xxx months, they increased a bit more
 
 # 5.0 Local Gi\* Analysis
 
 Filter
 
 ```{r}
-filtered<-combined_df |> 
-  filter(date=="July 2021")
+# filtered<-combined_df |> 
+#   filter(date=="July 2021")
 ```
 
 ## 5.1 Compute contiguity weights: Queen's method
 
 ```{r}
-wm_q <- filtered |> 
-  mutate(nb = st_contiguity(geometry),
-         wt = st_weights(nb,
-                         style = "W"),
-         .before = 1)
+# wm_q <- filtered |> 
+#   mutate(nb = st_contiguity(geometry),
+#          wt = st_weights(nb,
+#                          style = "W"),
+#          .before = 1)
 ```
 
 ## 5.2 Deriving fixed distance weights
 
 ```{r}
-geo <- sf::st_geometry(filtered)
-nb <- st_knn(geo, longlat = TRUE)
-dists <- unlist(st_nb_dists(geo, nb))
+# geo <- sf::st_geometry(filtered)
+# nb <- st_knn(geo, longlat = TRUE)
+# dists <- unlist(st_nb_dists(geo, nb))
 ```
 
 ```{r}
-sum_dists<-summary(dists)
+#sum_dists<-summary(dists)
 ```
 
 ## 5.3 Compute fixed distance weights
 
 ```{r}
-wm_fd <- filtered %>%
-  mutate(nb = st_dist_band(geometry,
-                           upper = 3600
-                             ),
-               wt = st_weights(nb),
-               .before = 1)
+# wm_fd <- filtered %>%
+#   mutate(nb = st_dist_band(geometry,
+#                            upper = 3600
+#                              ),
+#                wt = st_weights(nb),
+#                .before = 1)
 ```
 
 ## 5.4 Create function
@@ -539,24 +689,24 @@ wm_fd <- filtered %>%
 ## 5.6 Compute local moran's I
 
 ```{r}
-filtered
+#filtered
 ```
 
 ```{r}
-fips <- order(wm_fd$village_code)
-localMI <- local_moran(wm_fd$vaccination_rate,
-                       wm_fd$nb, 
-                       wm_fd$wt)
-head(localMI)
+# fips <- order(wm_fd$village_code)
+# localMI <- local_moran(wm_fd$vaccination_rate,
+#                        wm_fd$nb, 
+#                        wm_fd$wt)
+# head(localMI)
 ```
 
 ## 5.7 Print results in a list
 
 ```{r}
-head(printCoefmat(data.frame(
-  localMI[fips,], 
-  row.names=combined_df$village_code[fips]),
-  check.names=FALSE))
+# head(printCoefmat(data.frame(
+#   localMI[fips,], 
+#   row.names=combined_df$village_code[fips]),
+#   check.names=FALSE))
 ```
 
 ## 5.8 Map the local Moran's I
