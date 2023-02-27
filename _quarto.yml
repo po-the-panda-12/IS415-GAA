@@ -48,6 +48,18 @@ website:
             href: take_home_ex/take_home_ex01/take_home_ex01.qmd
           - text: "Exercise 2"
             href: take_home_ex/take_home_ex02/take_home_ex02.qmd
+            
+            
+      - text: "Shiny Workshop"
+        menu: 
+          - text: "Exercise 1"
+            href: prototype/01-prototype/app.R
+          - text: "Exercise 2"
+            href: prototype/02-prototype/app.R
+          - text: "Exercise 3"
+            href: prototype/03-prototype/app.R
+          - text: "Exercise 4"
+            href: prototype/04-prototype/app.R
           
 
 format:

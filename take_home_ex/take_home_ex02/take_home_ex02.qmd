@@ -646,7 +646,7 @@ During xxx months, they increased a bit more
 
 -   With reference to the analysis results, draw statistical conclusions (not more than 250 words).
 
-## 5.1 Compute Gi\* values 
+## 5.1 Compute Gi\* values
 
 To create a time series cube, we first have to make an attribute table with the data organised in the following format: Date, Location (`Sub_District`) and Value (`Vaccination_Rate`)
 
@@ -814,7 +814,7 @@ For the Sub-Districts with p-value of Gi\* \< 0.05, the Gi\* values of the month
 
 Throughout the 12 months, there were 128 Sub-Districts with at least 1 month of having a significant Gi\* value.
 
-The Gi\* value of the vaccination rates for all 12 months were significant for Sub-Districts \"BATU AMPAR\", \"CIPINANG CEMPEDAK\", \"GLODOK\", \"KAMPUNG BALI\", \"KAMPUNG TENGAH\", \"KEAGUNGAN\", \"KEBON KACANG\", \"KEBON MELATI\", \"MANGGA BESAR\", \"PETAMBURAN\". This means that the vaccination rates for 12 months for these Sub-Districts were either significantly high or low.
+The Gi\* value of the vaccination rates for all 12 months were significant for Sub-Districts "BATU AMPAR", "CIPINANG CEMPEDAK", "GLODOK", "KAMPUNG BALI", "KAMPUNG TENGAH", "KEAGUNGAN", "KEBON KACANG", "KEBON MELATI", "MANGGA BESAR", "PETAMBURAN". This means that the vaccination rates for 12 months for these Sub-Districts were either significantly high or low.
 
 # 5.0 Emerging Hot Spot Analysis (EHSA)
 
@@ -822,9 +822,9 @@ The Gi\* value of the vaccination rates for all 12 months were significant for S
 
 In this section, we will perform the Mann-Kendall Test using the spatio-temporal local Gi\* values on 3 Sub-Districts.
 
-### 5.1.1 Sub-District 1 - \"HALIM PERDANA KUSUMAH\"
+### 5.1.1 Sub-District 1 - "HALIM PERDANA KUSUMAH"
 
-Firstly, on Sub-District \"HALIM PERDANA KUSUMAH\":
+Firstly, on Sub-District "HALIM PERDANA KUSUMAH":
 
 ```{r}
 cbg <- gi_stars |>
@@ -958,4 +958,4 @@ The areas where the patterns are insignificant appears to be mostly at the Centr
 
 ------------------------------------------------------------------------
 
-I\'d like to thank Professor Kam for his insights and resource materials provided under IS415 Geospatial Analytics and Applications.
+I'd like to thank Professor Kam for his insights and resource materials provided under IS415 Geospatial Analytics and Applications.
