@@ -15,6 +15,10 @@ editor: visual
 
 ## 1.1 Background
 
+Due to the COVID-19 outbreak in late December 2019, Indonesia commenced its COVID-19 vaccination program on 13 January 2021. Despite having the 4th highest number of vaccines administered as of January 4th, 2022, the distribution was not necessarily even.
+
+This notebook explore how the vaccination rates changed over time for the DKI Jarkarta on a sub-district level.
+
 ## 1.2 Task
 
 -   Choropleth Mapping and Analysis
@@ -31,18 +35,20 @@ editor: visual
 
 -   sf - Used for handling geospatial data
 
--   tidyVerse - Used for data transformation and presentation
-
--   tmap, maptools, kableExtra - Used for visualizing dataframes and plots
-
--   spatstat - Used for point-pattern analysis
-
 -   sfdep - Used for functions not in spdep
 
--   raster - Used to handle gridded spatial data
+-   tmap, maptools, kableExtra, plotly - Used for visualizing dataframes and plots
+
+-   lubridate - Used for handling datetime
+
+-   tidyr - Used for changing the shape and hierarchy of dataframe
+
+-   readxl - to read excel data (.xlsx files)
+
+-   tidyVerse - Used for data transformation and presentation
 
 ```{r}
-pacman::p_load(sf, maptools, tmap, kableExtra, readxl, lubridate, tidyr, tidyverse)
+pacman::p_load(sf, sfdep, tmap, maptools, kableExtra, plotly, lubridate, tidyr, readxl, tidyverse)
 ```
 
 # 3.0 Data Wrangling
@@ -77,9 +83,15 @@ glimpse(bd_jakarta)
 #### View
 
 ```{r}
-plot(st_geometry(bd_jakarta))
+plot(st_geometry(bd_jakarta)) #qtm
 ```
 :::
+
+#### 3.2.1.1 Understanding the Data
+
+DKI Jarkarta is a province divided into municipalities (Kab Kota) which are further divided into districts (kecamatan) and finally divided into sub-districts (Desa Kelur)
+
+![](division.png){fig-align="center" width="343"}
 
 ### 3.2.2 Data Preprocessing
 
@@ -211,7 +223,7 @@ ggplot(df_grp_districs, aes(x=District, y=total_sub_districts)) +
   geom_bar(stat = "identity",
            color="black",
            fill="lightblue3") + 
-  scale_x_discrete(guide = guide_axis(n.dodge=5))+
+  scale_x_discrete(guide = guide_axis(n.dodge=7))+
   ggtitle("Number of Sub-districts by District") +
   xlab("District Name") +
   ylab("No. of Sub-districts") 
@@ -264,6 +276,8 @@ All files were downloaded as "Data Vaksinasi Berbasis Kelurahan (\<last date of 
 folder_path <- "data/aspatial"
 files <- list.files(folder_path, pattern = ".xlsx", full.names = TRUE)
 ```
+
+There was no file for Feb 28, 2022 so vaccination rate as of Feb 27, 2022 has been used instead
 
 ```{r}
 #combines files into vacc_df
@@ -442,7 +456,7 @@ Grey Missing data from 3.4.1 has been handled.
 $$ \mathrm Vaccination \ Rate = \frac{\mathrm Target \ - \ (\mathrm Not \ Vaccinated) \ }{\mathrm Target} \ * 100
 $$
 
-$Target \ has \ been \ chosen \ over \ total \ population \ to \ exclude \ people \ who \ are \ not \ required \ to \ be \ vaccinated$
+*(Target has been chosen over total population to excluse people who are not required to be vaccinated)*
 
 Add Vaccination Rate column to main dataframe (df)
 
@@ -523,7 +537,7 @@ tmap_mode("plot")
 tmap_arrange(plot("2022-03-31"), plot("2022-04-30"), plot("2022-05-31"), plot("2022-06-30"))
 ```
 
-The vaccination rate increases over the year for all regions. The municipality / districts xxx start with the highest vaccination rates then other regions like xxx catch up.
+The vaccination rate increases over the year for all regions. The Northern municipality starts with the highest vaccination rates then other regions, particularly the South and East, catch up.
 
 ## 4.3 Observations from Jenks based Mapping
 
@@ -540,9 +554,9 @@ temp_low <- df %>%
   arrange(Date)
 
 #plot
-ggplot(temp_low, aes(x=Date, y=vaccination_rate)) +
+ggplotly(ggplot(temp_low, aes(x=Date, y=vaccination_rate)) +
   geom_point(aes(color=temp_low$Sub_District)) + 
-  ggtitle("Lowest Vaccination Rates over the Year by Sub-district")
+  ggtitle("Lowest Vaccination Rates over the Year by Sub-district"))
 ```
 
 Not only does the minimum vaccination rate increase over year, but the sub-district Bale Kambang has a sharp increase in its rate and no longer has the lowest vaccination rate by July 2022.
@@ -558,37 +572,37 @@ temp_high <- df %>%
   arrange(Date)
 
 #plot
-ggplot(temp_high, aes(x=Date, y=vaccination_rate)) +
+ggplotly(ggplot(temp_high, aes(x=Date, y=vaccination_rate)) +
   geom_point(aes(color=temp_high$Sub_District)) + 
-  ggtitle("Highest Vaccination Rates over the Year by Sub-district")
+  ggtitle("Highest Vaccination Rates over the Year by Sub-district"))
 ```
 
 The sub-district Halim Perdana Kusumah has the highest vaccination rate for the most part.
 
-The vaccination rate by July 31, 2021 for this sub-district at 72.08% is much higher than that of Bale Kambang which was at 48.23%. This difference of 23.85% gets smoothed down to 8.77% by June 30, 2022.
+The vaccination rate by July 31, 2021 for this sub-district at 65.21% is much higher than that of Bale Kambang which was at 37.01%. This difference of 28.20% gets smoothed down to 11.47% by June 30, 2022.
 
 ```{r}
 temp <- data.frame(temp_low$Date, temp_low$vaccination_rate, temp_high$vaccination_rate) 
 
 colors <- c("Lowest" = "orange", "Highest" = "steelblue")
 
-ggplot(temp, aes(x=temp_low.Date)) + 
+ggplotly(ggplot(temp, aes(x=temp_low.Date)) + 
   geom_line(aes(y=temp_low.vaccination_rate, color="Lowest"), size = 1.2) + 
   geom_line(aes(y=temp_high.vaccination_rate, color="Highest"), size = 1.2) + 
   ggtitle("Highest and Lowest Vaccination Rates over the Year by Sub-district") + 
   labs(y = "Vaccination Rate (%)",
       color = "Vaccination Rate") +
-  scale_color_manual(values = colors)
+  scale_color_manual(values = colors))
 ```
 
 ### 4.3.2 Spatio-Temporal Mapping with custom breakpoints
 
 View how the vaccination rate increases in all regions over the year based on Jenks defined breakpoints.
 
-With the lowest and highest vaccination rates over the year being 48.23% and 91.87%, the Jenks breakpoints are defined as follows
+With the lowest and highest vaccination rates over the year being 37% and 90%, the Jenks breakpoints are defined as follows
 
 ```{r}
-breakpoints = c(48, 65, 72, 82, 86, 92)
+breakpoints = c(37, 55, 72, 80, 84, 90)
 ```
 
 ```{r}
@@ -630,59 +644,50 @@ tmap_mode("plot")
 tmap_arrange(plot("2022-03-31"), plot("2022-04-30"), plot("2022-05-31"), plot("2022-06-30"))
 ```
 
-\-\-\-\-\-\-\-\-\-\-\-\-\--
+As aforementioned, the overall vaccination rates grew from July 2021, to June 2022. From the maps, it is observed that the rates grew quickly till December 2021 and then grew at a steady pace.
 
-At the beginning, low rates in xxx, rates are good now.
+In July 2021, there is a slightly higher vaccination rate in the North and Western municipalities which quickly becomes uniform by August 2021.
 
-During xxx months, they increased a bit more
+From October 2021, it is seems that the Northern and Southern municipalities have the higher vaccination rates than their surrounding regions. The Eastern municipality catches up the fastest by March 2022 and the rest gradually catch up by June 2022.
 
 # 5.0 Local Gi\* Analysis
 
 ------------------------------------------------------------------------
 
--   Compute local Gi\* values of the monthly vaccination rate,
-
--   Display the Gi\* maps of the monthly vaccination rate. The maps should only display the significant (i.e. p-value \< 0.05)
-
--   With reference to the analysis results, draw statistical conclusions (not more than 250 words).
-
 ## 5.1 Compute Gi\* values
 
-To create a time series cube, we first have to make an attribute table with the data organised in the following format: Date, Location (`Sub_District`) and Value (`Vaccination_Rate`)
-
-Making an attribute table:
+### 5.1.1. Create attribute table
 
 ```{r}
-# make new vaccination attribute table with Date, Sub_District, Target, Not_Yet_Vaccinated
-vacc_attribute_table <- combined_jakarta %>% select(10, 8, 12, 13) %>% st_drop_geometry()
+# make table with Date, Sub_District, Target, Not_Yet_Vaccinated
+vacc_attr_table <- df %>% select(10, 8, 7, 2) %>% st_drop_geometry()
 
 # add a new field for Vaccination_Rate
-vacc_attribute_table$Vaccination_Rate <- (vacc_attribute_table$Target - vacc_attribute_table$Not_Yet_Vaccinated) / vacc_attribute_table$Target*100
+vacc_attr_table$Vaccination_Rate <- (vacc_attr_table$Target - vacc_attr_table$Not_Yet_Vaccinated) / vacc_attr_table$Target*100
 
 # final vaccination attribute table with Date, Sub_District, Vaccination_Rate
-vacc_attribute_table <- tibble(vacc_attribute_table %>% select(1,2,5))
+vacc_attr_table <- tibble(vacc_attr_table %>% select(1,4,5))
 ```
 
-Creating a time series cube (spatio-temporal cube) using `spacetime()` of sfdep package:
+### 5.1.2 Create a time series cube (spatio-temporal cube) 
 
 ```{r}
-vacc_rate_st <- spacetime(vacc_attribute_table, bd_jakarta,
+vacc_rate_st <- spacetime(vacc_attr_table, bd_jakarta,
                           .loc_col = "Sub_District",
                           .time_col = "Date")
-```
 
-Next, we can check if `vacc_rate_st` is indeed a space-time cube object using `is_spacetime_cube()` of sfdep package
-
-```{r}
+#check valid 
 is_spacetime_cube(vacc_rate_st)
 ```
 
-Derive spatial weights
+### 5.1.3 Derive spatial weights
 
 ```{r}
 vacc_rate_nb <- vacc_rate_st %>%
   activate("geometry") %>%
-  mutate(nb = include_self(st_contiguity(geometry)),
+         #neighbours
+  mutate(nb = include_self(st_contiguity(geometry)), 
+         #inverse distance weights
          wt = st_inverse_distance(nb, geometry,
                                   scale=1,
                                   alpha=1),
@@ -691,27 +696,15 @@ vacc_rate_nb <- vacc_rate_st %>%
   set_wts("wt")
 ```
 
-The above code does the following:
-
--   identify neighbours
-
--   derive inverse distance weights
-
--   `activate()` of dplyr package is used to activate the geometry context
-
--   `mutate()` of dplyr package is used to create two new columns nb and wt.
-
--   Then we will activate the data context again and copy over the nb and wt columns to each time-slice using `set_nbs()` and `set_wts()`
-
--   row order is very important so do not rearrange the observations after using `set_nbs()` or `set_wts()`.
-
-The dataset now has neighbours and weights for each time-slice:
+**View**
 
 ```{r}
 head(vacc_rate_nb)
 ```
 
-Set seed
+### 5.1.4 Compute Gi\* values
+
+Set Seed for replicable results
 
 ```{r}
 set.seed(1234)
@@ -720,152 +713,224 @@ set.seed(1234)
 Compute
 
 ```{r}
-gi_stars <- vacc_rate_nb |>
+#LISA
+gi_val <- vacc_rate_nb |>
   group_by(Date) |>
-  mutate(gi_star = local_gstar_perm(
+  mutate(gi_val = local_gstar_perm(
     Vaccination_Rate, nb, wt, nsim=99)) |>
-      tidyr::unnest(gi_star)
+      tidyr::unnest(gi_val)
 ```
 
-## 5.2 Displaying the Gi\* maps of the monthly vaccination rate
+**View**
 
-Before we can visualise the Gi\* values using maps, we need to join both `combined_jakarta` and `gi_stars` together:
+::: panel-tabset
+#### Column names
 
 ```{r}
-combined_jakarta_gi_stars <- combined_jakarta %>%
-  left_join(gi_stars)
+colnames(gi_val)
 ```
 
-Visualising Gi\* and p-value of Gi\* (only significant locations where p-value \< 0.05) for vaccination rates in July 2021:
+#### Data Frame
 
 ```{r}
-tmap_mode("plot")
-gi_star_map = tm_shape(filter(combined_jakarta_gi_stars, Date == '2021-07-31')) +
-  tm_fill("gi_star") +
-  tm_borders(alpha=0.5) +
-  tm_layout(main.title = "Gi* values for vaccination rates in July 2021", main.title.size=0.8)
-  # tm_view(set.zoom.limits = c(10,16))
+head(gi_val)
+```
+:::
 
-p_sim_map = tm_shape(filter(combined_jakarta_gi_stars, Date == '2021-07-31')) +
-  tm_fill("p_sim", breaks = c(0, 0.05, 1)) +
-  tm_borders(alpha=0.5) + 
-  tm_layout(main.title = "p-values of Gi* for vaccination rates in July 2021", main.title.size=0.8)
-  # tm_view(set.zoom.limits = c(10,16))
+## 5.2 Visualise Gi\* maps of the monthly vaccination rate
 
-tmap_arrange(gi_star_map, p_sim_map)
+Combine Gi\* values to main df
+
+```{r}
+gi_val_df <- df %>%
+  left_join(gi_val,
+            by = c("Sub_District", "Date"))
 ```
 
-Introducing a helper function to help us plot the Gi\* and p-value of Gi\* maps for all 12 months:
+**Visualising Gi\* and p-value of Gi\* for significant locations (p-value \< 0.05)**
 
 ```{r}
-gi_star_plot <- function(date, month) {
-  gi_star_map = tm_shape(filter(combined_jakarta_gi_stars, Date == date)) +
-    tm_fill("gi_star") +
-    tm_borders(alpha=0.5) +
-    tm_layout(main.title = paste("Gi* values for vaccination rates in", month), main.title.size=0.8)
-
-  p_sim_map = tm_shape(filter(combined_jakarta_gi_stars, Date == date)) +
-    tm_fill("p_sim", breaks = c(0, 0.05, 1)) +
-    tm_borders(alpha=0.5) + 
-    tm_layout(main.title = paste("p-values of Gi* for vaccination rates in", month), main.title.size=0.8)
-
-  tmap_arrange(gi_star_map, p_sim_map)
-}
-```
-
-(repeat 12 times)
-
-```{r}
-tmap_mode("plot")
-gi_star_plot("2021-07-31", "July 2021")
-```
-
-up to
-
-```{r}
-gi_star_plot("2022-06-30", "June 2022")
-```
-
-Locations with p-value of Gi\* \< 0.05 in month xx
-
-```{r}
-get_significant_locations <- function(date, month) {
-  print(paste("Sub-Districts with p-value of Gi* < 0.05 in", month))
-  filter(combined_jakarta_gi_stars, Date == date & p_sim<0.05)$Sub_District
+#| code-fold: true
+#helper function for plotting
+plot <- function(varname){
+ gi_plot <- 
+    tm_shape(filter(gi_val_df, Date == varname)) +
+    tm_polygons() +
+    tm_shape(gi_val_df %>% filter(p_sim <0.05)) +
+    tm_fill("gi_star",
+            style="equal",
+            n=5,
+            palette = "seq") +
+    tm_borders(alpha = 0.5) +
+    tm_layout(main.title = paste("Significant Local Gi for", paste(month(ymd(varname), label=TRUE), year(ymd(varname)))),
+              main.title.size = 0.8,
+              aes.palette = list(seq = "-RdBu"))
+  return(gi_plot)
 }
 ```
 
 ```{r}
-get_significant_locations("2021-07-31", "July 2021")
+#| code-fold: true
+tmap_mode("plot")
+tmap_arrange(plot("2021-07-31"), plot("2021-08-31"), plot("2021-09-30"),plot("2021-10-31"))
 ```
-
-Do for all months
-
-Below is a table that summarises the number of times the p-value of Gi\* was less than 0.05 for the respective Sub-Districts in the 12 months period (this table only shows the Sub-Districts with a significant p-value for at least 1 month):
 
 ```{r}
-# num_of_times = filter(combined_jakarta_gi_stars, p_sim<0.05)
-# as.data.frame(table(num_of_times$Sub_District))
+#| code-fold: true
+tmap_mode("plot")
+tmap_arrange(plot("2021-11-30"), plot("2021-12-31"), plot("2022-01-31"), plot("2022-02-27"))
+
 ```
-
-## 5.3 Statistical conclusions
-
-For the Sub-Districts with p-value of Gi\* \< 0.05, the Gi\* values of the monthly vaccination rates of these locations are significant.
-
-Throughout the 12 months, there were 128 Sub-Districts with at least 1 month of having a significant Gi\* value.
-
-The Gi\* value of the vaccination rates for all 12 months were significant for Sub-Districts "BATU AMPAR", "CIPINANG CEMPEDAK", "GLODOK", "KAMPUNG BALI", "KAMPUNG TENGAH", "KEAGUNGAN", "KEBON KACANG", "KEBON MELATI", "MANGGA BESAR", "PETAMBURAN". This means that the vaccination rates for 12 months for these Sub-Districts were either significantly high or low.
-
-# 5.0 Emerging Hot Spot Analysis (EHSA)
-
-## 5.1 Mann-Kendall Test
-
-In this section, we will perform the Mann-Kendall Test using the spatio-temporal local Gi\* values on 3 Sub-Districts.
-
-### 5.1.1 Sub-District 1 - "HALIM PERDANA KUSUMAH"
-
-Firstly, on Sub-District "HALIM PERDANA KUSUMAH":
 
 ```{r}
-cbg <- gi_stars |>
-  ungroup() |>
-  filter(Sub_District == "HALIM PERDANA KUSUMAH") |>
-  select(Sub_District, Date, gi_star)
+#| code-fold: true
+tmap_mode("plot")
+tmap_arrange(plot("2022-03-31"), plot("2022-04-30"), plot("2022-05-31"), plot("2022-06-30"))
 ```
+
+## 5.3 Observations of the Local Gi\* Analysis
+
+Filter by significant p-value (\<0.05)
+
+```{r}
+p_value_freq = filter(gi_val_df, p_sim<0.05)
+temp <- as.data.frame(table(p_value_freq$Sub_District))
+```
+
+```{r}
+#| code-fold: true
+cat("Throughout the 12 months, there were", nrow(temp), "Sub-districts with p-value of Gi* < 0.05 for at least 1 month")
+```
+
+```{r}
+#| code-fold: true
+cat("The Gi* value of the vaccination rates for the entire time period were significantly low / high for the", nrow(temp %>% filter(Freq == 12)), "following Sub-districts throughout the year - ")
+
+```
+
+| Sub-District      | Municipality | Significance |
+|-------------------|--------------|--------------|
+| BATU AMPAR        | East         | Low          |
+| CIPINANG CEMPEDAK | East         | Low          |
+| GLODOK            | West         | High         |
+| KAMPUNG BALI      | Central      | Low          |
+| KAMPUNG TENGAH    | East         | Low          |
+| KEAGUNGAN         | West         | High         |
+| KEBON KACANG      | Central      | Low          |
+| KEBON MELATI      | Central      | Low          |
+| MANGGA BESAR      | West         | High         |
+| PETAMBURAN        | Central      | Low          |
+
+It is observed the Central and Eastern municipalities have very distributed vaccination rates throughout the year whereas the Western municipality has evenly distributed vaccinated rates throughout the year.
+
+# 6.0 Emerging Hot Spot Analysis (EHSA)
+
+------------------------------------------------------------------------
+
+## 6.1 Mann-Kendall Test
+
+Perform the Mann-Kendall Test using the spatio-temporal local Gi\* values on the following Sub-districts - "ANCOL","KOJA" and "JOHAR BARU"
+
+```{r}
+sub_list = list("KAMAL","KOJA", "ANCOL")
+```
+
+Filter data
+
+```{r}
+cbg <- gi_val %>% 
+  ungroup() %>% 
+  filter(Sub_District %in% sub_list) |> 
+  select(Date, Sub_District, gi_star)
+```
+
+::: panel-tabset
+#### KAMAL
 
 Plot
 
 ```{r}
-ggplot(data = cbg,
-       aes(x = Date,
-           y = gi_star)) + 
-  geom_line() + 
-  theme_light()
+#| code-fold: true
+cbg_ <-filter(cbg, Sub_District==sub_list[1])
 
-#ggplotly(p) <- for interactive
+ggplotly(ggplot(data=cbg_, aes(x=Date, y=gi_star))+
+    geom_line()+
+    theme_light())
 ```
 
-p-value of Mann Kendall Test:
+P-value of Mann-Kendall Test
 
 ```{r}
-cbg %>%
+cbg_ |> 
   summarise(mk = list(
     unclass(
-      Kendall::MannKendall(gi_star)))) %>% 
+      Kendall::MannKendall(gi_star)))) |> 
   tidyr::unnest_wider(mk)
 ```
 
-The p-value is 0.08 which is \> 0.05 hence p-value is not significant. This result tells us that here is an overall upward but insignificant trend.
+The p-value (sl) is 0.0002 which is \< 0.05 hence p-value is significant and tau is -0.85 This means there is an overall significant downward trend.
 
-\
-Repeat for a few sub-districts.
+#### KOJA
 
-## 5.2 EHSA map of the Gi\* values of the vaccination rate
-
-To find out the significant emerging hot/cold spots, we would need to perform the Mann Kendall Test for each location. We can use `group_by()` of dplyr package:
+Plot
 
 ```{r}
-ehsa <- gi_stars %>%
+#| code-fold: true
+cbg_ <-filter(cbg, Sub_District==sub_list[2])
+
+ggplotly(ggplot(data=cbg_, aes(x=Date, y=gi_star))+
+    geom_line()+
+    theme_light())
+```
+
+P-value of Mann-Kendall Test
+
+```{r}
+cbg_ |> 
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) |> 
+  tidyr::unnest_wider(mk)
+```
+
+The p-value (sl) is 0.6 which is \> 0.05 hence p-value is significant and tau is 0.21 This means there is an overall insignificant upward trend. This is because the Gi\* values initially went down and then rose.
+
+#### ANCOL
+
+Plot
+
+```{r}
+#| code-fold: true
+cbg_ <-filter(cbg, Sub_District==sub_list[3])
+
+ggplotly(ggplot(data=cbg_, aes(x=Date, y=gi_star))+
+    geom_line()+
+    theme_light())
+```
+
+<div>
+
+P-value of Mann-Kendall Test
+
+```{r}
+cbg_ |> 
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) |> 
+  tidyr::unnest_wider(mk)
+```
+
+The p-value is 0.24 which is \< 0.05 hence p-value is significant and tau is -0.27. This means there is an overall significant downward trend.
+
+</div>
+:::
+
+## 6.2 EHSA map of the Gi\* values of the vaccination rate
+
+### 6.2.1. Perform the Mann Kendall Test for each location
+
+```{r}
+ehsa <- gi_val %>%
   group_by(Sub_District) %>%
   summarise(mk = list(
     unclass(
@@ -873,7 +938,7 @@ ehsa <- gi_stars %>%
   tidyr::unnest_wider(mk)
 ```
 
-Arrange to show significant emerging hot/cold spots:
+### 6.2.2. Arrange to show significant emerging hot/cold spots
 
 ```{r}
 emerging <- ehsa %>% 
@@ -882,79 +947,62 @@ emerging <- ehsa %>%
 emerging
 ```
 
-Performing Emerging Hotspot Analysis using `emerging_hotspot_analysis()` of sfdep package:
+### 6.2.3. Performing Emerging Hotspot Analysis (EHSA)
 
 ```{r}
 ehsa <- emerging_hotspot_analysis(
-  x = vacc_rate_st,
+  x = vacc_rate_st, #spacetime object
   .var = "Vaccination_Rate",
-  k = 1,
+  k = 1, #number of time lags
   nsim = 99
 )
 ```
 
-Notes:
-
--   It takes a spacetime object x (i.e. varr_rate_st)
-
--   and the quoted name of the variable of interest (i.e. Vaccination_Rate) for .var argument
-
--   k argument is used to specify the number of time lags which is set to 1 by default
-
--   nsim map numbers of simulation to be performed
-
-Visualisation of the distribution of EHSA classes using ggplot2 functions:
+**Plot**
 
 ```{r}
+#| code-fold: true
 ggplot(data = ehsa,
-       aes(x=classification, fill=classification)) + 
-  geom_bar()
+       aes(x=classification, fill=classification, stat = "identity")) + 
+    scale_fill_manual(values=c("#8DD3C7", "#FFFFB3", "#BEBADA", "#FB8072")) + 
+    geom_bar()
 ```
 
-The figure shows that the oscillating hot spot class has the highest number of Sub-Districts.
+Oscillating hotspot class has the highest number of Sub-districts.
 
-Before we can visualise the geographic distribution of the EHSA classes, we need to join `combined_jakarta` and `ehsa` together:
+Combine EHSA values to main df nad add classification column
 
 ```{r}
-combined_jakarta_ehsa <- combined_jakarta %>%
-  left_join(ehsa, by = c("Sub_District" = "location"))
+ehsa_df <- df %>%
+  left_join(ehsa, by = c("Sub_District" = "location")) %>%
+  mutate(NewClassification = case_when(p_value < 0.05 ~ classification,
+                                       p_value >= 0.05 ~ "insignificant"))
 ```
 
-Next, we can plot a categorical choropleth map for the significant locations using tmap functions:
+**Visualise**
 
 ```{r}
-# this adds a new column "NewClassification" so that we can include a class called "insignificant" in our plot
-combined_jakarta_ehsa <- combined_jakarta_ehsa %>% mutate(NewClassification = 
-                                                            case_when(p_value < 0.05 ~ classification,
-                                                                      p_value >= 0.05 ~ "insignificant"))
-```
-
-```{r}
+#| code-fold: true
 tmap_mode("plot")
-tm_shape(combined_jakarta_ehsa) +
+tm_shape(ehsa_df) +
   tm_polygons() +
   tm_borders(alpha = 0.5) +
-tm_shape(combined_jakarta_ehsa) +
-  tm_fill("NewClassification",
-          palette = c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")) + 
+tm_shape(ehsa_df %>% filter(NewClassification != "insignificant")) +
+  tm_fill("NewClassification") + 
   tm_borders(alpha = 0.4)
 ```
 
-### 5.2.1 Observations of the spatial patterns
+## 6.3 Observations of the spatial patterns
 
-Among the significant places, there is the greatest number of locations classified as oscillating hotspot, followed by sporadic coldspot, oscillating coldspot, and no pattern detected.
+As aforementioned, most the places are categorised under **oscillating hotspots**. These points are evenly spread out throughout the province. This is because more sub-districts had higher vaccination rates over time.
 
-The oscillating hotspots are spread out almost evenly in the whole of Jakarta.
+The second most number of places, under **sporadic coldspots** seem to be more clustered towards the Central municipality. This is because that region had the lowest relative vaccination rates, despite increasing over the year.
 
-The sporadic coldspots are spread out slightly less evenly than the oscillating hotspots as the borders are not covered as much.
+**Oscillating coldspots** are evenly spread out throughout the province, more so towards the provincial borders. This is because those regions started with the highest vaccination rates but were relatively less than its neighbours over time.
 
-The oscillating coldspots seem to be around the Southern, Western and Central area.
+Finally, with the fewest classes, the places where **no patterns are detected** seem to be mainly in the Central municipality.
 
-Lastly, the areas where no patterns are detected seem to be mainly in the Central area.
-
-The areas where the patterns are insignificant appears to be mostly at the Central area and a little at the Western and Southern area.
-
-# 6.0 Acknowledgements
+# 7.0 Acknowledgements
 
 ------------------------------------------------------------------------
 
