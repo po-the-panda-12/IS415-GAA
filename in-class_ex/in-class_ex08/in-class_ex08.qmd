@@ -1,0 +1,243 @@
+---
+title: "In-Class Exercise 7: Global Measures of Spatial Association"
+date: "20 February 2023"
+date-modified: "`r Sys.Date()`"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+---
+
+# 1.0 Overview
+
+# 2.0 Setup
+
+## 2.1 Installing and Loading the R Packages
+
+```{r}
+pacman::p_load(sf, sfdep, tmap, tidyverse, plotly, zoo, Kendall)
+```
+
+## 2.2 The Data
+
+-   Hunan, a geospatial data set in ESRI shapefile format, and
+
+-   Hunan_2012, an attribute data set in csv format.
+
+### 2.2.1 Import Geospatial Data
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+### 2.2.2 Import attribute table
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+### 2.2.3 Combine both data frames using left join
+
+```{r}
+hunan_GDPPC <- left_join(hunan,hunan2012)%>%
+  select(1:4, 7, 15) #name, id, name, engtype, 7 - county, 15 - gdppc
+```
+
+### 2.2.4 Choropleth Map
+
+```{r}
+tmap_mode("plot")
+tm_shape(hunan_GDPPC) + 
+  tm_fill("GDPPC",
+          style = "quantile",
+          palette = "Blues",
+          title = "GDPPC") + 
+  tm_layout(main.title = "Distribution of GDP per capita by district, Hunan Province",
+            main.title.position = "center",
+            main.title.size = 1.2,
+            legend.height = 0.45,
+            legend.width = 0.35,
+            frame = TRUE) + 
+  tm_borders(alpha = 0.5) + 
+  # tm_text("NAME_3", size=0.5) + 
+  tm_compass(type = "8star", size = 2) + 
+  tm_scale_bar() + 
+  tm_grid(alpha = 0.2)
+```
+
+# 3.0 Derive Contiguity Weights
+
+## 3.1 Contiguity Weights: Queen's Method
+
+```{r}
+wm_q <- hunan_GDPPC %>%
+  mutate(nb = st_contiguity(geometry),
+         wt = st_weights(nb,
+                         style = "W"),
+         .before = 1)
+```
+
+## 3.2 Contiguity Weights: Rook's Method
+
+```{r}
+wm_r <- hunan_GDPPC %>%
+  mutate(nb = st_contiguity(geometry),
+  queen = FALSE,
+  wt = st_weights(nb,
+                  style = "W"),
+  .before = 1)
+```
+
+## 3.3 Global Moran's I
+
+```{r}
+moranI <- global_moran(wm_q$GDPPC,
+                        wm_q$nb,
+                        wm_q$wt)
+```
+
+### 3.3.1 Global Moran's I Test
+
+```{r}
+global_moran_test(wm_q$GDPPC,
+                  wm_q$nb,
+                  wm_q$wt)
+```
+
+### 3.3.2 Global Moran\'s I permutation test
+
+```{r}
+set.seed(1234)
+```
+
+```{r}
+global_moran_perm(wm_q$GDPPC,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99) #default nsim
+```
+
+## 3.4 Local Moran's I
+
+```{r}
+lisa <- wm_q %>%
+  mutate(local_moran = local_moran(
+    GDPPC, nb, wt, nsim = 99),
+    .before = 1) %>%
+  unnest(local_moran)
+
+lisa
+```
+
+### 3.4.1 Visualising local Moran\'s I
+
+#### 3.4.1.1 Computing ii
+
+```{r}
+tmap_mode("plot")
+tm_shape(lisa) +
+  tm_fill("ii") +
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))
+```
+
+#### 3.4.1.2 Computing p_ii
+
+```{r}
+tmap_mode("plot")
+tm_shape(lisa) +
+  tm_fill("p_ii") +
+  tm_borders(alpha = 0.5)
+```
+
+Ideally should use p_ii_sim variable of lisa so that results produced is stable.
+
+#### 3.4.1.3 Visualising the local Moran\'s I Map
+
+```{r}
+lisa_sig <- lisa %>%
+  filter(p_ii < 0.05)
+tmap_mode("plot")
+tm_shape(lisa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(lisa_sig) +
+  tm_fill("mean") + 
+  tm_borders(alpha = 0.4)
+```
+
+# 4.0 Hot Spot and Cold Spot Analysis
+
+```{r}
+HCSA <- wm_q %>%
+  mutate(local_GI = local_gstar_perm(
+    GDPPC, nb, wt, nsim = 99),
+    .before = 1) %>%
+  unnest(local_GI)
+
+HCSA
+```
+
+## 4.1 Visualising Gi\*
+
+```{r}
+tmap_mode("view")
+tm_shape(HCSA) +
+  tm_fill("gi_star") +
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))
+```
+
+## 4.1 Visualising the p-value of HCSA
+
+```{r}
+tmap_mode("plot")
+tm_shape(HCSA) +
+  tm_fill("p_sim") +
+  tm_borders(alpha = 0.5)
+```
+
+# 5.0 Mann-Kendall Test
+
+Import Data
+
+```{r}
+GDPPC <- read_csv("Data/aspatial/Hunan_GDPPC.csv")
+```
+
+## 5.1 Create time series cube
+
+```{r}
+#time and location needed
+GDPPC_st <- spacetime(GDPPC, hunan,
+                      .loc_col = "County",
+                      .time_col = "Year")
+```
+
+```{r}
+GDPPC_nb <- GDPPC_st %>%
+  activate("geometry") %>%
+  mutate(
+    nb = include_self(st_contiguity(geometry)),
+    wt = st_weights(nb)
+  ) %>%
+  set_nbs("nb") %>%
+  set_wts("wt")
+```
+
+## 5.2 Show significant hotspot and coldspot areas
+
+## 5.3 Create time series cube
+
+```{r}
+ehsa <- emerging_hotspot_analysis(
+  x = GDPPC_st,
+  .var = "GDPPC",
+  k = 1,
+  nsim = 99
+)
+```
+
+## 5.4 Visualise EHSA
