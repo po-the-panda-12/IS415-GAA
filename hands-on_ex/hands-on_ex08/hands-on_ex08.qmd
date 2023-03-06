@@ -235,6 +235,7 @@ ggplot(data=condo_resale.sf,
 (To check for multicollinearity)
 
 ```{r}
+#corrplot::
 corrplot(cor(condo_resale[, 5:23]), diag = FALSE, order = "AOE",
          tl.pos = "td", tl.cex = 0.5, method = "number", type = "upper")
 ```
@@ -242,7 +243,7 @@ corrplot(cor(condo_resale[, 5:23]), diag = FALSE, order = "AOE",
 From the scatterplot matrix, it is clear that ***Freehold*** is highly correlated to ***LEASE_99YEAR***. In view of this, it is wiser to only include either one of them in the subsequent model building. As a result, ***LEASE_99YEAR*** is excluded in the subsequent model building.
 
 ::: {.callout-note appearance="minimal"}
-## Matrix reorder is very important for mining the hiden structure and patter in the matrix. There are four methods in corrplot (parameter order), named \"AOE\", \"FPC\", \"hclust\", \"alphabet\". In the code chunk above, AOE order is used. It orders the variables by using the angular order of the eigenvectors method suggested by Michael Friendly.
+## Matrix reorder is very important for mining the hiden structure and patter in the matrix. There are four methods in corrplot (parameter order), named "AOE", "FPC", "hclust", "alphabet". In the code chunk above, AOE order is used. It orders the variables by using the angular order of the eigenvectors method suggested by Michael Friendly.
 :::
 
 ## 6.3 Building a hedonic pricing model using multiple linear regression method
@@ -308,7 +309,7 @@ ols_plot_resid_fit(condo.mlr1)
 
 The figure above reveals that most of the data poitns are scattered around the 0 line, hence we can safely conclude that the relationships between the dependent variable and independent variables are linear.
 
-### 6.5.3  Test for Normality Assumption
+### 6.5.3 Test for Normality Assumption
 
 ::: panel-tabset
 #### Plot
@@ -387,7 +388,7 @@ Perform test
 lm.morantest(condo.mlr1, nb_lw)
 ```
 
-The Global Moran\'s I test for residual spatial autocorrelation shows that it\'s p-value is less than 2.2e-16 which is less than the alpha value of 0.05. Hence, we will reject the null hypothesis that the residuals are randomly distributed.
+The Global Moran's I test for residual spatial autocorrelation shows that it's p-value is less than 2.2e-16 which is less than the alpha value of 0.05. Hence, we will reject the null hypothesis that the residuals are randomly distributed.
 
 Since the Observed Global Moran I = 0.1424418 which is greater than 0, we can infer than the residuals resemble cluster distribution.
 
@@ -395,4 +396,4 @@ Since the Observed Global Moran I = 0.1424418 which is greater than 0, we can in
 
 ## 7.1 Building Fixed Bandwidth GWR Model
 
-### 7.1.1 Computing fixed bandwith 
+### 7.1.1 Computing fixed bandwith
