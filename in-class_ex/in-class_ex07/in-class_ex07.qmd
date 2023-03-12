@@ -106,7 +106,7 @@ global_moran_test(wm_q$GDPPC,
                   wm_q$wt)
 ```
 
-### 3.3.2 Global Moran\'s I permutation test
+### 3.3.2 Global Moran's I permutation test
 
 ```{r}
 set.seed(1234)
@@ -131,7 +131,7 @@ lisa <- wm_q %>%
 lisa
 ```
 
-### 3.4.1 Visualising local Moran\'s I
+### 3.4.1 Visualising local Moran's I
 
 #### 3.4.1.1 Computing ii
 
@@ -154,7 +154,7 @@ tm_shape(lisa) +
 
 Ideally should use p_ii_sim variable of lisa so that results produced is stable.
 
-#### 3.4.1.3 Visualising the local Moran\'s I Map
+#### 3.4.1.3 Visualising the local Moran's I Map
 
 ```{r}
 lisa_sig <- lisa %>%
@@ -241,3 +241,21 @@ ehsa <- emerging_hotspot_analysis(
 ```
 
 ## 5.4 Visualise EHSA
+
+```{r}
+hunan_ehsa <- hunan %>%
+  left_join(ehsa,
+            by = join_by(County == location))
+```
+
+```{r}
+ehsa_sig <- hunan_ehsa  %>%
+  filter(p_value < 0.05)
+tmap_mode("plot")
+tm_shape(hunan_ehsa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(ehsa_sig) +
+  tm_fill("classification") + 
+  tm_borders(alpha = 0.4)
+```

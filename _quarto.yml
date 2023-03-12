@@ -24,6 +24,8 @@ website:
             href: hands-on_ex/hands-on_ex07/hands-on_ex07.qmd
           - text: "Hands-on Exercise 8"
             href: hands-on_ex/hands-on_ex08/hands-on_ex08.qmd
+          - text: "Hands-on Exercise 9"
+            href: hands-on_ex/hands-on_ex09/hands-on_ex09.qmd
         
         
       
