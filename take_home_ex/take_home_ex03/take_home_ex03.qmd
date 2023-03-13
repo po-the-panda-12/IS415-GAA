@@ -1,0 +1,86 @@
+---
+title: "Take Home Exercise 3"
+date: "14 March 2023"
+date-modified: "`r Sys.Date()`"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+---
+
+# 1.0 Overview
+
+------------------------------------------------------------------------
+
+## 1.1 Background
+
+HDB Pricing
+
+## 1.2 Task
+
+In this take-home exercise, you are tasked to predict HDB resale prices at the sub-market level (i.e. HDB 3-room, HDB 4-room and HDB 5-room) for the month of January and February 2023 in Singapore. The predictive models must be built by using by using conventional OLS method and GWR methods. You are also required to compare the performance of the conventional OLS method versus the geographical weighted methods.
+
+# 2.0 Setup
+
+------------------------------------------------------------------------
+
+## 2.1 Import Packages
+
+-   sf - Used for handling geospatial data
+
+-   sfdep - Used for functions not in spdep
+
+-   tmap, maptools, kableExtra, plotly - Used for visualizing dataframes and plots
+
+-   lubridate - Used for handling datetime
+
+-   tidyr - Used for changing the shape and hierarchy of dataframe
+
+-   readxl - to read excel data (.xlsx files)
+
+-   tidyVerse - Used for data transformation and presentation
+
+```{r}
+pacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gtsummary, sfdep, onemapsgapi, stringr)
+```
+
+# 3.0 Data Wrangling
+
+------------------------------------------------------------------------
+
+## 3.1 Datasets Used
+
+| Type       | Name |
+|------------|------|
+| Geopsatial |      |
+| Aspatial   |      |
+
+## 3.2 Geospatial Data
+
+### 3.2.1 Load Data
+
+::: panel-tabset
+#### Import
+
+```{r}
+# mpsz <- st_read(dsn="data/geospatial",
+#                       layer="")
+```
+
+#### Glimpse
+
+```{r}
+# glimpse(mpsz)
+```
+
+#### View
+
+```{r}
+# plot(st_geometry(mpsz)) #qtm
+```
+:::
+
+#### 3.2.1.1 Understanding the Data
+
+DKI

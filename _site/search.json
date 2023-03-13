@@ -2007,5 +2007,96 @@
     "title": "Hands-on Exercise 9: Geographical Segmentation with Spatially Constrained Clustering Techniques",
     "section": "8.2 Multivariate Visualisation",
     "text": "8.2 Multivariate Visualisation\n\n\nCode\nggparcoord(data = shan_sf_ngeo_cluster, \n           columns = c(17:21), \n           scale = \"globalminmax\",\n           alphaLines = 0.2,\n           boxplot = TRUE, \n           title = \"Multiple Parallel Coordinates Plots of ICT Variables by Cluster\") +\n  facet_grid(~ CLUSTER) + \n  theme(axis.text.x = element_text(angle = 30))\n\n\n\n\n\nThe parallel coordinate plot above reveals that households in Cluster 4 townships tend to own the highest number of TV and mobile-phone. On the other hand, households in Cluster 5 tends to own the lowest of all the five ICT.\nSummary\n\nshan_sf_ngeo_cluster %>% \n  st_set_geometry(NULL) %>%\n  group_by(CLUSTER) %>%\n  summarise(mean_RADIO_PR = mean(RADIO_PR),\n            mean_TV_PR = mean(TV_PR),\n            mean_LLPHONE_PR = mean(LLPHONE_PR),\n            mean_MPHONE_PR = mean(MPHONE_PR),\n            mean_COMPUTER_PR = mean(COMPUTER_PR))\n\n# A tibble: 6 × 6\n  CLUSTER mean_RADIO_PR mean_TV_PR mean_LLPHONE_PR mean_MPHONE_PR mean_COMPUTE…¹\n  <chr>           <dbl>      <dbl>           <dbl>          <dbl>          <dbl>\n1 1               122.        329.           29.1           178.           10.7 \n2 2               296.        591.           44.2           380.           29.3 \n3 3               181.        715.           94.3           620.           52.0 \n4 4                84.8       472.           75.4           473.           18.5 \n5 5               222.        508.           40.0           199.           17.3 \n6 6               235.        204.            7.45           61.5           6.05\n# … with abbreviated variable name ¹​mean_COMPUTER_PR"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex09/in-class_ex09.html",
+    "href": "in-class_ex/in-class_ex09/in-class_ex09.html",
+    "title": "In-Class Exercise 9: Geographically Weighted Regression: Predictive Modelling",
+    "section": "",
+    "text": "HDB resale dataset - 2019\nSingapore geospatial data\n\n\n\n\n\npacman::p_load(sf, GWmodel, SpatialML, tidymodels, rsample, ranger, tidyverse)"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex09/in-class_ex09.html#reading-data-file",
+    "href": "in-class_ex/in-class_ex09/in-class_ex09.html#reading-data-file",
+    "title": "In-Class Exercise 9: Geographically Weighted Regression: Predictive Modelling",
+    "section": "2.1 Reading data file",
+    "text": "2.1 Reading data file\n\nmdata = read_rds(\"data/aspatial/mdata.rds\")"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex09/in-class_ex09.html#data-sampling",
+    "href": "in-class_ex/in-class_ex09/in-class_ex09.html#data-sampling",
+    "title": "In-Class Exercise 9: Geographically Weighted Regression: Predictive Modelling",
+    "section": "2.2 Data Sampling",
+    "text": "2.2 Data Sampling\n\nset.seed(1234)\nresale_split <- initial_split(mdata, prop = 6.5/10)\n\ntrain_data <- training(resale_split)\ntest_data <- testing(resale_split)\n\n\n2.2.2 Reading data file to RDS\n\nwrite_rds(train_data, \"data/model/train_data.rds\")\nwrite_rds(test_data, \"data/model/test_data.rds\")"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex09/in-class_ex09.html#converting-the-sf-dataframe-into-a-spatialpoints-dataframe",
+    "href": "in-class_ex/in-class_ex09/in-class_ex09.html#converting-the-sf-dataframe-into-a-spatialpoints-dataframe",
+    "title": "In-Class Exercise 9: Geographically Weighted Regression: Predictive Modelling",
+    "section": "5.1 Converting the sf dataframe into a SpatialPoints dataframe",
+    "text": "5.1 Converting the sf dataframe into a SpatialPoints dataframe\n\ntrain_data_sp <- as_Spatial(train_data)\n#train_data_sp"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex09/in-class_ex09.html#extracting-coordinate-data",
+    "href": "in-class_ex/in-class_ex09/in-class_ex09.html#extracting-coordinate-data",
+    "title": "In-Class Exercise 9: Geographically Weighted Regression: Predictive Modelling",
+    "section": "6.1 Extracting coordinate data",
+    "text": "6.1 Extracting coordinate data\n\ncoords <- st_coordinates(mdata)\ncoords_train <- st_coordinates(train_data)\ncoords_test <- st_coordinates(test_data)\n\nWrite into rds for future use\n\ncoords_train <- write_rds(coords_train, \"data/model/coords_train.rds\")\ncoords_test <- write_rds(coords_test, \"data/model/coords_test.rds\")\n\nRetrieve coords\n\ncoords_train <- read_rds(\"data/model/coords_train.rds\")\ncoords_test <- read_rds(\"data/model/coords_test.rds\")"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex09/in-class_ex09.html#dropping-geometry-field",
+    "href": "in-class_ex/in-class_ex09/in-class_ex09.html#dropping-geometry-field",
+    "title": "In-Class Exercise 9: Geographically Weighted Regression: Predictive Modelling",
+    "section": "6.2 Dropping geometry field",
+    "text": "6.2 Dropping geometry field\n\ntrain_data <- train_data %>%\n  st_drop_geometry()"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex09/in-class_ex09.html#calibrating-using-training-data",
+    "href": "in-class_ex/in-class_ex09/in-class_ex09.html#calibrating-using-training-data",
+    "title": "In-Class Exercise 9: Geographically Weighted Regression: Predictive Modelling",
+    "section": "8.1 Calibrating using training data",
+    "text": "8.1 Calibrating using training data\n(Adaptive bw has to be integer. Fixed bw can be float type)\n\nset.seed(1234)\ngwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + storey_order + \n               remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +\n               PROX_MRT + PROX_PARK + PROX_MALL + PROX_SUPERMARKET +\n               WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +\n               WITHIN_1KM_PRISCH,\n             \n             dframe = train_data,\n             bw = 55, #nearest transaction - why 55\n             kernel = \"adaptive\",\n             coords = coords_train)\n\nSave the model into rds\n\nwrite_rds(gwRF_adaptive, \"data/model/gwRF_adaptive.rds\")\n\nRetrieve model\n\ngwRF_adaptive <- read_rds(\"data/model/gwRF_adaptive.rds\")\n#vi_df <- as.data.frame(gwRF_adaptive$Global.Model$variable.importance)\n\n\ngwRF_adaptive$Global.Model\n\nRanger result\n\nCall:\n ranger(resale_price ~ floor_area_sqm + storey_order + remaining_lease_mths +      PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER + PROX_MRT + PROX_PARK +      PROX_MALL + PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +      WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + WITHIN_1KM_PRISCH,      data = train_data, num.trees = 500, mtry = 4, importance = \"impurity\",      num.threads = NULL) \n\nType:                             Regression \nNumber of trees:                  500 \nSample size:                      10335 \nNumber of independent variables:  14 \nMtry:                             4 \nTarget node size:                 5 \nVariable importance mode:         impurity \nSplitrule:                        variance \nOOB prediction error (MSE):       697593819 \nR squared (OOB):                  0.9517189"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex09/in-class_ex09.html#predicting-by-using-test-data",
+    "href": "in-class_ex/in-class_ex09/in-class_ex09.html#predicting-by-using-test-data",
+    "title": "In-Class Exercise 9: Geographically Weighted Regression: Predictive Modelling",
+    "section": "8.2 Predicting by using test data",
+    "text": "8.2 Predicting by using test data\n\n8.2.1 Preparing the test data\n\ntest_data <- cbind(test_data, coords_test) %>%\n  st_drop_geometry()\n\n\n\n8.2.2 Predicting with test data\n\ngwRF_pred <- predict.grf(gwRF_adaptive,\n                         test_data,\n                         x.var.name = \"X\",\n                         y.var.name = \"Y\",\n                         local.w = 1,\n                         global.w = 0)\n\nSave the model into rds\n\nwrite_rds(gwRF_pred, \"data/model/gwRF_pred.rds\")\n\nRetrieve model\n\ngwRF_pred <- read_rds(\"data/model/gwRF_pred.rds\")\n\n\n\n8.2.3 Converting the prediction output into a data frame\n\ngwRF_pred_df <- as.data.frame(gwRF_pred)\n\n\nhead(gwRF_pred_df)\n\n  gwRF_pred\n1  383250.2\n2  352868.8\n3  411256.3\n4  375408.6\n5  419465.5\n6  378760.3\n\n\n\n# test_predict <- cbind(test_data, gwRF_pred_df)\n\n# ggplot(data = test_predict)\n\n# sqrt(mean((test_predict$resale_price - \n#             test_predict$predict_grf)^2))"
+  },
+  {
+    "objectID": "take_home_ex/take_home_ex03/take_home_ex03.html",
+    "href": "take_home_ex/take_home_ex03/take_home_ex03.html",
+    "title": "Take Home Exercise 3",
+    "section": "",
+    "text": "HDB Pricing\n\n\n\nIn this take-home exercise, you are tasked to predict HDB resale prices at the sub-market level (i.e. HDB 3-room, HDB 4-room and HDB 5-room) for the month of January and February 2023 in Singapore. The predictive models must be built by using by using conventional OLS method and GWR methods. You are also required to compare the performance of the conventional OLS method versus the geographical weighted methods."
+  },
+  {
+    "objectID": "take_home_ex/take_home_ex03/take_home_ex03.html#import-packages",
+    "href": "take_home_ex/take_home_ex03/take_home_ex03.html#import-packages",
+    "title": "Take Home Exercise 3",
+    "section": "2.1 Import Packages",
+    "text": "2.1 Import Packages\n\nsf - Used for handling geospatial data\nsfdep - Used for functions not in spdep\ntmap, maptools, kableExtra, plotly - Used for visualizing dataframes and plots\nlubridate - Used for handling datetime\ntidyr - Used for changing the shape and hierarchy of dataframe\nreadxl - to read excel data (.xlsx files)\ntidyVerse - Used for data transformation and presentation\n\n\npacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gtsummary, sfdep, onemapsgapi, stringr)"
+  },
+  {
+    "objectID": "take_home_ex/take_home_ex03/take_home_ex03.html#datasets-used",
+    "href": "take_home_ex/take_home_ex03/take_home_ex03.html#datasets-used",
+    "title": "Take Home Exercise 3",
+    "section": "3.1 Datasets Used",
+    "text": "3.1 Datasets Used\n\n\n\nType\nName\n\n\n\n\nGeopsatial\n\n\n\nAspatial"
+  },
+  {
+    "objectID": "take_home_ex/take_home_ex03/take_home_ex03.html#geospatial-data",
+    "href": "take_home_ex/take_home_ex03/take_home_ex03.html#geospatial-data",
+    "title": "Take Home Exercise 3",
+    "section": "3.2 Geospatial Data",
+    "text": "3.2 Geospatial Data\n\n3.2.1 Load Data\n\nImportGlimpseView\n\n\n\n# mpsz <- st_read(dsn=\"data/geospatial\",\n#                       layer=\"\")\n\n\n\n\n# glimpse(mpsz)\n\n\n\n\n# plot(st_geometry(mpsz)) #qtm\n\n\n\n\n\n3.2.1.1 Understanding the Data\nDKI"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex09/data/geospatial/MPSZ-2019.html",
+    "href": "in-class_ex/in-class_ex09/data/geospatial/MPSZ-2019.html",
+    "title": "IS415-GAA",
+    "section": "",
+    "text": "<!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’>     dataset\n\n\n        0 0     false"
   }
 ]
