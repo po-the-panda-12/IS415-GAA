@@ -80,7 +80,3 @@ pacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gts
 # plot(st_geometry(mpsz)) #qtm
 ```
 :::
-
-#### 3.2.1.1 Understanding the Data
-
-DKI

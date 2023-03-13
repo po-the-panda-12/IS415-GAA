@@ -2090,7 +2090,7 @@
     "href": "take_home_ex/take_home_ex03/take_home_ex03.html#geospatial-data",
     "title": "Take Home Exercise 3",
     "section": "3.2 Geospatial Data",
-    "text": "3.2 Geospatial Data\n\n3.2.1 Load Data\n\nImportGlimpseView\n\n\n\n# mpsz <- st_read(dsn=\"data/geospatial\",\n#                       layer=\"\")\n\n\n\n\n# glimpse(mpsz)\n\n\n\n\n# plot(st_geometry(mpsz)) #qtm\n\n\n\n\n\n3.2.1.1 Understanding the Data\nDKI"
+    "text": "3.2 Geospatial Data\n\n3.2.1 Load Data\n\nImportGlimpseView\n\n\n\n# mpsz <- st_read(dsn=\"data/geospatial\",\n#                       layer=\"\")\n\n\n\n\n# glimpse(mpsz)\n\n\n\n\n# plot(st_geometry(mpsz)) #qtm"
   },
   {
     "objectID": "in-class_ex/in-class_ex09/data/geospatial/MPSZ-2019.html",
