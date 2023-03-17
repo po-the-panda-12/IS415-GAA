@@ -1,0 +1,351 @@
+---
+title: "Hands-on Exercise 10: Modelling Geographical Accessibility"
+date: "18 March 2023"
+date-modified: "`r Sys.Date()`"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+---
+
+# 1.0 Overview
+
+## 1.1 Learning Outcome
+
+To model geographical accessibility by computing accessibility measure by using Hansen's potential model and Spatial Accessibility Measure (SAM)
+
+## 1.2 The Data
+
+-   `MP14_SUBZONE_NO_SEA_PL`: URA Master Plan 2014 subzone boundary GIS data. This data set is downloaded from data.gov.sg.
+
+-   `hexagons`: A 250m radius hexagons GIS data. This data set was created by using [*st_make_grid()*](https://r-spatial.github.io/sf/reference/st_make_grid.html) of sf package. It is in ESRI shapefile format.
+
+-   `ELDERCARE`: GIS data showing location of eldercare service. [This data](https://data.gov.sg/dataset/eldercare-services) is downloaded from data.gov.sg. There are two versions. One in ESRI shapefile format. The other one in Google kml file format. For the purpose of this hands-on exercise, ESRI shapefile format is provided.
+
+-   `OD_Matrix`: a distance matrix in csv format. There are six fields in the data file. They are:
+
+    -   `origin_id`: the unique id values of the origin (i.e. `fid` of hexagon data set.),
+
+    -   `destination_id`: the unique id values of the destination (i.e. `fid` of `ELDERCARE` data set.),
+
+    -   `entry_cost`: the perpendicular distance between the origins and the nearest road),
+
+    -   `network_cost`: the actual network distance from the origin and destination,
+
+    -   `exit_cost`: the perpendicular distance between the destination and the nearest road), and
+
+    -   `total_cost`: the summation of `entry_cost`, `network_cost` and `exit_cost`.
+
+## 1.3 Load Packages
+
+```{r}
+pacman::p_load(tmap, SpatialAcc, sf, ggstatsplot, reshape2, tidyverse)
+```
+
+# 2.0 Geospatial Data Wrangling
+
+## 2.1 Importing Data
+
+::: panel-tabset
+#### GIS boundary
+
+```{r}
+mpsz <- st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_NO_SEA_PL")
+```
+
+#### GIS hexagon
+
+```{r}
+hexagons <- st_read(dsn = "data/geospatial", layer = "hexagons") 
+```
+
+#### Eldercare
+
+```{r}
+eldercare <- st_read(dsn = "data/geospatial", layer = "ELDERCARE") 
+```
+:::
+
+## 2.2 Update CRS information
+
+::: panel-tabset
+#### Transform
+
+```{r}
+mpsz <- st_transform(mpsz, 3414)
+eldercare <- st_transform(eldercare, 3414)
+hexagons <- st_transform(hexagons, 3414)
+```
+
+#### Verify
+
+```{r}
+st_crs(mpsz)
+```
+:::
+
+## 2.3 Clean and update attribute fields
+
+Select relevant fields
+
+```{r}
+eldercare <- eldercare %>%
+  select(fid, ADDRESSPOS) %>%
+  mutate(capacity = 100)
+```
+
+```{r}
+hexagons <- hexagons %>%
+  select(fid) %>%
+  mutate(demand = 100)
+```
+
+# 3.0 Aspatial Data Wrangling
+
+## 3.1 Import Distance Matrix
+
+```{r}
+ODMatrix <- read_csv("data/aspatial/OD_Matrix.csv", skip = 0)
+```
+
+## 3.2 Tidy distance matrix
+
+Pivot table where rows represent **origins** and columns represent **destination**
+
+```{r}
+distmat <- ODMatrix %>%
+  select(origin_id, destination_id, total_cost) %>%
+  spread(destination_id, total_cost)%>%
+  select(c(-c('origin_id')))
+```
+
+Change m to km
+
+```{r}
+distmat_km <- as.matrix(distmat/1000)
+```
+
+# 4.0 Modelling and Visualising Accessibility using Hansen Method
+
+## 4.1 Compute Hansen's accessibility
+
+```{r}
+acc_Hansen <- data.frame(ac(hexagons$demand,
+                            eldercare$capacity,
+                            distmat_km, 
+                            #d0 = 50,
+                            power = 2, 
+                            family = "Hansen"))
+```
+
+Rename for ease
+
+```{r}
+colnames(acc_Hansen) <- "accHansen"
+```
+
+Convert to tibble format
+
+```{r}
+acc_Hansen <- tbl_df(acc_Hansen)
+```
+
+Join with hexagon data
+
+```{r}
+hexagon_Hansen <- bind_cols(hexagons, acc_Hansen)
+```
+
+## 4.2 Visualise Hansen's accessibility
+
+Extract the extend of `hexagons` simple feature data frame
+
+```{r}
+mapex <- st_bbox(hexagons)
+```
+
+**View**
+
+```{r}
+tmap_mode("plot")
+tm_shape(hexagon_Hansen,
+         bbox = mapex) + 
+  tm_fill(col = "accHansen",
+          n = 10,
+          style = "quantile",
+          border.col = "black",
+          border.lwd = 1) +
+tm_shape(eldercare) +
+  tm_symbols(size = 0.1) +
+  tm_layout(main.title = "Accessibility to eldercare: Hansen method",
+            main.title.position = "center",
+            main.title.size = 2,
+            legend.outside = FALSE,
+            legend.height = 0.45, 
+            legend.width = 3.0,
+            legend.format = list(digits = 6),
+            legend.position = c("right", "top"),
+            frame = TRUE) +
+  tm_compass(type="8star", size = 2) +
+  tm_scale_bar(width = 0.15) +
+  tm_grid(lwd = 0.1, alpha = 0.5)
+```
+
+## 4.3 Statistical graphic visualisation
+
+Add planning region field into hexagon_Hansen df
+
+```{r}
+hexagon_Hansen <- st_join(hexagon_Hansen, mpsz, 
+                          join = st_intersects)
+```
+
+**Plot**
+
+```{r}
+ggplot(data=hexagon_Hansen, 
+       aes(y = log(accHansen), 
+           x= REGION_N)) +
+  geom_boxplot() +
+  geom_point(stat="summary", 
+             fun.y="mean", 
+             colour ="red", 
+             size=2)
+```
+
+# 5.0 Modelling and Visualising Accessibility using KD2SFCA Method
+
+## 5.1 Compute KD2SFCA's accessibility
+
+(Used for family argument)
+
+```{r}
+acc_KD2SFCA <- data.frame(ac(hexagons$demand,
+                            eldercare$capacity,
+                            distmat_km, 
+                            d0 = 50,
+                            power = 2, 
+                            family = "KD2SFCA"))
+
+colnames(acc_KD2SFCA) <- "accKD2SFCA"
+acc_KD2SFCA <- tbl_df(acc_KD2SFCA)
+hexagon_KD2SFCA <- bind_cols(hexagons, acc_KD2SFCA)
+```
+
+## 5.2 Visualise KD2SFCA's accessibility
+
+```{r}
+tmap_mode("plot")
+tm_shape(hexagon_KD2SFCA,
+         bbox = mapex) + 
+  tm_fill(col = "accKD2SFCA",
+          n = 10,
+          style = "quantile",
+          border.col = "black",
+          border.lwd = 1) +
+tm_shape(eldercare) +
+  tm_symbols(size = 0.1) +
+  tm_layout(main.title = "Accessibility to eldercare: KD2SFCA method",
+            main.title.position = "center",
+            main.title.size = 2,
+            legend.outside = FALSE,
+            legend.height = 0.45, 
+            legend.width = 3.0,
+            legend.format = list(digits = 6),
+            legend.position = c("right", "top"),
+            frame = TRUE) +
+  tm_compass(type="8star", size = 2) +
+  tm_scale_bar(width = 0.15) +
+  tm_grid(lwd = 0.1, alpha = 0.5)
+```
+
+## 5.3 Statistical graphic visualisation
+
+Add planning region field into hexagon_KD2SFCA df
+
+```{r}
+hexagon_KD2SFCA <- st_join(hexagon_KD2SFCA, mpsz, 
+                          join = st_intersects)
+```
+
+**Plot**
+
+```{r}
+ggplot(data=hexagon_KD2SFCA, 
+       aes(y = accKD2SFCA, 
+           x= REGION_N)) +
+  geom_boxplot() +
+  geom_point(stat="summary", 
+             fun.y="mean", 
+             colour ="red", 
+             size=2)
+```
+
+# 6.0 Modelling and Visualising Accessibility using Spatial Accessibility Measure (SAM) Method
+
+## 6.1 Compute SAM accessibility
+
+(SAM uses family argument)
+
+```{r}
+acc_SAM <- data.frame(ac(hexagons$demand,
+                         eldercare$capacity,
+                         distmat_km, 
+                         d0 = 50,
+                         power = 2, 
+                         family = "SAM"))
+
+colnames(acc_SAM) <- "accSAM"
+acc_SAM <- tbl_df(acc_SAM)
+hexagon_SAM <- bind_cols(hexagons, acc_SAM)
+```
+
+## 6.2 Visualising SAM's accessibility
+
+```{r}
+tmap_mode("plot")
+tm_shape(hexagon_SAM,
+         bbox = mapex) + 
+  tm_fill(col = "accSAM",
+          n = 10,
+          style = "quantile",
+          border.col = "black",
+          border.lwd = 1) +
+tm_shape(eldercare) +
+  tm_symbols(size = 0.1) +
+  tm_layout(main.title = "Accessibility to eldercare: SAM method",
+            main.title.position = "center",
+            main.title.size = 2,
+            legend.outside = FALSE,
+            legend.height = 0.45, 
+            legend.width = 3.0,
+            legend.format = list(digits = 3),
+            legend.position = c("right", "top"),
+            frame = TRUE) +
+  tm_compass(type="8star", size = 2) +
+  tm_scale_bar(width = 0.15) +
+  tm_grid(lwd = 0.1, alpha = 0.5)
+```
+
+## 6.3 Statistical graphic visualisation
+
+Add planning region field into hexagon_SAM df
+
+```{r}
+hexagon_SAM <- st_join(hexagon_SAM, mpsz, 
+                       join = st_intersects)
+```
+
+**Plot**
+
+```{r}
+ggplot(data=hexagon_SAM, 
+       aes(y = accSAM, 
+           x= REGION_N)) +
+  geom_boxplot() +
+  geom_point(stat="summary", 
+             fun.y="mean", 
+             colour ="red", 
+             size=2)
+```

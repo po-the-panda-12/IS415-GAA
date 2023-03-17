@@ -2098,5 +2098,124 @@
     "title": "IS415-GAA",
     "section": "",
     "text": "<!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’>     dataset\n\n\n        0 0     false"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "",
+    "text": "To model geographical accessibility by computing accessibility measure by using Hansen’s potential model and Spatial Accessibility Measure (SAM)\n\n\n\n\nMP14_SUBZONE_NO_SEA_PL: URA Master Plan 2014 subzone boundary GIS data. This data set is downloaded from data.gov.sg.\nhexagons: A 250m radius hexagons GIS data. This data set was created by using st_make_grid() of sf package. It is in ESRI shapefile format.\nELDERCARE: GIS data showing location of eldercare service. This data is downloaded from data.gov.sg. There are two versions. One in ESRI shapefile format. The other one in Google kml file format. For the purpose of this hands-on exercise, ESRI shapefile format is provided.\nOD_Matrix: a distance matrix in csv format. There are six fields in the data file. They are:\n\norigin_id: the unique id values of the origin (i.e. fid of hexagon data set.),\ndestination_id: the unique id values of the destination (i.e. fid of ELDERCARE data set.),\nentry_cost: the perpendicular distance between the origins and the nearest road),\nnetwork_cost: the actual network distance from the origin and destination,\nexit_cost: the perpendicular distance between the destination and the nearest road), and\ntotal_cost: the summation of entry_cost, network_cost and exit_cost.\n\n\n\n\n\n\npacman::p_load(tmap, SpatialAcc, sf, ggstatsplot, reshape2, tidyverse)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#importing-data",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#importing-data",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "2.1 Importing Data",
+    "text": "2.1 Importing Data\n\nGIS boundaryGIS hexagonEldercare\n\n\n\nmpsz <- st_read(dsn = \"data/geospatial\", layer = \"MP14_SUBZONE_NO_SEA_PL\")\n\nReading layer `MP14_SUBZONE_NO_SEA_PL' from data source \n  `/Users/shambhavigoenka/Desktop/School/Geo/IS415-GAA/hands-on_ex/hands-on_ex10/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21\n\n\n\n\n\nhexagons <- st_read(dsn = \"data/geospatial\", layer = \"hexagons\") \n\nReading layer `hexagons' from data source \n  `/Users/shambhavigoenka/Desktop/School/Geo/IS415-GAA/hands-on_ex/hands-on_ex10/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 3125 features and 6 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 21506.33 xmax: 50010.26 ymax: 50256.33\nProjected CRS: SVY21 / Singapore TM\n\n\n\n\n\neldercare <- st_read(dsn = \"data/geospatial\", layer = \"ELDERCARE\") \n\nReading layer `ELDERCARE' from data source \n  `/Users/shambhavigoenka/Desktop/School/Geo/IS415-GAA/hands-on_ex/hands-on_ex10/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 120 features and 19 fields\nGeometry type: POINT\nDimension:     XY\nBounding box:  xmin: 14481.92 ymin: 28218.43 xmax: 41665.14 ymax: 46804.9\nProjected CRS: SVY21 / Singapore TM"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#update-crs-information",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#update-crs-information",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "2.2 Update CRS information",
+    "text": "2.2 Update CRS information\n\nTransformVerify\n\n\n\nmpsz <- st_transform(mpsz, 3414)\neldercare <- st_transform(eldercare, 3414)\nhexagons <- st_transform(hexagons, 3414)\n\n\n\n\nst_crs(mpsz)\n\nCoordinate Reference System:\n  User input: EPSG:3414 \n  wkt:\nPROJCRS[\"SVY21 / Singapore TM\",\n    BASEGEOGCRS[\"SVY21\",\n        DATUM[\"SVY21\",\n            ELLIPSOID[\"WGS 84\",6378137,298.257223563,\n                LENGTHUNIT[\"metre\",1]]],\n        PRIMEM[\"Greenwich\",0,\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n        ID[\"EPSG\",4757]],\n    CONVERSION[\"Singapore Transverse Mercator\",\n        METHOD[\"Transverse Mercator\",\n            ID[\"EPSG\",9807]],\n        PARAMETER[\"Latitude of natural origin\",1.36666666666667,\n            ANGLEUNIT[\"degree\",0.0174532925199433],\n            ID[\"EPSG\",8801]],\n        PARAMETER[\"Longitude of natural origin\",103.833333333333,\n            ANGLEUNIT[\"degree\",0.0174532925199433],\n            ID[\"EPSG\",8802]],\n        PARAMETER[\"Scale factor at natural origin\",1,\n            SCALEUNIT[\"unity\",1],\n            ID[\"EPSG\",8805]],\n        PARAMETER[\"False easting\",28001.642,\n            LENGTHUNIT[\"metre\",1],\n            ID[\"EPSG\",8806]],\n        PARAMETER[\"False northing\",38744.572,\n            LENGTHUNIT[\"metre\",1],\n            ID[\"EPSG\",8807]]],\n    CS[Cartesian,2],\n        AXIS[\"northing (N)\",north,\n            ORDER[1],\n            LENGTHUNIT[\"metre\",1]],\n        AXIS[\"easting (E)\",east,\n            ORDER[2],\n            LENGTHUNIT[\"metre\",1]],\n    USAGE[\n        SCOPE[\"Cadastre, engineering survey, topographic mapping.\"],\n        AREA[\"Singapore - onshore and offshore.\"],\n        BBOX[1.13,103.59,1.47,104.07]],\n    ID[\"EPSG\",3414]]"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#clean-and-update-attribute-fields",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#clean-and-update-attribute-fields",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "2.3 Clean and update attribute fields",
+    "text": "2.3 Clean and update attribute fields\nSelect relevant fields\n\neldercare <- eldercare %>%\n  select(fid, ADDRESSPOS) %>%\n  mutate(capacity = 100)\n\n\nhexagons <- hexagons %>%\n  select(fid) %>%\n  mutate(demand = 100)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#import-distance-matrix",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#import-distance-matrix",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "3.1 Import Distance Matrix",
+    "text": "3.1 Import Distance Matrix\n\nODMatrix <- read_csv(\"data/aspatial/OD_Matrix.csv\", skip = 0)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#tidy-distance-matrix",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#tidy-distance-matrix",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "3.2 Tidy distance matrix",
+    "text": "3.2 Tidy distance matrix\nPivot table where rows represent origins and columns represent destination\n\ndistmat <- ODMatrix %>%\n  select(origin_id, destination_id, total_cost) %>%\n  spread(destination_id, total_cost)%>%\n  select(c(-c('origin_id')))\n\nChange m to km\n\ndistmat_km <- as.matrix(distmat/1000)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#compute-hansens-accessibility",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#compute-hansens-accessibility",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "4.1 Compute Hansen’s accessibility",
+    "text": "4.1 Compute Hansen’s accessibility\n\nacc_Hansen <- data.frame(ac(hexagons$demand,\n                            eldercare$capacity,\n                            distmat_km, \n                            #d0 = 50,\n                            power = 2, \n                            family = \"Hansen\"))\n\nRename for ease\n\ncolnames(acc_Hansen) <- \"accHansen\"\n\nConvert to tibble format\n\nacc_Hansen <- tbl_df(acc_Hansen)\n\nJoin with hexagon data\n\nhexagon_Hansen <- bind_cols(hexagons, acc_Hansen)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#visualise-hansens-accessibility",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#visualise-hansens-accessibility",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "4.2 Visualise Hansen’s accessibility",
+    "text": "4.2 Visualise Hansen’s accessibility\nExtract the extend of hexagons simple feature data frame\n\nmapex <- st_bbox(hexagons)\n\nView\n\ntmap_mode(\"plot\")\ntm_shape(hexagon_Hansen,\n         bbox = mapex) + \n  tm_fill(col = \"accHansen\",\n          n = 10,\n          style = \"quantile\",\n          border.col = \"black\",\n          border.lwd = 1) +\ntm_shape(eldercare) +\n  tm_symbols(size = 0.1) +\n  tm_layout(main.title = \"Accessibility to eldercare: Hansen method\",\n            main.title.position = \"center\",\n            main.title.size = 2,\n            legend.outside = FALSE,\n            legend.height = 0.45, \n            legend.width = 3.0,\n            legend.format = list(digits = 6),\n            legend.position = c(\"right\", \"top\"),\n            frame = TRUE) +\n  tm_compass(type=\"8star\", size = 2) +\n  tm_scale_bar(width = 0.15) +\n  tm_grid(lwd = 0.1, alpha = 0.5)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#statistical-graphic-visualisation",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#statistical-graphic-visualisation",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "4.3 Statistical graphic visualisation",
+    "text": "4.3 Statistical graphic visualisation\nAdd planning region field into hexagon_Hansen df\n\nhexagon_Hansen <- st_join(hexagon_Hansen, mpsz, \n                          join = st_intersects)\n\nPlot\n\nggplot(data=hexagon_Hansen, \n       aes(y = log(accHansen), \n           x= REGION_N)) +\n  geom_boxplot() +\n  geom_point(stat=\"summary\", \n             fun.y=\"mean\", \n             colour =\"red\", \n             size=2)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#compute-kd2sfcas-accessibility",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#compute-kd2sfcas-accessibility",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "5.1 Compute KD2SFCA’s accessibility",
+    "text": "5.1 Compute KD2SFCA’s accessibility\n(Used for family argument)\n\nacc_KD2SFCA <- data.frame(ac(hexagons$demand,\n                            eldercare$capacity,\n                            distmat_km, \n                            d0 = 50,\n                            power = 2, \n                            family = \"KD2SFCA\"))\n\ncolnames(acc_KD2SFCA) <- \"accKD2SFCA\"\nacc_KD2SFCA <- tbl_df(acc_KD2SFCA)\nhexagon_KD2SFCA <- bind_cols(hexagons, acc_KD2SFCA)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#visualise-kd2sfcas-accessibility",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#visualise-kd2sfcas-accessibility",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "5.2 Visualise KD2SFCA’s accessibility",
+    "text": "5.2 Visualise KD2SFCA’s accessibility\n\ntmap_mode(\"plot\")\ntm_shape(hexagon_KD2SFCA,\n         bbox = mapex) + \n  tm_fill(col = \"accKD2SFCA\",\n          n = 10,\n          style = \"quantile\",\n          border.col = \"black\",\n          border.lwd = 1) +\ntm_shape(eldercare) +\n  tm_symbols(size = 0.1) +\n  tm_layout(main.title = \"Accessibility to eldercare: KD2SFCA method\",\n            main.title.position = \"center\",\n            main.title.size = 2,\n            legend.outside = FALSE,\n            legend.height = 0.45, \n            legend.width = 3.0,\n            legend.format = list(digits = 6),\n            legend.position = c(\"right\", \"top\"),\n            frame = TRUE) +\n  tm_compass(type=\"8star\", size = 2) +\n  tm_scale_bar(width = 0.15) +\n  tm_grid(lwd = 0.1, alpha = 0.5)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#statistical-graphic-visualisation-1",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#statistical-graphic-visualisation-1",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "5.3 Statistical graphic visualisation",
+    "text": "5.3 Statistical graphic visualisation\nAdd planning region field into hexagon_KD2SFCA df\n\nhexagon_KD2SFCA <- st_join(hexagon_KD2SFCA, mpsz, \n                          join = st_intersects)\n\nPlot\n\nggplot(data=hexagon_KD2SFCA, \n       aes(y = accKD2SFCA, \n           x= REGION_N)) +\n  geom_boxplot() +\n  geom_point(stat=\"summary\", \n             fun.y=\"mean\", \n             colour =\"red\", \n             size=2)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#compute-sam-accessibility",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#compute-sam-accessibility",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "6.1 Compute SAM accessibility",
+    "text": "6.1 Compute SAM accessibility\n(SAM uses family argument)\n\nacc_SAM <- data.frame(ac(hexagons$demand,\n                         eldercare$capacity,\n                         distmat_km, \n                         d0 = 50,\n                         power = 2, \n                         family = \"SAM\"))\n\ncolnames(acc_SAM) <- \"accSAM\"\nacc_SAM <- tbl_df(acc_SAM)\nhexagon_SAM <- bind_cols(hexagons, acc_SAM)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#visualising-sams-accessibility",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#visualising-sams-accessibility",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "6.2 Visualising SAM’s accessibility",
+    "text": "6.2 Visualising SAM’s accessibility\n\ntmap_mode(\"plot\")\ntm_shape(hexagon_SAM,\n         bbox = mapex) + \n  tm_fill(col = \"accSAM\",\n          n = 10,\n          style = \"quantile\",\n          border.col = \"black\",\n          border.lwd = 1) +\ntm_shape(eldercare) +\n  tm_symbols(size = 0.1) +\n  tm_layout(main.title = \"Accessibility to eldercare: SAM method\",\n            main.title.position = \"center\",\n            main.title.size = 2,\n            legend.outside = FALSE,\n            legend.height = 0.45, \n            legend.width = 3.0,\n            legend.format = list(digits = 3),\n            legend.position = c(\"right\", \"top\"),\n            frame = TRUE) +\n  tm_compass(type=\"8star\", size = 2) +\n  tm_scale_bar(width = 0.15) +\n  tm_grid(lwd = 0.1, alpha = 0.5)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#statistical-graphic-visualisation-2",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#statistical-graphic-visualisation-2",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "6.3 Statistical graphic visualisation",
+    "text": "6.3 Statistical graphic visualisation\nAdd planning region field into hexagon_SAM df\n\nhexagon_SAM <- st_join(hexagon_SAM, mpsz, \n                       join = st_intersects)\n\nPlot\n\nggplot(data=hexagon_SAM, \n       aes(y = accSAM, \n           x= REGION_N)) +\n  geom_boxplot() +\n  geom_point(stat=\"summary\", \n             fun.y=\"mean\", \n             colour =\"red\", \n             size=2)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/data/geospatial/ELDERCARE.html",
+    "href": "hands-on_ex/hands-on_ex10/data/geospatial/ELDERCARE.html",
+    "title": "IS415-GAA",
+    "section": "",
+    "text": "<!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’>  ELDERCARE  ENG dataset\n\nELDERCARE\n\n                 0 0     false"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/data/geospatial/hexagons.html",
+    "href": "hands-on_ex/hands-on_ex10/data/geospatial/hexagons.html",
+    "title": "IS415-GAA",
+    "section": "",
+    "text": "<!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’>     dataset\n\n\n                 0 0     false"
   }
 ]
