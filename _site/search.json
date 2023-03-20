@@ -2125,7 +2125,7 @@
     "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#clean-and-update-attribute-fields",
     "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
     "section": "2.3 Clean and update attribute fields",
-    "text": "2.3 Clean and update attribute fields\nSelect relevant fields\n\neldercare <- eldercare %>%\n  select(fid, ADDRESSPOS) %>%\n  mutate(capacity = 100)\n\n\nhexagons <- hexagons %>%\n  select(fid) %>%\n  mutate(demand = 100)"
+    "text": "2.3 Clean and update attribute fields\nSelect relevant fields\n\neldercare <- eldercare %>%\n  select(fid, ADDRESSPOS) %>%\n  rename(destination_id = fid,\n         postal_code = ADDRESSPOS) %>%\n  mutate(capacity = 100)\n\n\nhexagons <- hexagons %>%\n  select(fid) %>%\n  rename(origin_id = fid) %>%\n  mutate(demand = 100)"
   },
   {
     "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#import-distance-matrix",
@@ -2146,7 +2146,7 @@
     "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#compute-hansens-accessibility",
     "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
     "section": "4.1 Compute Hansen’s accessibility",
-    "text": "4.1 Compute Hansen’s accessibility\n\nacc_Hansen <- data.frame(ac(hexagons$demand,\n                            eldercare$capacity,\n                            distmat_km, \n                            #d0 = 50,\n                            power = 2, \n                            family = \"Hansen\"))\n\nRename for ease\n\ncolnames(acc_Hansen) <- \"accHansen\"\n\nConvert to tibble format\n\nacc_Hansen <- tbl_df(acc_Hansen)\n\nJoin with hexagon data\n\nhexagon_Hansen <- bind_cols(hexagons, acc_Hansen)"
+    "text": "4.1 Compute Hansen’s accessibility\n\nacc_Hansen <- data.frame(ac(hexagons$demand,\n                            eldercare$capacity,\n                            distmat_km, \n                            #d0 = 50, #threshold km\n                            power = 2, \n                            family = \"Hansen\"))\n\nRename for ease\n\ncolnames(acc_Hansen) <- \"accHansen\"\n\nConvert to tibble format\n\nacc_Hansen <- tbl_df(acc_Hansen)\n\nJoin with hexagon data\n\nhexagon_Hansen <- bind_cols(hexagons, acc_Hansen)"
   },
   {
     "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#visualise-hansens-accessibility",
@@ -2214,6 +2214,83 @@
   {
     "objectID": "hands-on_ex/hands-on_ex10/data/geospatial/hexagons.html",
     "href": "hands-on_ex/hands-on_ex10/data/geospatial/hexagons.html",
+    "title": "IS415-GAA",
+    "section": "",
+    "text": "<!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’>     dataset\n\n\n                 0 0     false"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#tidy-distance-matrix---network-matrix",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#tidy-distance-matrix---network-matrix",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "3.2 Tidy distance matrix - network matrix",
+    "text": "3.2 Tidy distance matrix - network matrix\nPivot table where rows represent origins and columns represent destination\n\ndistmat <- ODMatrix %>%\n  select(origin_id, destination_id, total_cost) %>%\n  spread(destination_id, total_cost)%>%\n  select(c(-c('origin_id')))\n\nChange m to km\n\ndistmat_km <- as.matrix(distmat/1000)"
+  },
+  {
+    "objectID": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#optional---euclidean-distance-matrix",
+    "href": "hands-on_ex/hands-on_ex10/hands-on_ex10.html#optional---euclidean-distance-matrix",
+    "title": "Hands-on Exercise 10: Modelling Geographical Accessibility",
+    "section": "3.3 OPTIONAL - Euclidean distance matrix",
+    "text": "3.3 OPTIONAL - Euclidean distance matrix\nInstead of 3.2 Tidy distance matrix - network matrix,\n\neldercare_coord <- st_coordinates(eldercare)\nhexagon_coord <- st_coordinates(hexagons)\n\n\nECUMatrix <- SpatialAcc::distance(hexagon_coord,\n                                  eldercare_coord,\n                                  type = \"euclidean\")\n\nChange m to km\n\nECUMatrix_km <- as.matrix(ECUMatrix/1000)"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex10/in-class_ex10.html",
+    "href": "in-class_ex/in-class_ex10/in-class_ex10.html",
+    "title": "In-Class Exercise 10:",
+    "section": "",
+    "text": "MP14_SUBZONE_NO_SEA_PL: URA Master Plan 2014 subzone boundary GIS data. This data set is downloaded from data.gov.sg.\nhexagons: A 250m radius hexagons GIS data. This data set was created by using st_make_grid() of sf package. It is in ESRI shapefile format.\nELDERCARE: GIS data showing location of eldercare service. This data is downloaded from data.gov.sg. There are two versions. One in ESRI shapefile format. The other one in Google kml file format. For the purpose of this hands-on exercise, ESRI shapefile format is provided.\nOD_Matrix: a distance matrix in csv format. There are six fields in the data file. They are:\n\norigin_id: the unique id values of the origin (i.e. fid of hexagon data set.),\ndestination_id: the unique id values of the destination (i.e. fid of ELDERCARE data set.),\nentry_cost: the perpendicular distance between the origins and the nearest road),\nnetwork_cost: the actual network distance from the origin and destination,\nexit_cost: the perpendicular distance between the destination and the nearest road), and\ntotal_cost: the summation of entry_cost, network_cost and exit_cost.\n\n\n\n\n\n\npacman::p_load(tmap, SpatialAcc, sf, ggstatsplot, reshape2, tidyverse)"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex10/in-class_ex10.html#importing-data",
+    "href": "in-class_ex/in-class_ex10/in-class_ex10.html#importing-data",
+    "title": "In-Class Exercise 10:",
+    "section": "2.1 Importing Data",
+    "text": "2.1 Importing Data\n\nGIS boundaryGIS hexagonEldercare\n\n\n\nmpsz <- st_read(dsn = \"data/geospatial\", layer = \"MP14_SUBZONE_NO_SEA_PL\")\n\nReading layer `MP14_SUBZONE_NO_SEA_PL' from data source \n  `/Users/shambhavigoenka/Desktop/School/Geo/IS415-GAA/in-class_ex/in-class_ex10/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21\n\n\n\n\n\nhexagons <- st_read(dsn = \"data/geospatial\", layer = \"hexagons\") \n\nReading layer `hexagons' from data source \n  `/Users/shambhavigoenka/Desktop/School/Geo/IS415-GAA/in-class_ex/in-class_ex10/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 3125 features and 6 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 21506.33 xmax: 50010.26 ymax: 50256.33\nProjected CRS: SVY21 / Singapore TM\n\n\n\n\n\neldercare <- st_read(dsn = \"data/geospatial\", layer = \"ELDERCARE\") \n\nReading layer `ELDERCARE' from data source \n  `/Users/shambhavigoenka/Desktop/School/Geo/IS415-GAA/in-class_ex/in-class_ex10/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 120 features and 19 fields\nGeometry type: POINT\nDimension:     XY\nBounding box:  xmin: 14481.92 ymin: 28218.43 xmax: 41665.14 ymax: 46804.9\nProjected CRS: SVY21 / Singapore TM"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex10/in-class_ex10.html#update-crs-information",
+    "href": "in-class_ex/in-class_ex10/in-class_ex10.html#update-crs-information",
+    "title": "In-Class Exercise 10:",
+    "section": "2.2 Update CRS information",
+    "text": "2.2 Update CRS information\n\nTransformVerify\n\n\n\nmpsz <- st_transform(mpsz, 3414)\neldercare <- st_transform(eldercare, 3414)\nhexagon <- st_transform(hexagons, 3414)\n\n\n\n\nst_crs(mpsz)\n\nCoordinate Reference System:\n  User input: EPSG:3414 \n  wkt:\nPROJCRS[\"SVY21 / Singapore TM\",\n    BASEGEOGCRS[\"SVY21\",\n        DATUM[\"SVY21\",\n            ELLIPSOID[\"WGS 84\",6378137,298.257223563,\n                LENGTHUNIT[\"metre\",1]]],\n        PRIMEM[\"Greenwich\",0,\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n        ID[\"EPSG\",4757]],\n    CONVERSION[\"Singapore Transverse Mercator\",\n        METHOD[\"Transverse Mercator\",\n            ID[\"EPSG\",9807]],\n        PARAMETER[\"Latitude of natural origin\",1.36666666666667,\n            ANGLEUNIT[\"degree\",0.0174532925199433],\n            ID[\"EPSG\",8801]],\n        PARAMETER[\"Longitude of natural origin\",103.833333333333,\n            ANGLEUNIT[\"degree\",0.0174532925199433],\n            ID[\"EPSG\",8802]],\n        PARAMETER[\"Scale factor at natural origin\",1,\n            SCALEUNIT[\"unity\",1],\n            ID[\"EPSG\",8805]],\n        PARAMETER[\"False easting\",28001.642,\n            LENGTHUNIT[\"metre\",1],\n            ID[\"EPSG\",8806]],\n        PARAMETER[\"False northing\",38744.572,\n            LENGTHUNIT[\"metre\",1],\n            ID[\"EPSG\",8807]]],\n    CS[Cartesian,2],\n        AXIS[\"northing (N)\",north,\n            ORDER[1],\n            LENGTHUNIT[\"metre\",1]],\n        AXIS[\"easting (E)\",east,\n            ORDER[2],\n            LENGTHUNIT[\"metre\",1]],\n    USAGE[\n        SCOPE[\"Cadastre, engineering survey, topographic mapping.\"],\n        AREA[\"Singapore - onshore and offshore.\"],\n        BBOX[1.13,103.59,1.47,104.07]],\n    ID[\"EPSG\",3414]]"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex10/in-class_ex10.html#clean-and-update-attribute-fields",
+    "href": "in-class_ex/in-class_ex10/in-class_ex10.html#clean-and-update-attribute-fields",
+    "title": "In-Class Exercise 10:",
+    "section": "2.3 Clean and update attribute fields",
+    "text": "2.3 Clean and update attribute fields\nSelect relevant fields\n\neldercare <- eldercare %>%\n  select(fid, ADDRESSPOS) %>%\n  rename(destination_id = fid,\n         postal_code = ADDRESSPOS) %>%\n  mutate(capacity = 100)\n\n\nhexagon <- hexagon %>%\n  select(fid) %>%\n  rename(origin_id = fid) %>%\n  mutate(demand = 100)"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex10/in-class_ex10.html#import-distance-matrix",
+    "href": "in-class_ex/in-class_ex10/in-class_ex10.html#import-distance-matrix",
+    "title": "In-Class Exercise 10:",
+    "section": "3.1 Import Distance Matrix",
+    "text": "3.1 Import Distance Matrix\n\nODMatrix <- read_csv(\"data/aspatial/OD_Matrix.csv\", skip = 0)"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex10/in-class_ex10.html#tidy-distance-matrix",
+    "href": "in-class_ex/in-class_ex10/in-class_ex10.html#tidy-distance-matrix",
+    "title": "In-Class Exercise 10:",
+    "section": "3.2 Tidy distance matrix",
+    "text": "3.2 Tidy distance matrix\nPivot table where rows represent origins and columns represent destination\n\ndistmat <- ODMatrix %>%\n  select(origin_id, destination_id, total_cost) %>%\n  spread(destination_id, total_cost)%>%\n  select(c(-c('origin_id')))\n\nChange m to km\n\ndistmat_km <- as.matrix(distmat/1000)"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex10/in-class_ex10.html#optional---euclidean-distance-matrix",
+    "href": "in-class_ex/in-class_ex10/in-class_ex10.html#optional---euclidean-distance-matrix",
+    "title": "In-Class Exercise 10:",
+    "section": "3.3 OPTIONAL - Euclidean distance matrix",
+    "text": "3.3 OPTIONAL - Euclidean distance matrix\nInstead of 3.2,\n\neldercare_coord <- st_coordinates(eldercare)\nhexagon_coord <- st_coordinates(hexagon)\n\n\nECUMatrix <- SpatialAcc::distance(hexagon_coord,\n                                  eldercare_coord,\n                                  type = \"euclidean\")"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex10/data/geospatial/ELDERCARE.html",
+    "href": "in-class_ex/in-class_ex10/data/geospatial/ELDERCARE.html",
+    "title": "IS415-GAA",
+    "section": "",
+    "text": "<!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’>  ELDERCARE  ENG dataset\n\nELDERCARE\n\n                 0 0     false"
+  },
+  {
+    "objectID": "in-class_ex/in-class_ex10/data/geospatial/hexagons.html",
+    "href": "in-class_ex/in-class_ex10/data/geospatial/hexagons.html",
     "title": "IS415-GAA",
     "section": "",
     "text": "<!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’>     dataset\n\n\n                 0 0     false"

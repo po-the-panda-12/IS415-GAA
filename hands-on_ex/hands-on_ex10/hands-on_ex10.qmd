@@ -92,12 +92,15 @@ Select relevant fields
 ```{r}
 eldercare <- eldercare %>%
   select(fid, ADDRESSPOS) %>%
+  rename(destination_id = fid,
+         postal_code = ADDRESSPOS) %>%
   mutate(capacity = 100)
 ```
 
 ```{r}
 hexagons <- hexagons %>%
   select(fid) %>%
+  rename(origin_id = fid) %>%
   mutate(demand = 100)
 ```
 
@@ -109,7 +112,7 @@ hexagons <- hexagons %>%
 ODMatrix <- read_csv("data/aspatial/OD_Matrix.csv", skip = 0)
 ```
 
-## 3.2 Tidy distance matrix
+## 3.2 Tidy distance matrix - network matrix
 
 Pivot table where rows represent **origins** and columns represent **destination**
 
@@ -126,6 +129,27 @@ Change m to km
 distmat_km <- as.matrix(distmat/1000)
 ```
 
+## 3.3 OPTIONAL - Euclidean distance matrix
+
+Instead of [3.2 Tidy distance matrix - network matrix],
+
+```{r}
+eldercare_coord <- st_coordinates(eldercare)
+hexagon_coord <- st_coordinates(hexagons)
+```
+
+```{r}
+ECUMatrix <- SpatialAcc::distance(hexagon_coord,
+                                  eldercare_coord,
+                                  type = "euclidean")
+```
+
+Change m to km
+
+```{r}
+ECUMatrix_km <- as.matrix(ECUMatrix/1000)
+```
+
 # 4.0 Modelling and Visualising Accessibility using Hansen Method
 
 ## 4.1 Compute Hansen's accessibility
@@ -134,7 +158,7 @@ distmat_km <- as.matrix(distmat/1000)
 acc_Hansen <- data.frame(ac(hexagons$demand,
                             eldercare$capacity,
                             distmat_km, 
-                            #d0 = 50,
+                            #d0 = 50, #threshold km
                             power = 2, 
                             family = "Hansen"))
 ```
