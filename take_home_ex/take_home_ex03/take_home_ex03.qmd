@@ -42,7 +42,7 @@ In this take-home exercise, you are tasked to predict HDB resale prices at the s
 -   tidyVerse - Used for data transformation and presentation
 
 ```{r}
-pacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gtsummary, sfdep, onemapsgapi, stringr)
+pacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gtsummary, sfdep, onemapsgapi, stringr, httr, rjson)
 ```
 
 # 3.0 Data Wrangling
@@ -51,11 +51,25 @@ pacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gts
 
 ## 3.1 Datasets Used
 
-| Type       | Name                                                              |
-|---------------------|---------------------------------------------------|
-| Aspatial   | [HDB Resale Data](https://data.gov.sg/dataset/resale-flat-prices) |
-| Geospatial |                                                                   |
-| Geospatial |                                                                   |
+| Type       | Name                                                                                                    |
+|----------------------|--------------------------------------------------|
+| Aspatial   | [HDB Resale Data](https://data.gov.sg/dataset/resale-flat-prices)                                       |
+| Geospatial | [Singapore Subzones (base layer)](https://data.gov.sg/dataset/master-plan-2014-subzone-boundary-web)    |
+| Geospatial | [Bus Stops](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html?searchText=bus%20stop) |
+| Geospatial | [MRT Station Exits](https://data.gov.sg/dataset/lta-mrt-station-exit)                                   |
+| Geospatial | [Kindergartens](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                       |
+| Geospatial | [Childcare](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                           |
+| Geospatial | [Primary Schools](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                     |
+| Geospatial | [Sports Facilities](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                   |
+| Geospatial | [Parks](https://data.gov.sg/dataset/parks)                                                              |
+| Geospatial | [Gyms](https://data.gov.sg/dataset/gymssg)                                                              |
+| Geospatial | [Water Sites](https://data.gov.sg/dataset/abc-waters-sites)                                             |
+| Geospatial | [Hawker Centers](https://data.gov.sg/dataset/hawker-centres)                                            |
+| Geospatial | [Supermarkets](https://data.gov.sg/dataset/supermarkets)                                                |
+| Geospatial | [Eldercare](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                           |
+| Geospatial | [Waste Disposal](https://data.gov.sg/dataset/waste-treatment)                                           |
+| Geospatial | [Active Cemeteries](https://data.gov.sg/dataset/active-cemeteries)                                      |
+| Geospatial | [Historic Sites](https://data.gov.sg/dataset/historic-sites)                                            |
 
 ## 3.2 Aspatial Data
 
@@ -147,6 +161,27 @@ for(i in str_list) {
 }
 ```
 
+#### 3.2.2.3 Floor Level
+
+Convert storey_range from text to ordinal data (ranging 1 - 17)
+
+```{r}
+#| eval: false
+#| code-fold: true
+#get ordinal data of storey_range
+storey_text <- unique(resale$storey_range)
+storey_ordinal <- seq_along(storey_text)
+
+#set label
+resale$storey_num <- storey_ordinal[match(resale$storey_range, storey_text)] 
+levels(resale$storey_num) <- storey_text
+
+#change column to numeric data type
+resale<- resale |> 
+  mutate(storey_num=as.numeric(storey_num))
+
+```
+
 ### 3.2.3 Get Latitude and Longitude
 
 Extract latitude, longitude and postal code of all addresses and store into temporary data frame for further inspection
@@ -230,11 +265,20 @@ Join into main apsatial data frame
 rs_coords <- left_join(resale, postal_coords, by = c('address' = 'address'))
 ```
 
+Convert latitude and longitude into geometry points
+
+```{r}
+#| eval: false
+rs_coords <- st_as_sf(rs_coords, 
+                      coords = c("longitude", "latitude"),
+                      crs = 3414)
+```
+
 #### 3.2.3.2 Retain relevant fields
 
 ```{r}
 #| eval: false
-rs_coords <- subset(rs_coords, select = c(month, town, storey_range, floor_area_sqm, flat_model, remaining_lease, resale_price, address, postal, latitude, longitude))
+rs_coords <- subset(rs_coords, select = c(month, town, storey_num, floor_area_sqm, flat_model, remaining_lease, resale_price, address, postal))
 ```
 
 ### 3.2.4 Write file to RDS
@@ -249,3 +293,603 @@ write_rds(rs_coords, "data/aspatial/rds/resale.rds")
 ```{r}
 resale <- read_rds("data/aspatial/rds/resale.rds")
 ```
+
+### 3.2.6 Visualise Data
+
+```{r}
+#| eval: false
+plot(resale)
+```
+
+![](plot_resale.png)
+
+## 3.3 Geospatial Data
+
+The geospatial data used is the base map layer of Singapore and locational factors. For ease of use, the factors will be grouped by category (transport, education, sports, amenities and others).
+
+### 3.3.1 Load Data and Transform CRS
+
+Store token for using onemap api
+
+```{r}
+token <- "your token"
+```
+
+::: panel-tabset
+#### Base Map
+
+```{r}
+mpsz <- st_read(dsn = "data/geospatial/base", layer="MP14_SUBZONE_WEB_PL") %>%
+  st_transform(crs = 3414)
+```
+
+#### Transport
+
+**Bus Stop**
+
+```{r}
+busstop <- st_read(dsn = "data/geospatial/transport/BusStop", layer="BusStop") %>%
+  st_transform(crs = 3414) %>%
+  select(1)
+```
+
+**MRT**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract MRT data and save as shapefile
+mrt <- st_read(dsn= "data/geospatial/transport/MRT/lta-mrt-station-exit-kml.kml") |> 
+  st_zm()
+
+st_write(obj = mrt,
+         dsn = "data/geospatial/transport/MRT",
+         layer = "MRT",
+         driver = "ESRI Shapefile",
+         append = FALSE)
+```
+
+```{r}
+#read shapefile
+mrt <- st_read(dsn= "data/geospatial/transport/MRT", layer = "MRT") %>%
+  st_transform(crs = 3414) %>%
+  select(1)
+```
+
+#### Education
+
+**Kindergartens**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract kindergarten data and save as shapefile
+kindergartens<-get_theme(token,"kindergartens")
+kindergartens <- st_as_sf(kindergartens, coords=c("Lng", "Lat"), crs=3414)
+
+st_write(obj = kindergartens,
+         dsn = "data/geospatial/education/kindergartens",
+         layer = "kindergartens",
+         driver = "ESRI Shapefile")
+```
+
+```{r}
+kindergartens <- st_read(dsn = "data/geospatial/education/kindergartens", layer = "kindergartens") %>%
+  select(1)
+```
+
+**Childcare centers**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract childcare center data and save as shapefile
+childcare<-get_theme(token,"childcare")
+childcare <- st_as_sf(childcare, coords=c("Lng", "Lat"), crs=3414)
+
+st_write(obj = childcare,
+         dsn = "data/geospatial/education/childcare",
+         layer = "childcare",
+         driver = "ESRI Shapefile")
+```
+
+```{r}
+childcare <- st_read(dsn = "data/geospatial/education/childcare", layer = "childcare") %>%
+  select(1)
+```
+
+**Primary school**
+
+```{r}
+#| eval: false
+#| code-fold: true
+primary_schools <- read.csv("data/geospatial/education/primary_schools/general-information-of-schools.csv") |> 
+  filter(mainlevel_code=="PRIMARY") |> 
+  select(school_name, address, postal_code)
+
+
+#dataframe to store api data
+coords <- data.frame()
+
+for (i in primary_schools$postal_code) {
+  
+  r <- GET('https://developers.onemap.sg/commonapi/search?',
+           query=list(searchVal=i,
+                     returnGeom='Y',
+                     getAddrDetails='N'))
+  
+  data <- fromJSON(rawToChar(r$content))
+  found <- data$found
+  res <- data$results
+  
+  if (found > 0){
+      lat <- res[[1]]$LATITUDE
+      lng <- res[[1]]$LONGITUDE
+      
+      new_row <- data.frame(postal = as.numeric(i), latitude = lat, longitude = lng)
+  }
+  else {
+    new_row <- data.frame(postal = as.numeric(i), latitude = NA, longitude = NA)
+  }
+  coords <- rbind(coords, new_row)
+}
+
+#There are 3 missing coordinate data for postal codes 88256, 99757 and 99840
+#This is because the codes have 5 instead of 6 digits and need 0 padding
+
+coords <- na.omit(coords)
+
+for (i in c("088256", "099757", "099840")) {
+  r <- GET('https://developers.onemap.sg/commonapi/search?',
+           query=list(searchVal=i,
+                     returnGeom='Y',
+                     getAddrDetails='N'))
+  
+  res <- fromJSON(rawToChar(r$content))$results
+  new_row <- data.frame(postal = as.numeric(i), latitude = res[[1]]$LATITUDE, longitude = res[[1]]$LONGITUDE)
+  coords <- rbind(coords, new_row)
+}
+
+
+#add coordinate data into dataframe
+primary_schools <- left_join(primary_schools, coords, by = c('postal_code' = 'postal'))
+
+#store as sf object
+primary_schools <- st_as_sf(primary_schools, coords=c("longitude", "latitude"), crs=3414)
+
+#save as shapefile
+st_write(obj = primary_schools,
+         dsn = "data/geospatial/education/primary_schools",
+         layer = "primary_schools",
+         driver = "ESRI Shapefile")
+```
+
+```{r}
+primary_schools <- st_read(dsn = "data/geospatial/education/primary_schools", layer = "primary_schools") %>%
+  select(1)
+```
+
+**Good primary school**
+
+The top 10 schools have been selected from [here](https://schlah.com/primary-schools). Although this is 2020 data, it's ranking structure was more holistic as it was not solely based on GEP.
+
+```{r}
+#| eval: false
+#| code-fold: true
+school_list <- toupper(c("Nanyang Primary School", "Tao Nan School", "Catholic High School", "Nan Hua Primary School", "St. Hilda's Primary School", "Henry Park Primary School", "Anglo-Chinese School (Primary)", "Raffles Girls' Primary School", "Pei Hwa Presbyterian Primary School", "Chij St. Nicholas Girls' School"))
+
+good_primary_schools <- primary_schools %>%
+  filter(schl_nm %in% school_list)
+
+
+#There is a discrepency between the way Catholic High School and Chij St. Nicholas Girls' School are mentioned in the school list on the website but not in the list imported from onemap api. To simplify this, the next two best schools will be selected.
+
+school_list <- toupper(c("Rosyth School", "Kong Hwa School"))
+
+good_primary_schools <- rbind(good_primary_schools, primary_schools %>% filter(schl_nm %in% school_list))
+
+#save as shapefile
+st_write(obj = good_primary_schools,
+         dsn = "data/geospatial/education/good_primary_schools",
+         layer = "good_primary_schools",
+         driver = "ESRI Shapefile")
+```
+
+```{r}
+good_primary_schools <- st_read(dsn = "data/geospatial/education/good_primary_schools", layer = "good_primary_schools") %>%
+  select(1)
+```
+
+#### Sports
+
+**Sports Facilities**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract sports facilities data and save as shapefile
+sport_facilities <- get_theme(token,"sportsg_sport_facilities")
+
+#Longitute column contains "longitute|latitude" which needs to be cleaned
+sport_facilities <- sport_facilities %>%
+  mutate(Lng=str_extract(Lng, "\\d+\\.?\\d*")) %>%
+  select("NAME", "Lng", "Lat")
+
+sport_facilities <- st_as_sf(sport_facilities, coords=c("Lng", "Lat"), crs=3414)
+
+# creating a saved sf object in data file for easy reference
+st_write(obj = sport_facilities,
+         dsn = "data/geospatial/sports/sport_facilities",
+         layer = "sport_facilities",
+         driver = "ESRI Shapefile")
+```
+
+```{r}
+sport_facilities <- st_read(dsn = "data/geospatial/sports/sport_facilities", layer = "sport_facilities") %>%
+  select(1)
+```
+
+**Parks**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract park data and save as shapefile
+parks <- st_read(dsn= "data/geospatial/sports/parks/parks.kml") |> 
+  st_zm()
+
+st_write(obj = parks,
+         dsn = "data/geospatial/sports/parks",
+         layer = "parks",
+         driver = "ESRI Shapefile",
+         append = FALSE)
+```
+
+```{r}
+#read shapefile
+parks <- st_read(dsn= "data/geospatial/sports/parks", layer = "parks") %>%
+  st_transform(crs = 3414) %>%
+  select(1)
+```
+
+**Gyms**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract gym data and save as shapefile
+gyms <- st_read(dsn= "data/geospatial/sports/gyms/gyms-sg-kml.kml") |> 
+  st_zm()
+
+st_write(obj = gyms,
+         dsn = "data/geospatial/sports/gyms",
+         layer = "gyms",
+         driver = "ESRI Shapefile",
+         append = FALSE)
+```
+
+```{r}
+#read shapefile
+gyms <- st_read(dsn= "data/geospatial/sports/gyms", layer = "gyms") %>%
+  st_transform(crs = 3414) %>%
+  select(1)
+```
+
+**Water Sites**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract gym data and save as shapefile
+watersites <- st_read(dsn= "data/geospatial/sports/watersites/abc-water-sites.kml") |> 
+  st_zm()
+
+st_write(obj = watersites,
+         dsn = "data/geospatial/sports/watersites",
+         layer = "watersites",
+         driver = "ESRI Shapefile",
+         append = FALSE)
+```
+
+```{r}
+#read shapefile
+watersites <- st_read(dsn= "data/geospatial/sports/watersites", layer = "watersites") %>%
+  st_transform(crs = 3414) %>%
+  select(1)
+```
+
+#### Amenities
+
+**Hawker centers**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract gym data and save as shapefile
+hawker_centers <- st_read(dsn= "data/geospatial/amenities/hawker_centers/hawker-centres-kml.kml") |> 
+  st_zm()
+
+st_write(obj = hawker_centers,
+         dsn = "data/geospatial/amenities/hawker_centers",
+         layer = "hawker_centers",
+         driver = "ESRI Shapefile",
+         append = FALSE)
+```
+
+```{r}
+#read shapefile
+hawker_centers <- st_read(dsn= "data/geospatial/amenities/hawker_centers", layer = "hawker_centers") %>%
+  st_transform(crs = 3414) %>%
+  select(1)
+```
+
+**Supermarkets**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract gym data and save as shapefile
+supermarkets <- st_read(dsn= "data/geospatial/amenities/supermarkets/supermarkets-kml.kml") |> 
+  st_zm()
+
+st_write(obj = supermarkets,
+         dsn = "data/geospatial/amenities/supermarkets",
+         layer = "supermarkets",
+         driver = "ESRI Shapefile",
+         append = FALSE)
+```
+
+```{r}
+#read shapefile
+supermarkets <- st_read(dsn= "data/geospatial/amenities/supermarkets", layer = "supermarkets") %>%
+  st_transform(crs = 3414) %>%
+  select(1)
+```
+
+**Eldercare**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract eldercare center data and save as shapefile
+eldercare <-get_theme(token,"eldercare")
+eldercare <- st_as_sf(eldercare, coords=c("Lng", "Lat"), crs=3414)
+
+st_write(obj = eldercare,
+         dsn = "data/geospatial/amenities/eldercare",
+         layer = "eldercare",
+         driver = "ESRI Shapefile")
+```
+
+```{r}
+eldercare <- st_read(dsn = "data/geospatial/amenities/eldercare", layer = "eldercare") %>%
+  select(1)
+```
+
+#### Others
+
+**CBD Area**
+
+As the 'Downtown Core' is also referred to as the Central Business District (CBD), the coordinates of 'Downtown Core' shall be used. Based on the information [here](https://www.latlong.net/place/downtown-core-singapore-20616.html), the latitude is 1.287953 and longitude is 103.851784
+
+```{r}
+cbd <- st_as_sf(data.frame(name = c("CBD Area"), latitude = c(1.287953), longitude = c(103.851784)),
+                coords = c("longitude", "latitude"),
+                crs = 3414)
+```
+
+**Waste Disposal sites**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract waste disposal data and save as shapefile
+waste_disposal <- st_read(dsn= "data/geospatial/others/waste_disposal/waste-treatment-kml.kml") |> 
+  st_zm()
+
+st_write(obj = supermarkets,
+         dsn = "data/geospatial/others/waste_disposal",
+         layer = "waste_disposal",
+         driver = "ESRI Shapefile",
+         append = FALSE)
+```
+
+```{r}
+#read shapefile
+waste_disposal <- st_read(dsn= "data/geospatial/others/waste_disposal", layer = "waste_disposal") %>%
+  st_transform(crs = 3414) %>%
+  select(1)
+```
+
+**Active Cemeteries**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract active cemeteries data and save as shapefile
+cemeteries <- st_read(dsn= "data/geospatial/others/active_cemeteries/active-cemeteries-kml.kml") |> 
+  st_zm()
+
+st_write(obj = cemeteries,
+         dsn = "data/geospatial/others/active_cemeteries",
+         layer = "cemeteries",
+         driver = "ESRI Shapefile",
+         append = FALSE)
+```
+
+```{r}
+#read shapefile
+cemeteries <- st_read(dsn= "data/geospatial/others/active_cemeteries", layer = "cemeteries") %>%
+  st_transform(crs = 3414) %>%
+  select(1)
+```
+
+**Historic Sites**
+
+```{r}
+#| eval: false
+#| code-fold: true
+#extract historic sites data and save as shapefile
+historic_sites <- st_read(dsn= "data/geospatial/others/historic_sites/historic-sites-kml.kml") |> 
+  st_zm()
+
+st_write(obj = historic_sites,
+         dsn = "data/geospatial/others/historic_sites",
+         layer = "historic_sites",
+         driver = "ESRI Shapefile",
+         append = FALSE)
+```
+
+```{r}
+#read shapefile
+historic_sites <- st_read(dsn= "data/geospatial/others/historic_sites", layer = "historic_sites") %>%
+  st_transform(crs = 3414) %>%
+  select(1)
+```
+:::
+
+### 3.3.2 Check for Invalid Geometries
+
+#### 3.3.2.1 Base layer
+
+```{r}
+#| code-fold: true
+cat("There are", length(which(st_is_valid(mpsz) == FALSE)) , "invalid geometries in the base layer. This shall be resolved in the following step.")
+```
+
+```{r}
+mpsz <- st_make_valid(mpsz)
+```
+
+```{r}
+#| code-fold: true
+cat("There are now", length(which(st_is_valid(mpsz) == FALSE)) , "invalid geometries in the base layer.")
+```
+
+#### 3.3.2.2 Geospatial Factors
+
+```{r}
+#| code-fold: true
+df_list <- c("busstop", "cbd", "cemeteries", "childcare", "eldercare", "good_primary_schools", "gyms", "hawker_centers", "historic_sites", "kindergartens", "mrt", "parks", "primary_schools", "sport_facilities", "supermarkets", "waste_disposal", "watersites")
+
+c = 0 
+
+for(i in df_list) {
+  c = c + length(which(st_is_valid(eval(parse(text = i))) == FALSE))
+}
+
+cat("There are", c , "invalid geometries in the geospatial factors")
+```
+
+### 3.3.3 Check for Missing Values
+
+#### 3.3.3.1 Base layer
+
+```{r}
+#| code-fold: true
+cat("There are", sum(is.na(mpsz)) , "missing values in the base layer.")
+```
+
+#### 3.3.3.2 Geospatial Factors
+
+```{r}
+#| code-fold: true
+c = 0 
+for(i in df_list) {
+  c = c + sum(is.na(mpsz))
+}
+cat("There are", c , "missing values in the geospatial factors.")
+```
+
+## 3.4 Visualise Data
+
+::: panel-tabset
+#### Transport
+
+```{r}
+#| code-fold: true
+tm_shape(mpsz) +
+  tm_borders(alpha = 0.5) +
+  tmap_options(check.and.fix = TRUE) +
+tm_shape(busstop) +
+  tm_dots(col="azure3", alpha=0.5) +
+tm_shape(mrt) +
+  tm_dots(col="yellow", alpha=1)+
+  tm_layout(main.title = "Transport",
+          main.title.position = "center")
+```
+
+#### Education
+
+```{r}
+#| code-fold: true
+tm_shape(mpsz) +
+  tm_borders(alpha = 0.5) +
+  tmap_options(check.and.fix = TRUE) +
+tm_shape(childcare) +
+  tm_dots(col="linen", alpha=0.2) +
+tm_shape(primary_schools) +
+  tm_dots(col="lightskyblue3", alpha=0.5)+
+tm_shape(kindergartens) +
+  tm_dots(col="lightslateblue", alpha=0.5) +
+tm_shape(good_primary_schools) +
+  tm_dots(col="red", alpha=1)+
+  tm_layout(main.title = "Education",
+          main.title.position = "center")
+```
+
+#### Sports
+
+```{r}
+#| code-fold: true
+tm_shape(mpsz) +
+  tm_borders(alpha = 0.5) +
+  tmap_options(check.and.fix = TRUE) +
+tm_shape(sport_facilities) +
+  tm_dots(col="violet", alpha=1) +
+tm_shape(parks) +
+  tm_dots(col="mediumseagreen", alpha=0.5) + 
+tm_shape(gyms) +
+  tm_dots(col="azure3", alpha=0.7) +
+tm_shape(watersites) +
+  tm_dots(col="skyblue3", alpha=1) +
+  tm_layout(main.title = "Sports",
+          main.title.position = "center")
+```
+
+#### Amenities
+
+```{r}
+#| code-fold: true
+tm_shape(mpsz) +
+  tm_borders(alpha = 0.5) +
+  tmap_options(check.and.fix = TRUE) +
+tm_shape(hawker_centers) +
+  tm_dots(col="firebrick3", alpha=1) +
+tm_shape(supermarkets) +
+  tm_dots(col="olivedrab", alpha=0.5) + 
+tm_shape(eldercare) +
+  tm_dots(col="tan", alpha=0.7) +
+  tm_layout(main.title = "Amenities",
+          main.title.position = "center")
+```
+
+#### Others
+
+```{r}
+#| code-fold: true
+tm_shape(mpsz) +
+  tm_borders(alpha = 0.5) +
+  tmap_options(check.and.fix = TRUE) +
+tm_shape(cbd) +
+  tm_dots(col="cadetblue3", alpha=1) +
+tm_shape(waste_disposal) +
+  tm_dots(col="coral3", alpha=0.5) + 
+tm_shape(cemeteries) +
+  tm_dots(col="gray20", alpha=1) +
+tm_shape(historic_sites) +
+  tm_dots(col="darkseagreen2", alpha=1) +
+  tm_layout(main.title = "Others",
+          main.title.position = "center")
+```
+:::
