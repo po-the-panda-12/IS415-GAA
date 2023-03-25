@@ -1,0 +1,233 @@
+---
+title: "In-Class Exercise 9: Geographically Weighted Regression: Predictive Modelling"
+date: "13 March 2023"
+date-modified: "`r Sys.Date()`"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+---
+
+# 1.0 Setup
+
+## 1.1 Datasets
+
+-   HDB resale dataset - 2019
+
+-   Singapore geospatial data
+
+## 1.2 Load Packages
+
+```{r}
+pacman::p_load(sf, GWmodel, SpatialML, tidymodels, rsample, ranger, tidyverse)
+```
+
+# 2.0 Preparing Data
+
+## 2.1 Reading data file
+
+```{r}
+#| eval: false
+mdata = read_rds("data/aspatial/mdata.rds")
+```
+
+## 2.2 Data Sampling
+
+```{r}
+#| eval: false
+set.seed(1234)
+resale_split <- initial_split(mdata, prop = 6.5/10)
+
+train_data <- training(resale_split)
+test_data <- testing(resale_split)
+```
+
+### 2.2.2 Reading data file to RDS
+
+```{r}
+#| eval: false
+write_rds(train_data, "data/model/train_data.rds")
+write_rds(test_data, "data/model/test_data.rds")
+```
+
+# 3.0 Retrieving the Stored Data
+
+```{r}
+train_data <- read_rds("data/model/train_data.rds")
+test_data <- read_rds("data/model/test_data.rds")
+```
+
+# 4.0 Building a non-spatial multiple linear regression
+
+```{r}
+#| eval: false
+price_mlr <- lm(resale_price ~ floor_area_sqm + 
+                  storey_order + remaining_lease_mths + 
+                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+                  PROX_MRT + PROX_PARK + PROX_MALL + 
+                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
+                  WITHIN_1KM_PRISCH,
+                data = train_data)
+
+summary(price_mlr)
+```
+
+Store as rds
+
+```{r}
+#| eval: false
+write_rds(price_mlr, "data/model/price_mlr.rds")
+```
+
+# 5.0 GWR predictive method
+
+## 5.1 Converting the sf dataframe into a SpatialPoints dataframe
+
+```{r}
+train_data_sp <- as_Spatial(train_data)
+#train_data_sp
+```
+
+# 6.0 Preparing Coordinate Data
+
+## 6.1 Extracting coordinate data
+
+```{r}
+#| eval: false
+coords <- st_coordinates(mdata)
+coords_train <- st_coordinates(train_data)
+coords_test <- st_coordinates(test_data)
+```
+
+Write into rds for future use
+
+```{r}
+#| eval: false
+coords_train <- write_rds(coords_train, "data/model/coords_train.rds")
+coords_test <- write_rds(coords_test, "data/model/coords_test.rds")
+```
+
+Retrieve coords
+
+```{r}
+coords_train <- read_rds("data/model/coords_train.rds")
+coords_test <- read_rds("data/model/coords_test.rds")
+```
+
+## 6.2 Dropping geometry field
+
+```{r}
+train_data <- train_data %>%
+  st_drop_geometry()
+```
+
+# 7.0 Calibrating Random Forest
+
+```{r}
+set.seed(1234)
+rf <- ranger(resale_price ~ floor_area_sqm + storey_order + 
+               remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+               PROX_MRT + PROX_PARK + PROX_MALL + PROX_SUPERMARKET +
+               WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+               WITHIN_1KM_PRISCH,
+             
+             data = train_data)
+```
+
+```{r}
+print(rf)
+```
+
+# 8.0 Calibrating Geographic Weighted Regression
+
+## 8.1 Calibrating using training data
+
+(Adaptive bw has to be integer. Fixed bw can be float type)
+
+```{r}
+#| eval: false
+set.seed(1234)
+gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + storey_order + 
+               remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+               PROX_MRT + PROX_PARK + PROX_MALL + PROX_SUPERMARKET +
+               WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+               WITHIN_1KM_PRISCH,
+             
+             dframe = train_data,
+             bw = 55, #nearest transaction - why 55
+             kernel = "adaptive",
+             coords = coords_train)
+```
+
+Save the model into rds
+
+```{r}
+#| eval: false
+write_rds(gwRF_adaptive, "data/model/gwRF_adaptive.rds")
+```
+
+Retrieve model
+
+```{r}
+gwRF_adaptive <- read_rds("data/model/gwRF_adaptive.rds")
+#vi_df <- as.data.frame(gwRF_adaptive$Global.Model$variable.importance)
+```
+
+```{r}
+gwRF_adaptive$Global.Model
+```
+
+## 8.2 Predicting by using test data
+
+### 8.2.1 Preparing the test data
+
+```{r}
+test_data <- cbind(test_data, coords_test) %>%
+  st_drop_geometry()
+```
+
+### 8.2.2 Predicting with test data
+
+```{r}
+#| eval: false
+gwRF_pred <- predict.grf(gwRF_adaptive,
+                         test_data,
+                         x.var.name = "X",
+                         y.var.name = "Y",
+                         local.w = 1,
+                         global.w = 0)
+```
+
+Save the model into rds
+
+```{r}
+#| eval: false
+write_rds(gwRF_pred, "data/model/gwRF_pred.rds")
+```
+
+Retrieve model
+
+```{r}
+gwRF_pred <- read_rds("data/model/gwRF_pred.rds")
+```
+
+### 8.2.3 Converting the prediction output into a data frame
+
+```{r}
+gwRF_pred_df <- as.data.frame(gwRF_pred)
+```
+
+```{r}
+head(gwRF_pred_df)
+```
+
+```{r}
+# test_predict <- cbind(test_data, gwRF_pred_df)
+
+# ggplot(data = test_predict)
+
+# sqrt(mean((test_predict$resale_price - 
+#             test_predict$predict_grf)^2))
+```

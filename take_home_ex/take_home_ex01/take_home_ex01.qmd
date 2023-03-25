@@ -394,7 +394,7 @@ osun_sp <-as(osun_spat, "SpatialPolygons")
 Peek
 
 ::: panel-tabset
-####  Functional Water Points
+#### Functional Water Points
 
 ```{r}
 wp_f_sp
@@ -677,11 +677,11 @@ kde_wp_nf_raster
 #| code-fold: true
 #tmap generation function
 
-density_map <- function(raster_object, map_title) {
+kde <- function(raster_obj, map_title) {
   tmap_mode("view")
   #tm_basemap("OpenStreetMap") +
-tm_shape(raster_object) +
-  tm_raster("v", alpha=0.9, palette=c("white","blue")) +
+tm_shape(raster_obj) +
+  tm_raster("v", alpha=0.9, palette = "YlGnBu") +
   tm_view(set.bounds = c(4,7,5,8),
           set.zoom.limits = c(8, 13))
   } 
@@ -691,13 +691,13 @@ tm_shape(raster_object) +
 ### Functional Water Points
 
 ```{r}
-density_map(kde_wp_f_raster)
+kde(kde_wp_f_raster)
 ```
 
 ### Non-Functional Water Points
 
 ```{r}
-density_map(kde_wp_nf_raster)
+kde(kde_wp_nf_raster)
 ```
 :::
 
@@ -741,50 +741,6 @@ clarkevans.test(wp_nf_ppp,
 
 As the p-value is less than 0.05 is statistically significant and R\<1 for both functional and non-functional water points, we reject the null hypothesis that the distribution is not random and conclude that the **water points are likely clustered**.
 
-## 4.4 Local Colocation of Water Points
-
-Remove status 'unknown' water points
-
-```{r}
-wp_sf_clean <- wp_sf %>%  filter(!status_clean=='unknown')
-```
-
-```{r}
-nb = include_self(st_knn(st_geometry(wp_sf_clean), 6)) 
-#6 nearbest neighbors
-
-wt = st_kernel_weights(nb, wp_sf_clean, "gaussian", adaptive = TRUE)
-f = wp_sf_clean %>%
-  filter(status_clean == "Functional")
-
-A = f$status_clean
-
-nf = wp_sf_clean %>%
-  filter(status_clean == "Non-Functional")
-B = nf$status_clean
-
-LCLQ = local_colocation(A, B, nb, wt, 49)
-LCLQ_wp = cbind(wp_sf_clean, LCLQ)
-```
-
-View
-
-```{r}
-#| code-fold: true
-tmap_mode("view")
-tm_shape(osun) +
-  tm_polygons() +
-  tm_shape(LCLQ_wp) +
-  tm_dots(col = c("Non.Functional"), 
-          size = 0.01,
-          border.col = "black",
-          border.lwd = 0.5) +
-  tm_view(set.bounds = c(4,7,5,8),
-          set.zoom.limits = c(8, 13))
-```
-
-As there are not many colored patches of Functional Water Points, it means there are few Non-Functional Water Points in the same neighborhood.
-
 # 5.0 2nd Order Spatial Point Pattern Analysis
 
 Using G-Function for analysis with 95% confidence
@@ -800,29 +756,29 @@ The test hypotheses for Functional Water Point is :
 **H~1~ :** The distribution is not random
 
 ```{r}
-#G_wp_f = Gest(wp_f_ppp, correction = "border")
-#plot(G_wp_f)
+G_wp_f = Gest(wp_f_ppp, correction = "border")
+plot(G_wp_f)
 ```
 
 Complete Spatial Randomness Test
 
 ::: panel-tabset
-#### Plot
-
-```{r}
-#plot(G_wp_f.csr, main="G test - Functional")
-```
-
 #### Simulation
 
 ```{r}
-#G_wp_f.csr <- envelope(wp_f_ppp, Gest, nsim = 999)
+G_wp_f.csr <- envelope(wp_f_ppp, Gest, nsim = 500)
+```
+
+#### Plot
+
+```{r}
+plot(G_wp_f.csr, main="G test - Functional")
 ```
 :::
 
 ### 5.1.1 Conclusion
 
-We reject the null hypothesis that functional water points are randomly distributed at 95% confidence interval. As G\^~obs~(r) rises quickly and is greater than G~theo~(r) and the envelope it means the functional water points are clustered.
+We reject the null hypothesis that functional water points are randomly distributed at 99% confidence interval. As G\^~obs~(r) rises quickly and is greater than G~theo~(r) and the envelope it means the functional water points are clustered.
 
 ## 5.2 Test 2 - Non-functional Water Points
 
@@ -833,48 +789,226 @@ The test hypotheses for Non-Functional Water Point is :
 **H~1~ :** The distribution is not random
 
 ```{r}
-#G_wp_nf = Gest(wp_nf_ppp, correction = "border")
-#plot(G_wp_nf)
+G_wp_nf = Gest(wp_nf_ppp, correction = "border")
+plot(G_wp_nf)
 ```
 
 Complete Spatial Randomness Test
 
 ::: panel-tabset
-#### Plot
-
-```{r}
-#plot(G_wp_nf.csr,  main = "G test - Non-functional")
-```
-
 #### Simulation
 
 ```{r}
-#G_wp_nf.csr <- envelope(wp_nf_ppp, Gest, nsim = 999)
+G_wp_nf.csr <- envelope(wp_nf_ppp, Gest, nsim = 500)
+```
+
+#### Plot
+
+```{r}
+plot(G_wp_nf.csr,  main = "G test - Non-functional")
 ```
 :::
 
 ### 5.2.1 Conclusion
 
-We reject the null hypothesis that non-functional water points are randomly distributed at 95% confidence interval. As G\^~obs~(r) rises quickly and is greater than G~theo~(r) and the envelope it means the functional water points are clustered.
+We reject the null hypothesis that non-functional water points are randomly distributed at 99% confidence interval. As G\^~obs~(r) rises quickly and is greater than G~theo~(r) and the envelope it means the functional water points are clustered.
+
+## 5.3 Extra Tests
+
+We see the same observation as mentioned above after zooming into a few neighborhoods such as Ife Central for functional water ponits and Ede North for non-functional water points.
+
+### 5.3.1 Data Processing
+
+```{r}
+#Functional water points
+IfeCentral <- osun[osun$ADM2_EN == "Ife Central",] %>%
+    as('Spatial') %>%
+    as('SpatialPolygons') %>%
+    as('owin')
+
+
+#non functional points
+EdeNorth <- osun[osun$ADM2_EN == "Ede North",] %>%
+    as('Spatial') %>%
+    as('SpatialPolygons') %>%
+    as('owin')
+
+
+IfeCentral_ppp <- wp_f_ppp[IfeCentral]
+EdeNorth_ppp <- wp_nf_ppp[EdeNorth]
+```
+
+View
+
+```{r}
+#| code-fold: true
+par(mfrow=c(1,2))
+plot(IfeCentral_ppp,
+     main = "Ife Central - Functional Water Points",
+     ribside=c("bottom"))
+plot(EdeNorth_ppp,
+     main = "Ede North - Non-Functional Water Points",
+     ribside=c("bottom"))
+```
+
+### 5.3.2 Ife Central - Functional Water Points
+
+```{r}
+Ifecentral_G.csr = Gest(IfeCentral_ppp, correction = "border")
+plot(Ifecentral_G.csr)
+```
+
+Complete Spatial Randomness Test
+
+::: panel-tabset
+#### Simulation
+
+```{r}
+Ifecentral_G.csr <- envelope(IfeCentral_ppp, Gest, nsim=100)
+```
+
+#### Plot
+
+```{r}
+plot(Ifecentral_G.csr, main="Ife Central G-Function Test")
+```
+:::
+
+### 5.3.3 Ede North - Non-Functional Water Points
+
+```{r}
+EdeNorth_G.csr = Gest(EdeNorth_ppp, correction = "border")
+plot(EdeNorth_G.csr)
+```
+
+Complete Spatial Randomness Test
+
+::: panel-tabset
+#### Simulation
+
+```{r}
+EdeNorth_G.csr <- envelope(EdeNorth_ppp, Gest, nsim=100)
+```
+
+#### Plot
+
+```{r}
+plot(EdeNorth_G.csr, main="Ede North G-Function Test")
+```
+:::
+
+### 5.3.4 Conclusion 
+
+We observe the same that G\^~obs~(r) rises quickly and is greater than G~theo~(r) and the envelope it means the functional and non-functional water points are clustered, thereby rejecting the null hypothesis that the water points are randomly distributed at 99% confidence interval.
 
 # 6.0 Spatial Correlation Analysis
 
 ------------------------------------------------------------------------
 
-## 6.1 Data Wrangling
+## 6.1 Density Analysis
 
-Something
+Segregate data for plotting. Then convert to spatstat ppp format
 
 ```{r}
+wp_spat <- as_Spatial(wp_sf)
+wp_spat@data$status_clean <-as.factor(wp_spat@data$status_clean)
+wp_spat_ppp <- as(wp_spat, "ppp")
+  
+plot(wp_spat_ppp, which.marks = "status_clean")
 ```
 
-## 6.2 Density Analysis
+## 6.3 Test Correlation
 
-To do
+Use LCross function to test for spatial independence
 
-## 6.2 Test Correlation
+The test hypotheses for the spatial distribution of functional and non-functional water point are:
 
-To do
+**H~0~ :** The distribution is spatially independent
+
+**H~1~ :** The distribution is not spatially independent
+
+Simulation
+
+```{r}
+wp_spat_ppp_Lcross.csr <- envelope(wp_spat_ppp, 
+                                 Lcross, 
+                                 i="Functional", 
+                                 j="Non-Functional", 
+                                 correction="border", 
+                                 nsim=100)
+```
+
+Plot
+
+```{r}
+plot(wp_spat_ppp_Lcross.csr, xlab="in km")
+```
+
+**Conclusion**
+
+We reject the null hypothesis that water points are statistically independent at 99% confidence interval. As L\^~obs~(r) is greater than L~theo~(r) and the envelope it means the water points are statistically not independent.
+
+## 6.4 Local Colocation Analysis
+
+Remove status 'unknown' water points
+
+```{r}
+wp_sf_clean <- wp_sf %>%  filter(!status_clean=='unknown')
+```
+
+```{r}
+#6 nearbest neighbors
+nb = include_self(st_knn(st_geometry(wp_sf_clean), 6)) 
+
+#weight matrix
+wt = st_kernel_weights(nb, wp_sf_clean, "gaussian", adaptive = TRUE)
+
+
+f = wp_sf_clean %>%
+  filter(status_clean == "Functional")
+A = f$status_clean
+
+nf = wp_sf_clean %>%
+  filter(status_clean == "Non-Functional")
+B = nf$status_clean
+
+LCLQ = local_colocation(A, B, nb, wt, 42)
+LCLQ_wp = cbind(wp_sf_clean, LCLQ)
+```
+
+```{r}
+LCLQ_wp <- LCLQ_wp %>% 
+  mutate(
+    `p_sim_Non.Functional` = replace(`p_sim_Non.Functional`, `p_sim_Non.Functional` > 0.05, NA),
+    `Non.Functional` = ifelse(`p_sim_Non.Functional` > 0.05, NA, `Non.Functional`))
+
+LCLQ_wp <- LCLQ_wp %>% mutate(`size` = ifelse(is.na(`Non.Functional`), 1, 5))
+```
+
+View
+
+```{r}
+#| code-fold: true
+tmap_mode('view')
+tm_view(set.bounds = c(4,7,5,8),
+        set.zoom.limits=c(8, 13),
+        bbox = st_bbox(filter(LCLQ_wp, !is.na(`Non.Functional`)))) +
+  tm_shape(osun) +
+  tm_borders() +
+  tm_shape(LCLQ_wp) +
+  tm_dots(col = c("Non.Functional"), 
+          size = "size",
+          scale=0.15,
+          border.col = "black",
+          border.lwd = 0.5,
+          alpha=0.5,
+          title="LCLQ"
+          )
+
+tmap_mode('plot')
+```
+
+LCLQ is just less than 1 which is much greater than the p-value of 0.05. Hence it means there are few Non-Functional Water Points in the same neighborhood as Functional Water Points.
 
 # 7.0 Acknowledgements
 

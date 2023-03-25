@@ -14,10 +14,20 @@ website:
         menu: 
           - text: "Hands-on Exercise 1"
             href: hands-on_ex/hands-on_ex01/hands-on_ex01.qmd
-          - text: "Hands-on Exercise 2"
-            href: hands-on_ex/hands-on_ex02/hands-on_ex02.qmd
           - text: "Hands-on Exercise 3"
             href: hands-on_ex/hands-on_ex03/hands-on_ex03.qmd
+          - text: "Hands-on Exercise 4"
+            href: hands-on_ex/hands-on_ex04/hands-on_ex04.qmd
+          - text: "Hands-on Exercise 6"
+            href: hands-on_ex/hands-on_ex06/hands-on_ex06.qmd
+          - text: "Hands-on Exercise 7"
+            href: hands-on_ex/hands-on_ex07/hands-on_ex07.qmd
+          - text: "Hands-on Exercise 8"
+            href: hands-on_ex/hands-on_ex08/hands-on_ex08.qmd
+          - text: "Hands-on Exercise 9"
+            href: hands-on_ex/hands-on_ex09/hands-on_ex09.qmd
+          - text: "Hands-on Exercise 10"
+            href: hands-on_ex/hands-on_ex10/hands-on_ex10.qmd
         
         
       
@@ -31,6 +41,14 @@ website:
             href: in-class_ex/in-class_ex04/in-class_ex04.qmd
           - text: "In-class Exercise 5"
             href: in-class_ex/in-class_ex05/in-class_ex05.qmd
+          - text: "In-class Exercise 6"
+            href: in-class_ex/in-class_ex06/in-class_ex06.qmd
+          - text: "In-class Exercise 7"
+            href: in-class_ex/in-class_ex07/in-class_ex07.qmd
+          - text: "In-class Exercise 8"
+            href: in-class_ex/in-class_ex08/in-class_ex08.qmd
+          - text: "In-class Exercise 9"
+            href: in-class_ex/in-class_ex09/in-class_ex09.qmd
               
               
             
@@ -38,6 +56,20 @@ website:
         menu: 
           - text: "Exercise 1"
             href: take_home_ex/take_home_ex01/take_home_ex01.qmd
+          - text: "Exercise 2"
+            href: take_home_ex/take_home_ex02/take_home_ex02.qmd
+            
+            
+      - text: "Shiny Workshop"
+        menu: 
+          - text: "Exercise 1"
+            href: prototype/01-prototype/app.R
+          - text: "Exercise 2"
+            href: prototype/02-prototype/app.R
+          - text: "Exercise 3"
+            href: prototype/03-prototype/app.R
+          - text: "Exercise 4"
+            href: prototype/04-prototype/app.R
           
 
 format:

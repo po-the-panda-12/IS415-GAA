@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2023-02-18">
+
+<title>IS415-GAA - Take Home Exercise 2</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script src="../../site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="../../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<script src="../../site_libs/htmlwidgets-1.6.1/htmlwidgets.js"></script>
+<script src="../../site_libs/plotly-binding-4.10.1/plotly.js"></script>
+<script src="../../site_libs/typedarray-0.1/typedarray.min.js"></script>
+<script src="../../site_libs/jquery-3.5.1/jquery.min.js"></script>
+<link href="../../site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet">
+<script src="../../site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="../../site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="../../site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">IS415-GAA</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Hands-on Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex01/hands-on_ex01.html">
+ <span class="dropdown-text">Hands-on Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex03/hands-on_ex03.html">
+ <span class="dropdown-text">Hands-on Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex04/hands-on_ex04.html">
+ <span class="dropdown-text">Hands-on Exercise 4</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex06/hands-on_ex06.html">
+ <span class="dropdown-text">Hands-on Exercise 6</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../hands-on_ex/hands-on_ex07/hands-on_ex07.html">
+ <span class="dropdown-text">Hands-on Exercise 7</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">In-Class Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../in-class_ex/in-class_ex02/in-class_ex02.html">
+ <span class="dropdown-text">In-class Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../in-class_ex/in-class_ex03/in-class_ex03.html">
+ <span class="dropdown-text">In-class Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../in-class_ex/in-class_ex04/in-class_ex04.html">
+ <span class="dropdown-text">In-class Exercise 4</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../in-class_ex/in-class_ex05/in-class_ex05.html">
+ <span class="dropdown-text">In-class Exercise 5</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../in-class_ex/in-class_ex06/in-class_ex06.html">
+ <span class="dropdown-text">In-class Exercise 6</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../in-class_ex/in-class_ex07/in-class_ex07.html">
+ <span class="dropdown-text">In-class Exercise 7</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Take-home Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../take_home_ex/take_home_ex01/take_home_ex01.html">
+ <span class="dropdown-text">Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../take_home_ex/take_home_ex02/take_home_ex02.html">
+ <span class="dropdown-text">Exercise 2</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-shiny-workshop" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Shiny Workshop</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-shiny-workshop">    
+        <li>
+    <a class="dropdown-item" href="../../prototype/01-prototype/app.R">
+ <span class="dropdown-text">Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../prototype/02-prototype/app.R">
+ <span class="dropdown-text">Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../prototype/03-prototype/app.R">
+ <span class="dropdown-text">Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../prototype/04-prototype/app.R">
+ <span class="dropdown-text">Exercise 4</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1.0 Overview</a>
+  <ul class="collapse">
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">1.1 Background</a></li>
+  <li><a href="#task" id="toc-task" class="nav-link" data-scroll-target="#task">1.2 Task</a></li>
+  </ul></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">2.0 Setup</a>
+  <ul class="collapse">
+  <li><a href="#import-packages" id="toc-import-packages" class="nav-link" data-scroll-target="#import-packages">2.1 Import Packages</a></li>
+  </ul></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">3.0 Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#datasets-used" id="toc-datasets-used" class="nav-link" data-scroll-target="#datasets-used">3.1 Datasets Used</a></li>
+  <li><a href="#geospatial-data" id="toc-geospatial-data" class="nav-link" data-scroll-target="#geospatial-data">3.2 Geospatial Data</a>
+  <ul class="collapse">
+  <li><a href="#load-data" id="toc-load-data" class="nav-link" data-scroll-target="#load-data">3.2.1 Load Data</a></li>
+  <li><a href="#data-preprocessing" id="toc-data-preprocessing" class="nav-link" data-scroll-target="#data-preprocessing">3.2.2 Data Preprocessing</a></li>
+  <li><a href="#transform-coordinate-system" id="toc-transform-coordinate-system" class="nav-link" data-scroll-target="#transform-coordinate-system">3.2.3 Transform Coordinate System</a></li>
+  <li><a href="#remove-outer-islands" id="toc-remove-outer-islands" class="nav-link" data-scroll-target="#remove-outer-islands">3.2.4 Remove outer islands</a></li>
+  <li><a href="#data-summary" id="toc-data-summary" class="nav-link" data-scroll-target="#data-summary">3.2.5 Data Summary</a></li>
+  </ul></li>
+  <li><a href="#aspatial-data" id="toc-aspatial-data" class="nav-link" data-scroll-target="#aspatial-data">3.3 Aspatial Data</a>
+  <ul class="collapse">
+  <li><a href="#load-data-1" id="toc-load-data-1" class="nav-link" data-scroll-target="#load-data-1">3.3.1 Load Data</a></li>
+  <li><a href="#data-preprocessing-1" id="toc-data-preprocessing-1" class="nav-link" data-scroll-target="#data-preprocessing-1">3.3.2 Data Preprocessing</a></li>
+  <li><a href="#remove-outer-islands-1" id="toc-remove-outer-islands-1" class="nav-link" data-scroll-target="#remove-outer-islands-1">3.3.3 Remove outer islands</a></li>
+  </ul></li>
+  <li><a href="#combined-data-wrangling" id="toc-combined-data-wrangling" class="nav-link" data-scroll-target="#combined-data-wrangling">3.4 Combined Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#join-vaccination-data" id="toc-join-vaccination-data" class="nav-link" data-scroll-target="#join-vaccination-data">3.4.1 Join vaccination data</a></li>
+  <li><a href="#standardise-data" id="toc-standardise-data" class="nav-link" data-scroll-target="#standardise-data">3.4.2 Standardise Data</a></li>
+  <li><a href="#join-vaccination-data-again" id="toc-join-vaccination-data-again" class="nav-link" data-scroll-target="#join-vaccination-data-again">3.4.3 Join vaccination data (again)</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#choropleth-mapping" id="toc-choropleth-mapping" class="nav-link" data-scroll-target="#choropleth-mapping">4.0 Choropleth Mapping</a>
+  <ul class="collapse">
+  <li><a href="#compute-vaccination-rates" id="toc-compute-vaccination-rates" class="nav-link" data-scroll-target="#compute-vaccination-rates">4.1 Compute Vaccination Rates</a></li>
+  <li><a href="#visualise-monthly-vaccination-rates" id="toc-visualise-monthly-vaccination-rates" class="nav-link" data-scroll-target="#visualise-monthly-vaccination-rates">4.2 Visualise monthly vaccination rates</a></li>
+  <li><a href="#observations-from-jenks-based-mapping" id="toc-observations-from-jenks-based-mapping" class="nav-link" data-scroll-target="#observations-from-jenks-based-mapping">4.3 Observations from Jenks based Mapping</a>
+  <ul class="collapse">
+  <li><a href="#vaccination-rates-by-sub-district" id="toc-vaccination-rates-by-sub-district" class="nav-link" data-scroll-target="#vaccination-rates-by-sub-district">4.3.1 Vaccination Rates by Sub-district</a></li>
+  <li><a href="#spatio-temporal-mapping-with-custom-breakpoints" id="toc-spatio-temporal-mapping-with-custom-breakpoints" class="nav-link" data-scroll-target="#spatio-temporal-mapping-with-custom-breakpoints">4.3.2 Spatio-Temporal Mapping with custom breakpoints</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#local-gi-analysis" id="toc-local-gi-analysis" class="nav-link" data-scroll-target="#local-gi-analysis">5.0 Local Gi* Analysis</a>
+  <ul class="collapse">
+  <li><a href="#compute-gi-values" id="toc-compute-gi-values" class="nav-link" data-scroll-target="#compute-gi-values">5.1 Compute Gi* values</a>
+  <ul class="collapse">
+  <li><a href="#create-attribute-table" id="toc-create-attribute-table" class="nav-link" data-scroll-target="#create-attribute-table">5.1.1. Create attribute table</a></li>
+  <li><a href="#create-a-time-series-cube-spatio-temporal-cube" id="toc-create-a-time-series-cube-spatio-temporal-cube" class="nav-link" data-scroll-target="#create-a-time-series-cube-spatio-temporal-cube">5.1.2 Create a time series cube (spatio-temporal cube)</a></li>
+  <li><a href="#derive-spatial-weights" id="toc-derive-spatial-weights" class="nav-link" data-scroll-target="#derive-spatial-weights">5.1.3 Derive spatial weights</a></li>
+  <li><a href="#compute-gi-values-1" id="toc-compute-gi-values-1" class="nav-link" data-scroll-target="#compute-gi-values-1">5.1.4 Compute Gi* values</a></li>
+  </ul></li>
+  <li><a href="#visualise-gi-maps-of-the-monthly-vaccination-rate" id="toc-visualise-gi-maps-of-the-monthly-vaccination-rate" class="nav-link" data-scroll-target="#visualise-gi-maps-of-the-monthly-vaccination-rate">5.2 Visualise Gi* maps of the monthly vaccination rate</a></li>
+  <li><a href="#observations-of-the-local-gi-analysis" id="toc-observations-of-the-local-gi-analysis" class="nav-link" data-scroll-target="#observations-of-the-local-gi-analysis">5.3 Observations of the Local Gi* Analysis</a></li>
+  </ul></li>
+  <li><a href="#emerging-hot-spot-analysis-ehsa" id="toc-emerging-hot-spot-analysis-ehsa" class="nav-link" data-scroll-target="#emerging-hot-spot-analysis-ehsa">6.0 Emerging Hot Spot Analysis (EHSA)</a>
+  <ul class="collapse">
+  <li><a href="#mann-kendall-test" id="toc-mann-kendall-test" class="nav-link" data-scroll-target="#mann-kendall-test">6.1 Mann-Kendall Test</a></li>
+  <li><a href="#ehsa-map-of-the-gi-values-of-the-vaccination-rate" id="toc-ehsa-map-of-the-gi-values-of-the-vaccination-rate" class="nav-link" data-scroll-target="#ehsa-map-of-the-gi-values-of-the-vaccination-rate">6.2 EHSA map of the Gi* values of the vaccination rate</a>
+  <ul class="collapse">
+  <li><a href="#perform-the-mann-kendall-test-for-each-location" id="toc-perform-the-mann-kendall-test-for-each-location" class="nav-link" data-scroll-target="#perform-the-mann-kendall-test-for-each-location">6.2.1. Perform the Mann Kendall Test for each location</a></li>
+  <li><a href="#arrange-to-show-significant-emerging-hotcold-spots" id="toc-arrange-to-show-significant-emerging-hotcold-spots" class="nav-link" data-scroll-target="#arrange-to-show-significant-emerging-hotcold-spots">6.2.2. Arrange to show significant emerging hot/cold spots</a></li>
+  <li><a href="#performing-emerging-hotspot-analysis-ehsa" id="toc-performing-emerging-hotspot-analysis-ehsa" class="nav-link" data-scroll-target="#performing-emerging-hotspot-analysis-ehsa">6.2.3. Performing Emerging Hotspot Analysis (EHSA)</a></li>
+  </ul></li>
+  <li><a href="#observations-of-the-spatial-patterns" id="toc-observations-of-the-spatial-patterns" class="nav-link" data-scroll-target="#observations-of-the-spatial-patterns">6.3 Observations of the spatial patterns</a></li>
+  </ul></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements">7.0 Acknowledgements</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Take Home Exercise 2</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 18, 2023</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">February 28, 2023</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<section id="overview" class="level1">
+<h1>1.0 Overview</h1>
+<hr>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">1.1 Background</h2>
+<p>Due to the COVID-19 outbreak in late December 2019, Indonesia commenced its COVID-19 vaccination program on 13 January 2021. Despite having the 4th highest number of vaccines administered as of January 4th, 2022, the distribution was not necessarily even.</p>
+<p>This notebook explore how the vaccination rates changed over time for the DKI Jarkarta on a sub-district level.</p>
+</section>
+<section id="task" class="level2">
+<h2 class="anchored" data-anchor-id="task">1.2 Task</h2>
+<ul>
+<li><p>Choropleth Mapping and Analysis</p></li>
+<li><p>Local Gi* Analysis</p></li>
+<li><p>Emerging Hot Spot Analysis (EHSA)</p></li>
+</ul>
+</section>
+</section>
+<section id="setup" class="level1">
+<h1>2.0 Setup</h1>
+<hr>
+<section id="import-packages" class="level2">
+<h2 class="anchored" data-anchor-id="import-packages">2.1 Import Packages</h2>
+<ul>
+<li><p>sf - Used for handling geospatial data</p></li>
+<li><p>sfdep - Used for functions not in spdep</p></li>
+<li><p>tmap, maptools, kableExtra, plotly - Used for visualizing dataframes and plots</p></li>
+<li><p>lubridate - Used for handling datetime</p></li>
+<li><p>tidyr - Used for changing the shape and hierarchy of dataframe</p></li>
+<li><p>readxl - to read excel data (.xlsx files)</p></li>
+<li><p>tidyVerse - Used for data transformation and presentation</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, sfdep, tmap, maptools, kableExtra, plotly, lubridate, tidyr, readxl, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="data-wrangling" class="level1">
+<h1>3.0 Data Wrangling</h1>
+<hr>
+<section id="datasets-used" class="level2">
+<h2 class="anchored" data-anchor-id="datasets-used">3.1 Datasets Used</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Geopsatial</td>
+<td>BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA</td>
+</tr>
+<tr class="even">
+<td>Aspatial</td>
+<td>DKI Jakarta Provincial Vaccination Open Data</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="geospatial-data" class="level2">
+<h2 class="anchored" data-anchor-id="geospatial-data">3.2 Geospatial Data</h2>
+<section id="load-data" class="level3">
+<h3 class="anchored" data-anchor-id="load-data">3.2.1 Load Data</h3>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Import</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Glimpse</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">View</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>bd_jakarta <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">layer=</span><span class="st">"BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA' from data source 
+  `/Users/shambhavigoenka/Desktop/School/Geo/IS415-GAA/take_home_ex/take_home_ex02/data/geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 269 features and 161 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 106.3831 ymin: -6.370815 xmax: 106.9728 ymax: -5.184322
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(bd_jakarta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 269
+Columns: 162
+$ OBJECT_ID  &lt;dbl&gt; 25477, 25478, 25397, 25400, 25378, 25379, 25390, 25382, 253…
+$ KODE_DESA  &lt;chr&gt; "3173031006", "3173031007", "3171031003", "3171031006", "31…
+$ DESA       &lt;chr&gt; "KEAGUNGAN", "GLODOK", "HARAPAN MULIA", "CEMPAKA BARU", "PU…
+$ KODE       &lt;dbl&gt; 317303, 317303, 317103, 317103, 310101, 310101, 317102, 310…
+$ PROVINSI   &lt;chr&gt; "DKI JAKARTA", "DKI JAKARTA", "DKI JAKARTA", "DKI JAKARTA",…
+$ KAB_KOTA   &lt;chr&gt; "JAKARTA BARAT", "JAKARTA BARAT", "JAKARTA PUSAT", "JAKARTA…
+$ KECAMATAN  &lt;chr&gt; "TAMAN SARI", "TAMAN SARI", "KEMAYORAN", "KEMAYORAN", "KEPU…
+$ DESA_KELUR &lt;chr&gt; "KEAGUNGAN", "GLODOK", "HARAPAN MULIA", "CEMPAKA BARU", "PU…
+$ JUMLAH_PEN &lt;dbl&gt; 21609, 9069, 29085, 41913, 6947, 7059, 15793, 5891, 33383, …
+$ JUMLAH_KK  &lt;dbl&gt; 7255, 3273, 9217, 13766, 2026, 2056, 5599, 1658, 11276, 128…
+$ LUAS_WILAY &lt;dbl&gt; 0.36, 0.37, 0.53, 0.97, 0.93, 0.95, 1.76, 1.14, 0.47, 1.31,…
+$ KEPADATAN  &lt;dbl&gt; 60504, 24527, 54465, 42993, 7497, 7401, 8971, 5156, 71628, …
+$ PERPINDAHA &lt;dbl&gt; 102, 25, 131, 170, 17, 26, 58, 13, 113, 178, 13, 87, 56, 12…
+$ JUMLAH_MEN &lt;dbl&gt; 68, 52, 104, 151, 14, 32, 36, 10, 60, 92, 5, 83, 21, 70, 93…
+$ PERUBAHAN  &lt;dbl&gt; 20464, 8724, 27497, 38323, 6853, 6993, 15006, 5807, 31014, …
+$ WAJIB_KTP  &lt;dbl&gt; 16027, 7375, 20926, 30264, 4775, 4812, 12559, 3989, 24784, …
+$ SILAM      &lt;dbl&gt; 15735, 1842, 26328, 36813, 6941, 7057, 7401, 5891, 23057, 2…
+$ KRISTEN    &lt;dbl&gt; 2042, 2041, 1710, 3392, 6, 0, 3696, 0, 4058, 5130, 1, 3061,…
+$ KHATOLIK   &lt;dbl&gt; 927, 1460, 531, 1082, 0, 0, 1602, 0, 2100, 2575, 0, 1838, 7…
+$ HINDU      &lt;dbl&gt; 15, 9, 42, 127, 0, 0, 622, 0, 25, 27, 0, 9, 115, 47, 382, 7…
+$ BUDHA      &lt;dbl&gt; 2888, 3716, 469, 495, 0, 2, 2462, 0, 4134, 4740, 5, 1559, 3…
+$ KONGHUCU   &lt;dbl&gt; 2, 1, 5, 1, 0, 0, 10, 0, 9, 10, 0, 4, 1, 1, 4, 0, 2, 0, 0, …
+$ KEPERCAYAA &lt;dbl&gt; 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 2, 0, 22, 0, 3, 3, 0, 0, 0…
+$ PRIA       &lt;dbl&gt; 11049, 4404, 14696, 21063, 3547, 3551, 7833, 2954, 16887, 1…
+$ WANITA     &lt;dbl&gt; 10560, 4665, 14389, 20850, 3400, 3508, 7960, 2937, 16496, 1…
+$ BELUM_KAWI &lt;dbl&gt; 10193, 4240, 14022, 20336, 3366, 3334, 7578, 2836, 15860, 1…
+$ KAWIN      &lt;dbl&gt; 10652, 4364, 13450, 19487, 3224, 3404, 7321, 2791, 15945, 1…
+$ CERAI_HIDU &lt;dbl&gt; 255, 136, 430, 523, 101, 80, 217, 44, 381, 476, 39, 305, 10…
+$ CERAI_MATI &lt;dbl&gt; 509, 329, 1183, 1567, 256, 241, 677, 220, 1197, 993, 79, 90…
+$ U0         &lt;dbl&gt; 1572, 438, 2232, 3092, 640, 648, 802, 585, 2220, 2399, 376,…
+$ U5         &lt;dbl&gt; 1751, 545, 2515, 3657, 645, 684, 995, 588, 2687, 2953, 331,…
+$ U10        &lt;dbl&gt; 1703, 524, 2461, 3501, 620, 630, 1016, 513, 2653, 2754, 309…
+$ U15        &lt;dbl&gt; 1493, 521, 2318, 3486, 669, 671, 1106, 548, 2549, 2666, 328…
+$ U20        &lt;dbl&gt; 1542, 543, 2113, 3098, 619, 609, 1081, 491, 2313, 2515, 290…
+$ U25        &lt;dbl&gt; 1665, 628, 2170, 3024, 639, 582, 1002, 523, 2446, 2725, 325…
+$ U30        &lt;dbl&gt; 1819, 691, 2363, 3188, 564, 592, 1236, 478, 2735, 3122, 329…
+$ U35        &lt;dbl&gt; 1932, 782, 2595, 3662, 590, 572, 1422, 504, 3034, 3385, 317…
+$ U40        &lt;dbl&gt; 1828, 675, 2371, 3507, 480, 486, 1200, 397, 2689, 3037, 250…
+$ U45        &lt;dbl&gt; 1600, 607, 2250, 3391, 421, 457, 1163, 365, 2470, 2597, 206…
+$ U50        &lt;dbl&gt; 1408, 619, 1779, 2696, 346, 369, 1099, 288, 2129, 2282, 134…
+$ U55        &lt;dbl&gt; 1146, 602, 1379, 1909, 252, 318, 979, 235, 1843, 1930, 129,…
+$ U60        &lt;dbl&gt; 836, 614, 1054, 1397, 197, 211, 880, 162, 1386, 1394, 75, 9…
+$ U65        &lt;dbl&gt; 587, 555, 654, 970, 122, 114, 747, 111, 958, 932, 50, 706, …
+$ U70        &lt;dbl&gt; 312, 311, 411, 631, 69, 55, 488, 65, 554, 573, 38, 412, 129…
+$ U75        &lt;dbl&gt; 415, 414, 420, 704, 74, 61, 577, 38, 717, 642, 37, 528, 125…
+$ TIDAK_BELU &lt;dbl&gt; 3426, 1200, 4935, 7328, 1306, 1318, 2121, 973, 5075, 6089, …
+$ BELUM_TAMA &lt;dbl&gt; 1964, 481, 2610, 3763, 730, 676, 1278, 732, 3241, 3184, 383…
+$ TAMAT_SD   &lt;dbl&gt; 2265, 655, 2346, 2950, 1518, 2054, 1169, 1266, 4424, 3620, …
+$ SLTP       &lt;dbl&gt; 3660, 1414, 3167, 5138, 906, 1357, 2236, 852, 5858, 6159, 5…
+$ SLTA       &lt;dbl&gt; 8463, 3734, 12172, 16320, 2040, 1380, 5993, 1570, 12448, 14…
+$ DIPLOMA_I  &lt;dbl&gt; 81, 23, 84, 179, 22, 15, 43, 36, 85, 83, 4, 63, 27, 79, 110…
+$ DIPLOMA_II &lt;dbl&gt; 428, 273, 1121, 1718, 101, 59, 573, 97, 604, 740, 25, 734, …
+$ DIPLOMA_IV &lt;dbl&gt; 1244, 1241, 2477, 4181, 314, 191, 2199, 357, 1582, 1850, 83…
+$ STRATA_II  &lt;dbl&gt; 74, 46, 166, 315, 10, 8, 168, 8, 63, 92, 5, 174, 125, 122, …
+$ STRATA_III &lt;dbl&gt; 4, 2, 7, 21, 0, 1, 13, 0, 3, 9, 0, 16, 8, 7, 75, 49, 65, 14…
+$ BELUM_TIDA &lt;dbl&gt; 3927, 1388, 5335, 8105, 1788, 1627, 2676, 1129, 5985, 6820,…
+$ APARATUR_P &lt;dbl&gt; 81, 10, 513, 931, 246, 75, 156, 160, 132, 79, 23, 145, 369,…
+$ TENAGA_PEN &lt;dbl&gt; 70, 43, 288, 402, 130, 93, 81, 123, 123, 73, 45, 109, 30, 1…
+$ WIRASWASTA &lt;dbl&gt; 8974, 3832, 10662, 14925, 788, 728, 6145, 819, 12968, 14714…
+$ PERTANIAN  &lt;dbl&gt; 1, 0, 1, 3, 2, 2, 1, 3, 2, 5, 1, 1, 0, 0, 2, 5, 2, 1, 13, 4…
+$ NELAYAN    &lt;dbl&gt; 0, 0, 2, 0, 960, 1126, 1, 761, 1, 2, 673, 0, 0, 0, 0, 0, 2,…
+$ AGAMA_DAN  &lt;dbl&gt; 6, 6, 5, 40, 0, 0, 49, 2, 10, 11, 0, 54, 15, 16, 21, 14, 17…
+$ PELAJAR_MA &lt;dbl&gt; 4018, 1701, 6214, 9068, 1342, 1576, 3135, 1501, 6823, 6866,…
+$ TENAGA_KES &lt;dbl&gt; 28, 29, 80, 142, 34, 26, 60, 11, 48, 55, 16, 68, 89, 93, 28…
+$ PENSIUNAN  &lt;dbl&gt; 57, 50, 276, 498, 20, 7, 59, 14, 56, 75, 2, 97, 53, 146, 57…
+$ LAINNYA    &lt;dbl&gt; 4447, 2010, 5709, 7799, 1637, 1799, 3430, 1368, 7235, 7206,…
+$ GENERATED  &lt;chr&gt; "30 Juni 2019", "30 Juni 2019", "30 Juni 2019", "30 Juni 20…
+$ KODE_DES_1 &lt;chr&gt; "3173031006", "3173031007", "3171031003", "3171031006", "31…
+$ BELUM_     &lt;dbl&gt; 3099, 1032, 4830, 7355, 1663, 1704, 2390, 1213, 5330, 5605,…
+$ MENGUR_    &lt;dbl&gt; 4447, 2026, 5692, 7692, 1576, 1731, 3500, 1323, 7306, 7042,…
+$ PELAJAR_   &lt;dbl&gt; 3254, 1506, 6429, 8957, 1476, 1469, 3185, 1223, 6993, 6858,…
+$ PENSIUNA_1 &lt;dbl&gt; 80, 65, 322, 603, 24, 8, 70, 20, 75, 97, 2, 132, 67, 165, 6…
+$ PEGAWAI_   &lt;dbl&gt; 48, 5, 366, 612, 223, 72, 65, 143, 73, 48, 15, 89, 91, 174,…
+$ TENTARA    &lt;dbl&gt; 4, 0, 41, 57, 3, 0, 74, 1, 20, 12, 2, 11, 90, 340, 41, 52, …
+$ KEPOLISIAN &lt;dbl&gt; 10, 1, 16, 42, 11, 8, 2, 9, 17, 7, 3, 9, 165, 15, 17, 28, 1…
+$ PERDAG_    &lt;dbl&gt; 31, 5, 1, 3, 6, 1, 2, 4, 3, 1, 4, 0, 1, 2, 9, 2, 8, 2, 5, 9…
+$ PETANI     &lt;dbl&gt; 0, 0, 1, 2, 0, 1, 1, 0, 1, 1, 1, 2, 0, 0, 1, 2, 0, 1, 6, 1,…
+$ PETERN_    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ NELAYAN_1  &lt;dbl&gt; 1, 0, 1, 0, 914, 1071, 0, 794, 0, 1, 663, 0, 0, 0, 0, 0, 2,…
+$ INDUSTR_   &lt;dbl&gt; 7, 3, 4, 3, 1, 3, 0, 0, 1, 7, 0, 0, 2, 2, 1, 3, 12, 1, 8, 4…
+$ KONSTR_    &lt;dbl&gt; 3, 0, 2, 6, 3, 8, 1, 6, 1, 5, 10, 0, 2, 5, 7, 4, 7, 1, 6, 2…
+$ TRANSP_    &lt;dbl&gt; 2, 0, 7, 4, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 6, 3, 2, 1, 2, 5,…
+$ KARYAW_    &lt;dbl&gt; 6735, 3034, 7347, 10185, 237, 264, 4319, 184, 9405, 10844, …
+$ KARYAW1    &lt;dbl&gt; 9, 2, 74, 231, 4, 0, 16, 1, 13, 10, 1, 24, 17, 29, 187, 246…
+$ KARYAW1_1  &lt;dbl&gt; 0, 0, 5, 15, 0, 0, 0, 1, 0, 1, 0, 0, 2, 4, 7, 9, 3, 1, 6, 5…
+$ KARYAW1_12 &lt;dbl&gt; 23, 4, 25, 35, 141, 50, 16, 157, 6, 9, 40, 11, 11, 15, 22, …
+$ BURUH      &lt;dbl&gt; 515, 155, 971, 636, 63, 218, 265, 55, 1085, 652, 17, 357, 2…
+$ BURUH_     &lt;dbl&gt; 1, 0, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 2, 1, 0, 1, 1,…
+$ BURUH1     &lt;dbl&gt; 0, 0, 1, 0, 1, 25, 0, 2, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+$ BURUH1_1   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,…
+$ PEMBANT_   &lt;dbl&gt; 1, 1, 4, 1, 1, 0, 7, 0, 5, 1, 0, 6, 1, 10, 11, 9, 8, 3, 4, …
+$ TUKANG     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,…
+$ TUKANG_1   &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ TUKANG_12  &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ TUKANG__13 &lt;dbl&gt; 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,…
+$ TUKANG__14 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ TUKANG__15 &lt;dbl&gt; 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,…
+$ TUKANG__16 &lt;dbl&gt; 7, 4, 10, 14, 0, 0, 2, 0, 7, 8, 0, 8, 1, 0, 3, 2, 2, 0, 17,…
+$ TUKANG__17 &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ PENATA     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,…
+$ PENATA_    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ PENATA1_1  &lt;dbl&gt; 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0,…
+$ MEKANIK    &lt;dbl&gt; 11, 1, 10, 8, 0, 0, 4, 0, 7, 8, 0, 9, 0, 15, 10, 10, 3, 0, …
+$ SENIMAN_   &lt;dbl&gt; 4, 0, 12, 28, 0, 0, 2, 0, 3, 4, 0, 9, 6, 7, 14, 13, 17, 22,…
+$ TABIB      &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,…
+$ PARAJI_    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ PERANCA_   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1, 0, 1, 2, 0, 0,…
+$ PENTER_    &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0,…
+$ IMAM_M     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ PENDETA    &lt;dbl&gt; 2, 4, 5, 33, 0, 0, 20, 0, 10, 8, 0, 30, 14, 14, 18, 12, 1, …
+$ PASTOR     &lt;dbl&gt; 0, 1, 0, 1, 0, 0, 8, 0, 0, 0, 0, 23, 0, 0, 0, 0, 2, 0, 0, 0…
+$ WARTAWAN   &lt;dbl&gt; 7, 1, 16, 27, 0, 0, 4, 0, 8, 6, 0, 9, 5, 9, 26, 30, 11, 7, …
+$ USTADZ     &lt;dbl&gt; 6, 1, 1, 5, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,…
+$ JURU_M     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0,…
+$ PROMOT     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ ANGGOTA_   &lt;dbl&gt; 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 2, 1, 2, 1, 0, 0,…
+$ ANGGOTA1   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1,…
+$ ANGGOTA1_1 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ PRESIDEN   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ WAKIL_PRES &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,…
+$ ANGGOTA1_2 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,…
+$ ANGGOTA1_3 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,…
+$ DUTA_B     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,…
+$ GUBERNUR   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,…
+$ WAKIL_GUBE &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ BUPATI     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ WAKIL_BUPA &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ WALIKOTA   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ WAKIL_WALI &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ ANGGOTA1_4 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 1,…
+$ ANGGOTA1_5 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,…
+$ DOSEN      &lt;dbl&gt; 3, 2, 23, 36, 1, 2, 11, 0, 3, 5, 0, 14, 6, 28, 69, 73, 58, …
+$ GURU       &lt;dbl&gt; 72, 40, 272, 378, 118, 72, 69, 116, 126, 71, 36, 97, 23, 10…
+$ PILOT      &lt;dbl&gt; 1, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 1, 0, 0, 0,…
+$ PENGACARA_ &lt;dbl&gt; 4, 1, 8, 22, 0, 0, 5, 0, 5, 4, 0, 4, 3, 12, 24, 26, 40, 13,…
+$ NOTARIS    &lt;dbl&gt; 0, 0, 3, 5, 0, 0, 4, 0, 0, 0, 0, 5, 0, 5, 10, 3, 7, 1, 0, 4…
+$ ARSITEK    &lt;dbl&gt; 1, 0, 2, 3, 0, 0, 2, 0, 0, 0, 0, 4, 1, 2, 7, 3, 9, 2, 0, 4,…
+$ AKUNTA_    &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 2, 0, 3, 1,…
+$ KONSUL_    &lt;dbl&gt; 1, 0, 2, 11, 0, 0, 4, 0, 0, 0, 0, 6, 2, 3, 10, 8, 12, 2, 1,…
+$ DOKTER     &lt;dbl&gt; 16, 32, 35, 68, 0, 1, 63, 0, 27, 32, 1, 63, 48, 60, 236, 12…
+$ BIDAN      &lt;dbl&gt; 3, 1, 9, 18, 12, 8, 1, 3, 3, 3, 7, 3, 10, 10, 7, 2, 3, 2, 1…
+$ PERAWAT    &lt;dbl&gt; 7, 0, 25, 44, 12, 10, 3, 6, 12, 20, 6, 7, 26, 16, 21, 20, 9…
+$ APOTEK_    &lt;dbl&gt; 0, 0, 2, 3, 1, 0, 0, 0, 1, 2, 0, 1, 2, 3, 3, 3, 3, 1, 0, 1,…
+$ PSIKIATER  &lt;dbl&gt; 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 3, 2, 1, 0, 0, 0,…
+$ PENYIA_    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,…
+$ PENYIA1    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,…
+$ PELAUT     &lt;dbl&gt; 0, 0, 6, 16, 1, 1, 0, 14, 2, 4, 1, 2, 4, 2, 10, 13, 2, 0, 3…
+$ PENELITI   &lt;dbl&gt; 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 0, 2, 0,…
+$ SOPIR      &lt;dbl&gt; 65, 3, 94, 123, 0, 1, 61, 0, 76, 79, 0, 63, 44, 101, 71, 59…
+$ PIALAN     &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ PARANORMAL &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,…
+$ PEDAGA_    &lt;dbl&gt; 379, 126, 321, 562, 11, 10, 412, 15, 202, 225, 0, 271, 212,…
+$ PERANG_    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,…
+$ KEPALA_    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ BIARAW_    &lt;dbl&gt; 0, 1, 0, 0, 0, 0, 22, 0, 3, 0, 0, 2, 1, 0, 4, 0, 17, 1, 0, …
+$ WIRASWAST_ &lt;dbl&gt; 1370, 611, 1723, 3099, 131, 119, 1128, 259, 2321, 2677, 79,…
+$ LAINNYA_12 &lt;dbl&gt; 94, 57, 82, 122, 12, 10, 41, 6, 89, 158, 24, 37, 15, 94, 12…
+$ LUAS_DESA  &lt;dbl&gt; 25476, 25477, 25396, 25399, 25377, 25378, 25389, 25381, 253…
+$ KODE_DES_3 &lt;chr&gt; "3173031006", "3173031007", "3171031003", "3171031006", "31…
+$ DESA_KEL_1 &lt;chr&gt; "KEAGUNGAN", "GLODOK", "HARAPAN MULIA", "CEMPAKA BARU", "PU…
+$ KODE_12    &lt;dbl&gt; 317303, 317303, 317103, 317103, 310101, 310101, 317102, 310…
+$ geometry   &lt;MULTIPOLYGON [°]&gt; MULTIPOLYGON (((106.8164 -6..., MULTIPOLYGON (…</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(bd_jakarta)) <span class="co">#qtm</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<section id="understanding-the-data" class="level4">
+<h4 class="anchored" data-anchor-id="understanding-the-data">3.2.1.1 Understanding the Data</h4>
+<p>DKI Jarkarta is a province divided into municipalities (Kab Kota) which are further divided into districts (kecamatan) and finally divided into sub-districts (Desa Kelur)</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="division.png" class="img-fluid figure-img" width="343"></p>
+</figure>
+</div>
+</section>
+</section>
+<section id="data-preprocessing" class="level3">
+<h3 class="anchored" data-anchor-id="data-preprocessing">3.2.2 Data Preprocessing</h3>
+<section id="invalid-geometries" class="level4">
+<h4 class="anchored" data-anchor-id="invalid-geometries">3.2.2.1 Invalid Geometries</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">which</span>(<span class="fu">st_is_valid</span>(bd_jakarta) <span class="sc">==</span> <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+<p>Everything is valid</p>
+</section>
+<section id="exclude-redundant-fields" class="level4">
+<h4 class="anchored" data-anchor-id="exclude-redundant-fields">3.2.2.2 Exclude redundant fields</h4>
+<p>Exclude all data except Municipality, District name, District Code, Sub-district Code, Sub-district name, Total Population and geometry of the regions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>bd_jakarta <span class="ot">&lt;-</span> bd_jakarta <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">6</span><span class="sc">:</span><span class="dv">7</span>, <span class="dv">9</span>,)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="rename-from-bahasa-indonesia-to-english" class="level4">
+<h4 class="anchored" data-anchor-id="rename-from-bahasa-indonesia-to-english">3.2.2.3 Rename from Bahasa Indonesia to English</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Index</th>
+<th>Original Name</th>
+<th>Translated Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>KODE_DESA</td>
+<td>Sub_District_Code</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>DESA</td>
+<td>Sub_District</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>KODE</td>
+<td>District_Code</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>KAB_KOTA</td>
+<td>Municipality</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>KECAMATAN</td>
+<td>District</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>JUMLAH_PEN</td>
+<td>Total_Population</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>bd_jakarta <span class="ot">&lt;-</span> bd_jakarta <span class="sc">%&gt;%</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Municipality=</span>KAB_KOTA,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">District=</span>KECAMATAN,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">District_Code=</span>KODE,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sub_District=</span>DESA,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sub_District_Code=</span>KODE_DESA,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Total_Population=</span>JUMLAH_PEN</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="handle-missing-values" class="level4">
+<h4 class="anchored" data-anchor-id="handle-missing-values">3.2.2.4 Handle Missing Values</h4>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"There are"</span>, <span class="fu">sum</span>(<span class="fu">is.na</span>(bd_jakarta)), <span class="st">"missing values in"</span>, <span class="fu">paste</span>(<span class="fu">names</span>(<span class="fu">which</span>(<span class="fu">colSums</span>(<span class="fu">is.na</span>(bd_jakarta))<span class="sc">&gt;</span><span class="dv">0</span>)), <span class="at">collapse =</span> <span class="st">", "</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>There are 4 missing values in Municipality, District</code></pre>
+</div>
+</div>
+<p><strong>Remove all rows with missing values</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>bd_jakarta <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(bd_jakarta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="transform-coordinate-system" class="level3">
+<h3 class="anchored" data-anchor-id="transform-coordinate-system">3.2.3 Transform Coordinate System</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(bd_jakarta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: WGS 84 
+  wkt:
+GEOGCRS["WGS 84",
+    DATUM["World Geodetic System 1984",
+        ELLIPSOID["WGS 84",6378137,298.257223563,
+            LENGTHUNIT["metre",1]]],
+    PRIMEM["Greenwich",0,
+        ANGLEUNIT["degree",0.0174532925199433]],
+    CS[ellipsoidal,2],
+        AXIS["latitude",north,
+            ORDER[1],
+            ANGLEUNIT["degree",0.0174532925199433]],
+        AXIS["longitude",east,
+            ORDER[2],
+            ANGLEUNIT["degree",0.0174532925199433]],
+    ID["EPSG",4326]]</code></pre>
+</div>
+</div>
+<p>Transform the CRS to DGN95, ESPG code 23845</p>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Transform</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">View</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>bd_jakarta <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(bd_jakarta, <span class="dv">23845</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(bd_jakarta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: EPSG:23845 
+  wkt:
+PROJCRS["DGN95 / Indonesia TM-3 zone 54.1",
+    BASEGEOGCRS["DGN95",
+        DATUM["Datum Geodesi Nasional 1995",
+            ELLIPSOID["WGS 84",6378137,298.257223563,
+                LENGTHUNIT["metre",1]]],
+        PRIMEM["Greenwich",0,
+            ANGLEUNIT["degree",0.0174532925199433]],
+        ID["EPSG",4755]],
+    CONVERSION["Indonesia TM-3 zone 54.1",
+        METHOD["Transverse Mercator",
+            ID["EPSG",9807]],
+        PARAMETER["Latitude of natural origin",0,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8801]],
+        PARAMETER["Longitude of natural origin",139.5,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8802]],
+        PARAMETER["Scale factor at natural origin",0.9999,
+            SCALEUNIT["unity",1],
+            ID["EPSG",8805]],
+        PARAMETER["False easting",200000,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8806]],
+        PARAMETER["False northing",1500000,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8807]]],
+    CS[Cartesian,2],
+        AXIS["easting (X)",east,
+            ORDER[1],
+            LENGTHUNIT["metre",1]],
+        AXIS["northing (Y)",north,
+            ORDER[2],
+            LENGTHUNIT["metre",1]],
+    USAGE[
+        SCOPE["Cadastre."],
+        AREA["Indonesia - onshore east of 138°E."],
+        BBOX[-9.19,138,-1.49,141.01]],
+    ID["EPSG",23845]]</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="remove-outer-islands" class="level3">
+<h3 class="anchored" data-anchor-id="remove-outer-islands">3.2.4 Remove outer islands</h3>
+<p>Based on first glance in <a href="#view-1">View</a>, there are several small islands surrounding the mainland. As this is not relevant to the analysis, they shall be omitted.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># KEPULAUAN SERIBU means thousand islands</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>bd_jakarta <span class="ot">&lt;-</span> <span class="fu">filter</span>(bd_jakarta, Municipality <span class="sc">!=</span> <span class="st">"KEPULAUAN SERIBU"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="data-summary" class="level3">
+<h3 class="anchored" data-anchor-id="data-summary">3.2.5 Data Summary</h3>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>c <span class="ot">=</span> <span class="fu">length</span>(<span class="fu">unique</span>(bd_jakarta<span class="sc">$</span><span class="st">"Municipality"</span>))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">=</span> <span class="fu">length</span>(<span class="fu">unique</span>(bd_jakarta<span class="sc">$</span><span class="st">"District"</span>))</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>sd <span class="ot">=</span> <span class="fu">length</span>(<span class="fu">unique</span>(bd_jakarta<span class="sc">$</span><span class="st">"Sub_District"</span>))</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"There are"</span>, c, <span class="st">"unique municipalities,"</span>, d, <span class="st">"unique districts, and"</span>, sd, <span class="st">"unique sub-districs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>There are 5 unique municipalities, 42 unique districts, and 261 unique sub-districs</code></pre>
+</div>
+</div>
+<section id="view-distribution" class="level4">
+<h4 class="anchored" data-anchor-id="view-distribution">3.2.5.1 View distribution</h4>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Districts per Municipality</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Sub-districts per District</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df_grp_municipality <span class="ot">=</span> bd_jakarta <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Municipality)  <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">summarise</span>(<span class="at">total_districts =</span> <span class="fu">n</span>(),</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">.groups =</span> <span class="st">'drop'</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                              </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_grp_municipality, <span class="fu">aes</span>(<span class="at">x=</span>Municipality, <span class="at">y=</span>total_districts), <span class="at">fill=</span>Municipality) <span class="sc">+</span> </span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">color=</span><span class="st">"black"</span>,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill=</span><span class="st">"lightblue4"</span>) <span class="sc">+</span> </span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Number of Districts by Municipality"</span>) <span class="sc">+</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Municipality Name"</span>) <span class="sc">+</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"No. of Districts"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df_grp_districs <span class="ot">=</span> bd_jakarta <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(District)  <span class="sc">%&gt;%</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">summarise</span>(<span class="at">total_sub_districts =</span> <span class="fu">n</span>(),</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">.groups =</span> <span class="st">'drop'</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_grp_districs, <span class="fu">aes</span>(<span class="at">x=</span>District, <span class="at">y=</span>total_sub_districts)) <span class="sc">+</span> </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">color=</span><span class="st">"black"</span>,</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill=</span><span class="st">"lightblue3"</span>) <span class="sc">+</span> </span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">guide =</span> <span class="fu">guide_axis</span>(<span class="at">n.dodge=</span><span class="dv">7</span>))<span class="sc">+</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Number of Sub-districts by District"</span>) <span class="sc">+</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"District Name"</span>) <span class="sc">+</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"No. of Sub-districts"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="view-by-municipality-divisions" class="level4">
+<h4 class="anchored" data-anchor-id="view-by-municipality-divisions">3.2.5.2 View by Municipality Divisions</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bd_jakarta) <span class="sc">+</span> </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="st">"Municipality"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="view-by-population" class="level4">
+<h4 class="anchored" data-anchor-id="view-by-population">3.2.5.2 View by Population</h4>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Distribution</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Map</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bd_jakarta, <span class="fu">aes</span>(<span class="at">x=</span>Total_Population)) <span class="sc">+</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">10</span>,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">color=</span><span class="st">"black"</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">fill=</span><span class="st">"indianred"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<p>Equal Interval Classification</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bd_jakarta) <span class="sc">+</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"Total_Population"</span>,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"equal"</span>,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> <span class="st">"OrRd"</span>) <span class="sc">+</span> </span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Distribution by Population"</span>) <span class="sc">+</span> </span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="aspatial-data" class="level2">
+<h2 class="anchored" data-anchor-id="aspatial-data">3.3 Aspatial Data</h2>
+<section id="load-data-1" class="level3">
+<h3 class="anchored" data-anchor-id="load-data-1">3.3.1 Load Data</h3>
+<p>All files were downloaded as “Data Vaksinasi Berbasis Kelurahan (&lt;last date of month&gt; &lt;Indonesian month name&gt; &lt;year&gt;).xlsx” were locally renamed as “&lt;last date of month&gt; &lt;English month name&gt; &lt;year&gt;.xlsx”</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#get list of aspatial data files</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>folder_path <span class="ot">&lt;-</span> <span class="st">"data/aspatial"</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(folder_path, <span class="at">pattern =</span> <span class="st">".xlsx"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There was no file for Feb 28, 2022 so vaccination rate as of Feb 27, 2022 has been used instead</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#combines files into vacc_df</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>vacc_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (file <span class="cf">in</span> files) {</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(file, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>) <span class="co">#sub-district</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  data<span class="sc">$</span>Date <span class="ot">&lt;-</span> <span class="fu">dmy</span>(<span class="fu">str_extract</span>(file, <span class="st">"</span><span class="sc">\\</span><span class="st">d{2} [[:alpha:]]+ </span><span class="sc">\\</span><span class="st">d{4}"</span>)) <span class="co">#add date column</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  vacc_df <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(vacc_df, data)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="data-preprocessing-1" class="level3">
+<h3 class="anchored" data-anchor-id="data-preprocessing-1">3.3.2 Data Preprocessing</h3>
+<section id="exclude-redundant-fields-1" class="level4">
+<h4 class="anchored" data-anchor-id="exclude-redundant-fields-1">3.3.2.1 Exclude redundant fields</h4>
+<p>Exclude all values except Municipality name, Sub-district name, Sub-district code, Target number, Number not yet vaccinated, Total vaccines administered and Date.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>vacc_df <span class="ot">&lt;-</span>  vacc_df <span class="sc">%&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">4</span><span class="sc">:</span><span class="dv">6</span>, <span class="dv">9</span>, <span class="dv">28</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="rename-from-bahasa-indonesia-to-english-1" class="level4">
+<h4 class="anchored" data-anchor-id="rename-from-bahasa-indonesia-to-english-1">3.3.2.2 Rename from Bahasa Indonesia to English</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Index</th>
+<th>Original Name</th>
+<th>Translated Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>KODE KELURAHAN</td>
+<td>Sub_District_Code</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>WILAYAH KOTA</td>
+<td>Municipality</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>KELURAHAN</td>
+<td>Sub_District</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>SANSARAN</td>
+<td>Target</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>BELUM VAKSIN</td>
+<td>Not_Yet_Vaccinated</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>TOTAL VAKSIN DIBERIKAN</td>
+<td>Total_Vaccine_Administered</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>vacc_df <span class="ot">&lt;-</span> vacc_df <span class="sc">%&gt;%</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Municipality=</span><span class="st">"WILAYAH KOTA"</span>,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sub_District=</span><span class="st">"KELURAHAN"</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sub_District_Code=</span><span class="st">"KODE KELURAHAN"</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Target=</span><span class="st">"SASARAN"</span>, </span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Not_Yet_Vaccinated=</span><span class="st">"BELUM VAKSIN"</span>, </span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Total_Vaccine_Administered=</span><span class="st">"TOTAL VAKSIN</span><span class="sc">\r\n</span><span class="st">DIBERIKAN"</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="handle-missing-values-1" class="level4">
+<h4 class="anchored" data-anchor-id="handle-missing-values-1">3.3.2.3 Handle Missing Values</h4>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"There are"</span>, <span class="fu">sum</span>(<span class="fu">is.na</span>(vacc_df)), <span class="st">"missing values in"</span>, <span class="fu">paste</span>(<span class="fu">names</span>(<span class="fu">which</span>(<span class="fu">colSums</span>(<span class="fu">is.na</span>(vacc_df))<span class="sc">&gt;</span><span class="dv">0</span>)), <span class="at">collapse =</span> <span class="st">", "</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>There are 24 missing values in Sub_District_Code, Municipality</code></pre>
+</div>
+</div>
+<p>Remove all rows with missing values</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>vacc_df <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(vacc_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="remove-outer-islands-1" class="level3">
+<h3 class="anchored" data-anchor-id="remove-outer-islands-1">3.3.3 Remove outer islands</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>vacc_df <span class="ot">&lt;-</span> <span class="fu">filter</span>(vacc_df, Municipality <span class="sc">!=</span> <span class="st">"KAB.ADM.KEP.SERIBU"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Remove column Municipality as there is no further need for it in this data frame</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>vacc_df <span class="ot">=</span> vacc_df[,<span class="sc">!</span>(<span class="fu">names</span>(vacc_df) <span class="sc">%in%</span> <span class="st">"Municipality"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="combined-data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="combined-data-wrangling">3.4 Combined Data Wrangling</h2>
+<section id="join-vaccination-data" class="level3">
+<h3 class="anchored" data-anchor-id="join-vaccination-data">3.4.1 Join vaccination data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">left_join</span>(bd_jakarta, vacc_df,</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">by=</span><span class="fu">c</span>(<span class="st">"Sub_District_Code"</span><span class="ot">=</span><span class="st">"Sub_District_Code"</span>,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Sub_District"</span><span class="ot">=</span><span class="st">"Sub_District"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Visualise</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">=</span> <span class="fu">tm_shape</span>(df)<span class="sc">+</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"Target"</span>) <span class="sc">+</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title=</span><span class="st">"Target"</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">=</span> <span class="fu">tm_shape</span>(df)<span class="sc">+</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"Total_Vaccine_Administered"</span>) <span class="sc">+</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title=</span><span class="st">"Total Vaccines Administered"</span>)</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(p1, p2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>While Target and Total Vaccines Administered seem highly correlated, there several grey Missing patches which will be addressed below</p>
+</section>
+<section id="standardise-data" class="level3">
+<h3 class="anchored" data-anchor-id="standardise-data">3.4.2 Standardise Data</h3>
+<p>Although missing values from the geospatial and aspatial data have already been omitted, there is a “Missing” data in the above visualisation. This is because there are discrepancies between the sub-district names in the two datasets.</p>
+<p><strong>View Discrepancies</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>cases_subdistrict <span class="ot">&lt;-</span> <span class="fu">c</span>(vacc_df<span class="sc">$</span>Sub_District)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>bd_subdistrict <span class="ot">&lt;-</span> <span class="fu">c</span>(bd_jakarta<span class="sc">$</span>Sub_District)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>aspatial_list <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">unique</span>(cases_subdistrict[<span class="sc">!</span>(cases_subdistrict <span class="sc">%in%</span> bd_subdistrict)]))</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>aspatial_list <span class="ot">&lt;-</span> <span class="fu">c</span>(aspatial_list[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>], aspatial_list[<span class="dv">6</span>], aspatial_list[<span class="dv">5</span>], aspatial_list[<span class="dv">7</span><span class="sc">:</span><span class="dv">9</span>], aspatial_list[<span class="dv">4</span>]) <span class="co">#rearrgane - hardcoded</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>geospatial_list <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">unique</span>(bd_subdistrict[<span class="sc">!</span>(bd_subdistrict <span class="sc">%in%</span> cases_subdistrict)]))</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>spelling <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">Aspatial_Cases=</span>aspatial_list,</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Geospatial_BD=</span>geospatial_list</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a><span class="co"># with dataframe a input, outputs a kable</span></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(spelling, <span class="at">caption=</span><span class="st">"Mismatched Records"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_material</span>(<span class="st">"hover"</span>, <span class="at">latex_options=</span><span class="st">"scale_down"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+
+<table class=" lightable-material lightable-hover" style="font-family: &quot;Source Sans Pro&quot;, helvetica, sans-serif; margin-left: auto; margin-right: auto;">
+<caption>Mismatched Records</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Aspatial_Cases </th>
+   <th style="text-align:left;"> Geospatial_BD </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> BALE KAMBANG </td>
+   <td style="text-align:left;"> BALEKAMBANG </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HALIM PERDANA KUSUMAH </td>
+   <td style="text-align:left;"> HALIM PERDANA KUSUMA </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> JATI PULO </td>
+   <td style="text-align:left;"> JATIPULO </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> KRAMAT JATI </td>
+   <td style="text-align:left;"> KRAMATJATI </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> KERENDANG </td>
+   <td style="text-align:left;"> KRENDANG </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> PAL MERIAM </td>
+   <td style="text-align:left;"> PALMERIAM </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> PINANG RANTI </td>
+   <td style="text-align:left;"> PINANGRANTI </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> RAWA JATI </td>
+   <td style="text-align:left;"> RAWAJATI </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> KAMPUNG TENGAH </td>
+   <td style="text-align:left;"> TENGAH </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<p><strong>Rename geospatial data with aspatial data values</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>) {</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  bd_jakarta<span class="sc">$</span>Sub_District[bd_jakarta<span class="sc">$</span>Sub_District <span class="sc">==</span> geospatial_list[i]] <span class="ot">&lt;-</span> aspatial_list[i]</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(aspatial_list, geospatial_list, i) <span class="co">#cleanup</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="join-vaccination-data-again" class="level3">
+<h3 class="anchored" data-anchor-id="join-vaccination-data-again">3.4.3 Join vaccination data (again)</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">left_join</span>(bd_jakarta, vacc_df,</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">by=</span><span class="fu">c</span>(<span class="st">"Sub_District_Code"</span><span class="ot">=</span><span class="st">"Sub_District_Code"</span>,</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Sub_District"</span><span class="ot">=</span><span class="st">"Sub_District"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Visualise</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">=</span> <span class="fu">tm_shape</span>(df)<span class="sc">+</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"Target"</span>) <span class="sc">+</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title=</span><span class="st">"Target"</span>)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">=</span> <span class="fu">tm_shape</span>(df)<span class="sc">+</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"Total_Vaccine_Administered"</span>) <span class="sc">+</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title=</span><span class="st">"Total Vaccines Administered"</span>)</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(p1, p2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Grey Missing data from 3.4.1 has been handled.</p>
+</section>
+</section>
+</section>
+<section id="choropleth-mapping" class="level1">
+<h1>4.0 Choropleth Mapping</h1>
+<hr>
+<section id="compute-vaccination-rates" class="level2">
+<h2 class="anchored" data-anchor-id="compute-vaccination-rates">4.1 Compute Vaccination Rates</h2>
+<p><span class="math display">\[ \mathrm Vaccination \ Rate = \frac{\mathrm Target \ - \ (\mathrm Not \ Vaccinated) \ }{\mathrm Target} \ * 100
+\]</span></p>
+<p><em>(Target has been chosen over total population to excluse people who are not required to be vaccinated)</em></p>
+<p>Add Vaccination Rate column to main dataframe (df)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">vaccination_rate =</span> ((Target<span class="sc">-</span>Not_Yet_Vaccinated)<span class="sc">/</span>Target)<span class="sc">*</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Create table vacc_rate_df that groups vaccination rate by sub-district and date</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>vacc_rate_df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  st_drop_geometry  <span class="sc">%&gt;%</span> <span class="co">#remove geometry for pivot</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Sub_District, Date) <span class="sc">%&gt;%</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(vaccination_rate) <span class="sc">%&gt;%</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Date, <span class="co">#use pivot table to rearrange</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> vaccination_rate) <span class="sc">%&gt;%</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(bd_jakarta, <span class="at">by=</span><span class="fu">c</span>(<span class="st">"Sub_District"</span><span class="ot">=</span><span class="st">"Sub_District"</span>)) <span class="co">#add geometry back</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>View</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(vacc_rate_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 19
+  Sub_District 2021-07…¹ 2021-…² 2021-…³ 2021-…⁴ 2021-…⁵ 2021-…⁶ 2022-…⁷ 2022-…⁸
+  &lt;chr&gt;            &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1 ANCOL             48.5    61.6    72.1    75.0    76.9    78.9    80.6    80.8
+2 ANGKE             52.8    64.6    74.2    77.7    79.6    80.9    81.7    81.9
+3 BALE KAMBANG      37.0    57.0    70.0    73.9    76.6    78.2    79.5    79.7
+4 BALI MESTER       47.0    62.0    74.2    78.2    80.3    81.7    82.8    83.1
+5 BAMBU APUS        47.6    64.2    76.2    80.9    82.5    83.4    84.5    84.7
+6 BANGKA            51.6    61.3    73.2    78.0    79.8    80.7    81.5    81.7
+# … with 10 more variables: `2022-03-31` &lt;dbl&gt;, `2022-04-30` &lt;dbl&gt;,
+#   `2022-05-31` &lt;dbl&gt;, `2022-06-30` &lt;dbl&gt;, Sub_District_Code &lt;chr&gt;,
+#   District_Code &lt;dbl&gt;, Municipality &lt;chr&gt;, District &lt;chr&gt;,
+#   Total_Population &lt;dbl&gt;, geometry &lt;MULTIPOLYGON [m]&gt;, and abbreviated
+#   variable names ¹​`2021-07-31`, ²​`2021-08-31`, ³​`2021-09-30`, ⁴​`2021-10-31`,
+#   ⁵​`2021-11-30`, ⁶​`2021-12-31`, ⁷​`2022-01-31`, ⁸​`2022-02-27`</code></pre>
+</div>
+</div>
+<p>Convert to sf object for plotting</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>vacc_rate_df <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(vacc_rate_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="visualise-monthly-vaccination-rates" class="level2">
+<h2 class="anchored" data-anchor-id="visualise-monthly-vaccination-rates">4.2 Visualise monthly vaccination rates</h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co">#helper function for plots</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Can use fisher too</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="cf">function</span>(varname) {</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(vacc_rate_df) <span class="sc">+</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_polygons</span>() <span class="sc">+</span></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(vacc_rate_df) <span class="sc">+</span></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_fill</span>(varname, </span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>          <span class="at">n=</span> <span class="dv">6</span>,</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"jenks"</span>, </span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette=</span><span class="st">"RdPu"</span>,</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">title =</span> <span class="st">"Vaccination Rate (%)"</span>) <span class="sc">+</span></span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="fu">paste</span>(<span class="st">"Vaccination rate by"</span>, <span class="fu">paste</span>(<span class="fu">month</span>(<span class="fu">ymd</span>(varname), <span class="at">label=</span><span class="cn">TRUE</span>), <span class="fu">year</span>(<span class="fu">ymd</span>(varname)))),</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">main.title.position =</span> <span class="st">"center"</span>,</span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">frame =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>)</span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Plot</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(<span class="fu">plot</span>(<span class="st">"2021-07-31"</span>), <span class="fu">plot</span>(<span class="st">"2021-08-31"</span>), <span class="fu">plot</span>(<span class="st">"2021-09-30"</span>),<span class="fu">plot</span>(<span class="st">"2021-10-31"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(<span class="fu">plot</span>(<span class="st">"2021-11-30"</span>), <span class="fu">plot</span>(<span class="st">"2021-12-31"</span>), <span class="fu">plot</span>(<span class="st">"2022-01-31"</span>), <span class="fu">plot</span>(<span class="st">"2022-02-27"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(<span class="fu">plot</span>(<span class="st">"2022-03-31"</span>), <span class="fu">plot</span>(<span class="st">"2022-04-30"</span>), <span class="fu">plot</span>(<span class="st">"2022-05-31"</span>), <span class="fu">plot</span>(<span class="st">"2022-06-30"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The vaccination rate increases over the year for all regions. The Northern municipality starts with the highest vaccination rates then other regions, particularly the South and East, catch up.</p>
+</section>
+<section id="observations-from-jenks-based-mapping" class="level2">
+<h2 class="anchored" data-anchor-id="observations-from-jenks-based-mapping">4.3 Observations from Jenks based Mapping</h2>
+<section id="vaccination-rates-by-sub-district" class="level3">
+<h3 class="anchored" data-anchor-id="vaccination-rates-by-sub-district">4.3.1 Vaccination Rates by Sub-district</h3>
+<p><strong>For lowest vaccination rates,</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co">#temporary dataset</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>temp_low <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Date) <span class="sc">%&gt;%</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(vaccination_rate <span class="sc">==</span> <span class="fu">min</span>(vaccination_rate)) <span class="sc">%&gt;%</span> </span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Date)</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a><span class="co">#plot</span></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(<span class="fu">ggplot</span>(temp_low, <span class="fu">aes</span>(<span class="at">x=</span>Date, <span class="at">y=</span>vaccination_rate)) <span class="sc">+</span></span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color=</span>temp_low<span class="sc">$</span>Sub_District)) <span class="sc">+</span> </span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Lowest Vaccination Rates over the Year by Sub-district"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-57106e097dce3a621689" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-57106e097dce3a621689">{"x":{"data":[{"x":[18839],"y":[37.0090114879274],"text":"Date: 2021-07-31<br />vaccination_rate: 37.00901<br />temp_low$Sub_District: BALE KAMBANG","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"BALE KAMBANG","legendgroup":"BALE KAMBANG","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18900,18931,18961,19023],"y":[66.9729921399444,71.7569883576621,73.8461083860292,76.7951066721825],"text":["Date: 2021-09-30<br />vaccination_rate: 66.97299<br />temp_low$Sub_District: KALIBARU","Date: 2021-10-31<br />vaccination_rate: 71.75699<br />temp_low$Sub_District: KALIBARU","Date: 2021-11-30<br />vaccination_rate: 73.84611<br />temp_low$Sub_District: KALIBARU","Date: 2022-01-31<br />vaccination_rate: 76.79511<br />temp_low$Sub_District: KALIBARU"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(124,174,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(124,174,0,1)"}},"hoveron":"points","name":"KALIBARU","legendgroup":"KALIBARU","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18992,19050,19082,19112,19143,19173],"y":[75.6473948953611,77.2278457430292,77.6594423399367,78.010308638142,78.1314040861951,78.3052847295535],"text":["Date: 2021-12-31<br />vaccination_rate: 75.64739<br />temp_low$Sub_District: KEBON MELATI","Date: 2022-02-27<br />vaccination_rate: 77.22785<br />temp_low$Sub_District: KEBON MELATI","Date: 2022-03-31<br />vaccination_rate: 77.65944<br />temp_low$Sub_District: KEBON MELATI","Date: 2022-04-30<br />vaccination_rate: 78.01031<br />temp_low$Sub_District: KEBON MELATI","Date: 2022-05-31<br />vaccination_rate: 78.13140<br />temp_low$Sub_District: KEBON MELATI","Date: 2022-06-30<br />vaccination_rate: 78.30528<br />temp_low$Sub_District: KEBON MELATI"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)"}},"hoveron":"points","name":"KEBON MELATI","legendgroup":"KEBON MELATI","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18870],"y":[54.5640347449731],"text":"Date: 2021-08-31<br />vaccination_rate: 54.56403<br />temp_low$Sub_District: PETAMBURAN","type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(199,124,255,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(199,124,255,1)"}},"hoveron":"points","name":"PETAMBURAN","legendgroup":"PETAMBURAN","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.7625570776256,"r":7.30593607305936,"b":40.1826484018265,"l":37.2602739726027},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"title":{"text":"Lowest Vaccination Rates over the Year by Sub-district","font":{"color":"rgba(0,0,0,1)","family":"","size":17.5342465753425},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18822.3,19189.7],"tickmode":"array","ticktext":["Oct 2021","Jan 2022","Apr 2022","Jul 2022"],"tickvals":[18901,18993,19083,19174],"categoryorder":"array","categoryarray":["Oct 2021","Jan 2022","Apr 2022","Jul 2022"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[34.9441978258461,80.3700983916348],"tickmode":"array","ticktext":["40","50","60","70","80"],"tickvals":[40,50,60,70,80],"categoryorder":"array","categoryarray":["40","50","60","70","80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"vaccination_rate","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"title":{"text":"temp_low$Sub_District","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"f43a77a9e066":{"x":{},"y":{},"colour":{},"type":"scatter"}},"cur_data":"f43a77a9e066","visdat":{"f43a77a9e066":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>Not only does the minimum vaccination rate increase over year, but the sub-district Bale Kambang has a sharp increase in its rate and no longer has the lowest vaccination rate by July 2022.</p>
+<p><strong>For highest vaccination rates,</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co">#temporary dataset</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>temp_high <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Date) <span class="sc">%&gt;%</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(vaccination_rate <span class="sc">==</span> <span class="fu">max</span>(vaccination_rate)) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Date)</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a><span class="co">#plot</span></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(<span class="fu">ggplot</span>(temp_high, <span class="fu">aes</span>(<span class="at">x=</span>Date, <span class="at">y=</span>vaccination_rate)) <span class="sc">+</span></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color=</span>temp_high<span class="sc">$</span>Sub_District)) <span class="sc">+</span> </span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Highest Vaccination Rates over the Year by Sub-district"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-2b7dc319d01908779bc8" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-2b7dc319d01908779bc8">{"x":{"data":[{"x":[18900,18931,18961,18992,19023,19050,19082,19112,19143,19173],"y":[83.70412156683,86.6022635123224,87.5013221450481,88.3439692557205,89.0279589606177,89.1901420865212,89.4580968162747,89.6943200648732,89.7577830271833,89.7789373479533],"text":["Date: 2021-09-30<br />vaccination_rate: 83.70412<br />temp_high$Sub_District: HALIM PERDANA KUSUMAH","Date: 2021-10-31<br />vaccination_rate: 86.60226<br />temp_high$Sub_District: HALIM PERDANA KUSUMAH","Date: 2021-11-30<br />vaccination_rate: 87.50132<br />temp_high$Sub_District: HALIM PERDANA KUSUMAH","Date: 2021-12-31<br />vaccination_rate: 88.34397<br />temp_high$Sub_District: HALIM PERDANA KUSUMAH","Date: 2022-01-31<br />vaccination_rate: 89.02796<br />temp_high$Sub_District: HALIM PERDANA KUSUMAH","Date: 2022-02-27<br />vaccination_rate: 89.19014<br />temp_high$Sub_District: HALIM PERDANA KUSUMAH","Date: 2022-03-31<br />vaccination_rate: 89.45810<br />temp_high$Sub_District: HALIM PERDANA KUSUMAH","Date: 2022-04-30<br />vaccination_rate: 89.69432<br />temp_high$Sub_District: HALIM PERDANA KUSUMAH","Date: 2022-05-31<br />vaccination_rate: 89.75778<br />temp_high$Sub_District: HALIM PERDANA KUSUMAH","Date: 2022-06-30<br />vaccination_rate: 89.77894<br />temp_high$Sub_District: HALIM PERDANA KUSUMAH"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"HALIM PERDANA KUSUMAH","legendgroup":"HALIM PERDANA KUSUMAH","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18839,18870],"y":[65.2049497293117,72.985305491106],"text":["Date: 2021-07-31<br />vaccination_rate: 65.20495<br />temp_high$Sub_District: KAMAL MUARA","Date: 2021-08-31<br />vaccination_rate: 72.98531<br />temp_high$Sub_District: KAMAL MUARA"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)"}},"hoveron":"points","name":"KAMAL MUARA","legendgroup":"KAMAL MUARA","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.7625570776256,"r":7.30593607305936,"b":40.1826484018265,"l":37.2602739726027},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"title":{"text":"Highest Vaccination Rates over the Year by Sub-district","font":{"color":"rgba(0,0,0,1)","family":"","size":17.5342465753425},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18822.3,19189.7],"tickmode":"array","ticktext":["Oct 2021","Jan 2022","Apr 2022","Jul 2022"],"tickvals":[18901,18993,19083,19174],"categoryorder":"array","categoryarray":["Oct 2021","Jan 2022","Apr 2022","Jul 2022"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[63.9762503483796,91.0076367288854],"tickmode":"array","ticktext":["65","70","75","80","85","90"],"tickvals":[65,70,75,80,85,90],"categoryorder":"array","categoryarray":["65","70","75","80","85","90"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"vaccination_rate","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"title":{"text":"temp_high$Sub_District","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"f43a1363d401":{"x":{},"y":{},"colour":{},"type":"scatter"}},"cur_data":"f43a1363d401","visdat":{"f43a1363d401":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>The sub-district Halim Perdana Kusumah has the highest vaccination rate for the most part.</p>
+<p>The vaccination rate by July 31, 2021 for this sub-district at 65.21% is much higher than that of Bale Kambang which was at 37.01%. This difference of 28.20% gets smoothed down to 11.47% by June 30, 2022.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(temp_low<span class="sc">$</span>Date, temp_low<span class="sc">$</span>vaccination_rate, temp_high<span class="sc">$</span>vaccination_rate) </span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Lowest"</span> <span class="ot">=</span> <span class="st">"orange"</span>, <span class="st">"Highest"</span> <span class="ot">=</span> <span class="st">"steelblue"</span>)</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(<span class="fu">ggplot</span>(temp, <span class="fu">aes</span>(<span class="at">x=</span>temp_low.Date)) <span class="sc">+</span> </span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y=</span>temp_low.vaccination_rate, <span class="at">color=</span><span class="st">"Lowest"</span>), <span class="at">size =</span> <span class="fl">1.2</span>) <span class="sc">+</span> </span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y=</span>temp_high.vaccination_rate, <span class="at">color=</span><span class="st">"Highest"</span>), <span class="at">size =</span> <span class="fl">1.2</span>) <span class="sc">+</span> </span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Highest and Lowest Vaccination Rates over the Year by Sub-district"</span>) <span class="sc">+</span> </span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Vaccination Rate (%)"</span>,</span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">"Vaccination Rate"</span>) <span class="sc">+</span></span>
+<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> colors))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-9313b7b74fca23e84f36" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-9313b7b74fca23e84f36">{"x":{"data":[{"x":[18839,18870,18900,18931,18961,18992,19023,19050,19082,19112,19143,19173],"y":[37.0090114879274,54.5640347449731,66.9729921399444,71.7569883576621,73.8461083860292,75.6473948953611,76.7951066721825,77.2278457430292,77.6594423399367,78.010308638142,78.1314040861951,78.3052847295535],"text":["temp_low.Date: 2021-07-31<br />temp_low.vaccination_rate: 37.00901<br />colour: Lowest","temp_low.Date: 2021-08-31<br />temp_low.vaccination_rate: 54.56403<br />colour: Lowest","temp_low.Date: 2021-09-30<br />temp_low.vaccination_rate: 66.97299<br />colour: Lowest","temp_low.Date: 2021-10-31<br />temp_low.vaccination_rate: 71.75699<br />colour: Lowest","temp_low.Date: 2021-11-30<br />temp_low.vaccination_rate: 73.84611<br />colour: Lowest","temp_low.Date: 2021-12-31<br />temp_low.vaccination_rate: 75.64739<br />colour: Lowest","temp_low.Date: 2022-01-31<br />temp_low.vaccination_rate: 76.79511<br />colour: Lowest","temp_low.Date: 2022-02-27<br />temp_low.vaccination_rate: 77.22785<br />colour: Lowest","temp_low.Date: 2022-03-31<br />temp_low.vaccination_rate: 77.65944<br />colour: Lowest","temp_low.Date: 2022-04-30<br />temp_low.vaccination_rate: 78.01031<br />colour: Lowest","temp_low.Date: 2022-05-31<br />temp_low.vaccination_rate: 78.13140<br />colour: Lowest","temp_low.Date: 2022-06-30<br />temp_low.vaccination_rate: 78.30528<br />colour: Lowest"],"type":"scatter","mode":"lines","line":{"width":4.53543307086614,"color":"rgba(255,165,0,1)","dash":"solid"},"hoveron":"points","name":"Lowest","legendgroup":"Lowest","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18839,18870,18900,18931,18961,18992,19023,19050,19082,19112,19143,19173],"y":[65.2049497293117,72.985305491106,83.70412156683,86.6022635123224,87.5013221450481,88.3439692557205,89.0279589606177,89.1901420865212,89.4580968162747,89.6943200648732,89.7577830271833,89.7789373479533],"text":["temp_low.Date: 2021-07-31<br />temp_high.vaccination_rate: 65.20495<br />colour: Highest","temp_low.Date: 2021-08-31<br />temp_high.vaccination_rate: 72.98531<br />colour: Highest","temp_low.Date: 2021-09-30<br />temp_high.vaccination_rate: 83.70412<br />colour: Highest","temp_low.Date: 2021-10-31<br />temp_high.vaccination_rate: 86.60226<br />colour: Highest","temp_low.Date: 2021-11-30<br />temp_high.vaccination_rate: 87.50132<br />colour: Highest","temp_low.Date: 2021-12-31<br />temp_high.vaccination_rate: 88.34397<br />colour: Highest","temp_low.Date: 2022-01-31<br />temp_high.vaccination_rate: 89.02796<br />colour: Highest","temp_low.Date: 2022-02-27<br />temp_high.vaccination_rate: 89.19014<br />colour: Highest","temp_low.Date: 2022-03-31<br />temp_high.vaccination_rate: 89.45810<br />colour: Highest","temp_low.Date: 2022-04-30<br />temp_high.vaccination_rate: 89.69432<br />colour: Highest","temp_low.Date: 2022-05-31<br />temp_high.vaccination_rate: 89.75778<br />colour: Highest","temp_low.Date: 2022-06-30<br />temp_high.vaccination_rate: 89.77894<br />colour: Highest"],"type":"scatter","mode":"lines","line":{"width":4.53543307086614,"color":"rgba(70,130,180,1)","dash":"solid"},"hoveron":"points","name":"Highest","legendgroup":"Highest","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.7625570776256,"r":7.30593607305936,"b":40.1826484018265,"l":37.2602739726027},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"title":{"text":"Highest and Lowest Vaccination Rates over the Year by Sub-district","font":{"color":"rgba(0,0,0,1)","family":"","size":17.5342465753425},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18822.3,19189.7],"tickmode":"array","ticktext":["Oct 2021","Jan 2022","Apr 2022","Jul 2022"],"tickvals":[18901,18993,19083,19174],"categoryorder":"array","categoryarray":["Oct 2021","Jan 2022","Apr 2022","Jul 2022"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"temp_low.Date","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[34.3705151949261,92.4174336409546],"tickmode":"array","ticktext":["40","50","60","70","80","90"],"tickvals":[40,50,60,70,80,90],"categoryorder":"array","categoryarray":["40","50","60","70","80","90"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"Vaccination Rate (%)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"title":{"text":"Vaccination Rate","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"f43a17c3f026":{"x":{},"y":{},"colour":{},"type":"scatter"},"f43a40cb5afa":{"x":{},"y":{},"colour":{}}},"cur_data":"f43a17c3f026","visdat":{"f43a17c3f026":["function (y) ","x"],"f43a40cb5afa":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="spatio-temporal-mapping-with-custom-breakpoints" class="level3">
+<h3 class="anchored" data-anchor-id="spatio-temporal-mapping-with-custom-breakpoints">4.3.2 Spatio-Temporal Mapping with custom breakpoints</h3>
+<p>View how the vaccination rate increases in all regions over the year based on Jenks defined breakpoints.</p>
+<p>With the lowest and highest vaccination rates over the year being 37% and 90%, the Jenks breakpoints are defined as follows</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>breakpoints <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">37</span>, <span class="dv">55</span>, <span class="dv">72</span>, <span class="dv">80</span>, <span class="dv">84</span>, <span class="dv">90</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co">#helper function for plotting</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="cf">function</span>(varname) {</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(vacc_rate_df) <span class="sc">+</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_polygons</span>() <span class="sc">+</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(vacc_rate_df) <span class="sc">+</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_fill</span>(varname, </span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">breaks=</span> breakpoints,</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette=</span><span class="st">"RdPu"</span>,</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">title =</span> <span class="st">"Vaccination Rate"</span>) <span class="sc">+</span></span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="fu">paste</span>(<span class="st">"Vaccination rate by"</span>, <span class="fu">paste</span>(<span class="fu">month</span>(<span class="fu">ymd</span>(varname), <span class="at">label=</span><span class="cn">TRUE</span>), <span class="fu">year</span>(<span class="fu">ymd</span>(varname)))),</span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>          <span class="at">main.title.position =</span> <span class="st">"center"</span>,</span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">frame =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>)</span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Plot</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(<span class="fu">plot</span>(<span class="st">"2021-07-31"</span>), <span class="fu">plot</span>(<span class="st">"2021-08-31"</span>), <span class="fu">plot</span>(<span class="st">"2021-09-30"</span>),<span class="fu">plot</span>(<span class="st">"2021-10-31"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(<span class="fu">plot</span>(<span class="st">"2021-11-30"</span>), <span class="fu">plot</span>(<span class="st">"2021-12-31"</span>), <span class="fu">plot</span>(<span class="st">"2022-01-31"</span>), <span class="fu">plot</span>(<span class="st">"2022-02-27"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(<span class="fu">plot</span>(<span class="st">"2022-03-31"</span>), <span class="fu">plot</span>(<span class="st">"2022-04-30"</span>), <span class="fu">plot</span>(<span class="st">"2022-05-31"</span>), <span class="fu">plot</span>(<span class="st">"2022-06-30"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-49-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As aforementioned, the overall vaccination rates grew from July 2021, to June 2022. From the maps, it is observed that the rates grew quickly till December 2021 and then grew at a steady pace.</p>
+<p>In July 2021, there is a slightly higher vaccination rate in the North and Western municipalities which quickly becomes uniform by August 2021.</p>
+<p>From October 2021, it is seems that the Northern and Southern municipalities have the higher vaccination rates than their surrounding regions. The Eastern municipality catches up the fastest by March 2022 and the rest gradually catch up by June 2022.</p>
+</section>
+</section>
+</section>
+<section id="local-gi-analysis" class="level1">
+<h1>5.0 Local Gi* Analysis</h1>
+<hr>
+<section id="compute-gi-values" class="level2">
+<h2 class="anchored" data-anchor-id="compute-gi-values">5.1 Compute Gi* values</h2>
+<section id="create-attribute-table" class="level3">
+<h3 class="anchored" data-anchor-id="create-attribute-table">5.1.1. Create attribute table</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co"># make table with Date, Sub_District, Target, Not_Yet_Vaccinated</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>vacc_attr_table <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="dv">10</span>, <span class="dv">8</span>, <span class="dv">7</span>, <span class="dv">2</span>) <span class="sc">%&gt;%</span> <span class="fu">st_drop_geometry</span>()</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a><span class="co"># add a new field for Vaccination_Rate</span></span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>vacc_attr_table<span class="sc">$</span>Vaccination_Rate <span class="ot">&lt;-</span> (vacc_attr_table<span class="sc">$</span>Target <span class="sc">-</span> vacc_attr_table<span class="sc">$</span>Not_Yet_Vaccinated) <span class="sc">/</span> vacc_attr_table<span class="sc">$</span>Target<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a><span class="co"># final vaccination attribute table with Date, Sub_District, Vaccination_Rate</span></span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>vacc_attr_table <span class="ot">&lt;-</span> <span class="fu">tibble</span>(vacc_attr_table <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="create-a-time-series-cube-spatio-temporal-cube" class="level3">
+<h3 class="anchored" data-anchor-id="create-a-time-series-cube-spatio-temporal-cube">5.1.2 Create a time series cube (spatio-temporal cube)</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>vacc_rate_st <span class="ot">&lt;-</span> <span class="fu">spacetime</span>(vacc_attr_table, bd_jakarta,</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">.loc_col =</span> <span class="st">"Sub_District"</span>,</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">.time_col =</span> <span class="st">"Date"</span>)</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a><span class="co">#check valid </span></span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a><span class="fu">is_spacetime_cube</span>(vacc_rate_st)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+</section>
+<section id="derive-spatial-weights" class="level3">
+<h3 class="anchored" data-anchor-id="derive-spatial-weights">5.1.3 Derive spatial weights</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>vacc_rate_nb <span class="ot">&lt;-</span> vacc_rate_st <span class="sc">%&gt;%</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(<span class="st">"geometry"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>         <span class="co">#neighbours</span></span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">include_self</span>(<span class="fu">st_contiguity</span>(geometry)), </span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>         <span class="co">#inverse distance weights</span></span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_inverse_distance</span>(nb, geometry,</span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">scale=</span><span class="dv">1</span>,</span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">alpha=</span><span class="dv">1</span>),</span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before=</span><span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_nbs</span>(<span class="st">"nb"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_wts</span>(<span class="st">"wt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>View</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(vacc_rate_nb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  Date       Sub_District  Vaccination_Rate nb        wt       
+  &lt;date&gt;     &lt;chr&gt;                    &lt;dbl&gt; &lt;list&gt;    &lt;list&gt;   
+1 2021-07-31 KEAGUNGAN                 53.3 &lt;int [6]&gt; &lt;dbl [6]&gt;
+2 2021-07-31 GLODOK                    61.6 &lt;int [7]&gt; &lt;dbl [7]&gt;
+3 2021-07-31 HARAPAN MULIA             49.7 &lt;int [6]&gt; &lt;dbl [6]&gt;
+4 2021-07-31 CEMPAKA BARU              46.7 &lt;int [7]&gt; &lt;dbl [7]&gt;
+5 2021-07-31 PASAR BARU                59.3 &lt;int [9]&gt; &lt;dbl [9]&gt;
+6 2021-07-31 KARANG ANYAR              52.2 &lt;int [7]&gt; &lt;dbl [7]&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="compute-gi-values-1" class="level3">
+<h3 class="anchored" data-anchor-id="compute-gi-values-1">5.1.4 Compute Gi* values</h3>
+<p>Set Seed for replicable results</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Compute</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co">#LISA</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>gi_val <span class="ot">&lt;-</span> vacc_rate_nb <span class="sc">|&gt;</span></span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Date) <span class="sc">|&gt;</span></span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gi_val =</span> <span class="fu">local_gstar_perm</span>(</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>    Vaccination_Rate, nb, wt, <span class="at">nsim=</span><span class="dv">99</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>      tidyr<span class="sc">::</span><span class="fu">unnest</span>(gi_val)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>View</strong></p>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">Column names</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">Data Frame</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(gi_val)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Date"             "Sub_District"     "Vaccination_Rate" "nb"              
+ [5] "wt"               "gi_star"          "e_gi"             "var_gi"          
+ [9] "p_value"          "p_sim"            "p_folded_sim"     "skewness"        
+[13] "kurtosis"        </code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(gi_val)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 13
+# Groups:   Date [1]
+  Date       Sub_Dis…¹ Vacci…² nb    wt    gi_star    e_gi  var_gi p_value p_sim
+  &lt;date&gt;     &lt;chr&gt;       &lt;dbl&gt; &lt;lis&gt; &lt;lis&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
+1 2021-07-31 KEAGUNGAN    53.3 &lt;int&gt; &lt;dbl&gt;   2.44  0.00383 2.13e-8 1.46e-2  0.02
+2 2021-07-31 GLODOK       61.6 &lt;int&gt; &lt;dbl&gt;   3.85  0.00384 1.56e-8 1.18e-4  0.02
+3 2021-07-31 HARAPAN …    49.7 &lt;int&gt; &lt;dbl&gt;   0.309 0.00382 2.20e-8 7.57e-1  0.84
+4 2021-07-31 CEMPAKA …    46.7 &lt;int&gt; &lt;dbl&gt;  -1.05  0.00383 1.53e-8 2.96e-1  0.34
+5 2021-07-31 PASAR BA…    59.3 &lt;int&gt; &lt;dbl&gt;   2.71  0.00383 1.38e-8 6.82e-3  0.02
+6 2021-07-31 KARANG A…    52.2 &lt;int&gt; &lt;dbl&gt;   1.67  0.00382 2.17e-8 9.49e-2  0.1 
+# … with 3 more variables: p_folded_sim &lt;dbl&gt;, skewness &lt;dbl&gt;, kurtosis &lt;dbl&gt;,
+#   and abbreviated variable names ¹​Sub_District, ²​Vaccination_Rate</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="visualise-gi-maps-of-the-monthly-vaccination-rate" class="level2">
+<h2 class="anchored" data-anchor-id="visualise-gi-maps-of-the-monthly-vaccination-rate">5.2 Visualise Gi* maps of the monthly vaccination rate</h2>
+<p>Combine Gi* values to main df</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>gi_val_df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(gi_val,</span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Sub_District"</span>, <span class="st">"Date"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Visualising Gi* and p-value of Gi* for significant locations (p-value &lt; 0.05)</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co">#helper function for plotting</span></span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="cf">function</span>(varname){</span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a> gi_plot <span class="ot">&lt;-</span> </span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_shape</span>(<span class="fu">filter</span>(gi_val_df, Date <span class="sc">==</span> varname)) <span class="sc">+</span></span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_polygons</span>() <span class="sc">+</span></span>
+<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_shape</span>(gi_val_df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(p_sim <span class="sc">&lt;</span><span class="fl">0.05</span>)) <span class="sc">+</span></span>
+<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_fill</span>(<span class="st">"gi_star"</span>,</span>
+<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">style=</span><span class="st">"equal"</span>,</span>
+<span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">n=</span><span class="dv">5</span>,</span>
+<span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">palette =</span> <span class="st">"seq"</span>) <span class="sc">+</span></span>
+<span id="cb72-11"><a href="#cb72-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb72-12"><a href="#cb72-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="fu">paste</span>(<span class="st">"Significant Local Gi for"</span>, <span class="fu">paste</span>(<span class="fu">month</span>(<span class="fu">ymd</span>(varname), <span class="at">label=</span><span class="cn">TRUE</span>), <span class="fu">year</span>(<span class="fu">ymd</span>(varname)))),</span>
+<span id="cb72-13"><a href="#cb72-13" aria-hidden="true" tabindex="-1"></a>              <span class="at">main.title.size =</span> <span class="fl">0.8</span>,</span>
+<span id="cb72-14"><a href="#cb72-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">aes.palette =</span> <span class="fu">list</span>(<span class="at">seq =</span> <span class="st">"-RdBu"</span>))</span>
+<span id="cb72-15"><a href="#cb72-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(gi_plot)</span>
+<span id="cb72-16"><a href="#cb72-16" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(<span class="fu">plot</span>(<span class="st">"2021-07-31"</span>), <span class="fu">plot</span>(<span class="st">"2021-08-31"</span>), <span class="fu">plot</span>(<span class="st">"2021-09-30"</span>),<span class="fu">plot</span>(<span class="st">"2021-10-31"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-60-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(<span class="fu">plot</span>(<span class="st">"2021-11-30"</span>), <span class="fu">plot</span>(<span class="st">"2021-12-31"</span>), <span class="fu">plot</span>(<span class="st">"2022-01-31"</span>), <span class="fu">plot</span>(<span class="st">"2022-02-27"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-61-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(<span class="fu">plot</span>(<span class="st">"2022-03-31"</span>), <span class="fu">plot</span>(<span class="st">"2022-04-30"</span>), <span class="fu">plot</span>(<span class="st">"2022-05-31"</span>), <span class="fu">plot</span>(<span class="st">"2022-06-30"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-62-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="observations-of-the-local-gi-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="observations-of-the-local-gi-analysis">5.3 Observations of the Local Gi* Analysis</h2>
+<p>Filter by significant p-value (&lt;0.05)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>p_value_freq <span class="ot">=</span> <span class="fu">filter</span>(gi_val_df, p_sim<span class="sc">&lt;</span><span class="fl">0.05</span>)</span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>temp <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">table</span>(p_value_freq<span class="sc">$</span>Sub_District))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Throughout the 12 months, there were"</span>, <span class="fu">nrow</span>(temp), <span class="st">"Sub-districts with p-value of Gi* &lt; 0.05 for at least 1 month"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Throughout the 12 months, there were 128 Sub-districts with p-value of Gi* &lt; 0.05 for at least 1 month</code></pre>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"The Gi* value of the vaccination rates for the entire time period were significantly low / high for the"</span>, <span class="fu">nrow</span>(temp <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Freq <span class="sc">==</span> <span class="dv">12</span>)), <span class="st">"following Sub-districts throughout the year - "</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>The Gi* value of the vaccination rates for the entire time period were significantly low / high for the 10 following Sub-districts throughout the year - </code></pre>
+</div>
+</div>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Sub-District</th>
+<th>Municipality</th>
+<th>Significance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>BATU AMPAR</td>
+<td>East</td>
+<td>Low</td>
+</tr>
+<tr class="even">
+<td>CIPINANG CEMPEDAK</td>
+<td>East</td>
+<td>Low</td>
+</tr>
+<tr class="odd">
+<td>GLODOK</td>
+<td>West</td>
+<td>High</td>
+</tr>
+<tr class="even">
+<td>KAMPUNG BALI</td>
+<td>Central</td>
+<td>Low</td>
+</tr>
+<tr class="odd">
+<td>KAMPUNG TENGAH</td>
+<td>East</td>
+<td>Low</td>
+</tr>
+<tr class="even">
+<td>KEAGUNGAN</td>
+<td>West</td>
+<td>High</td>
+</tr>
+<tr class="odd">
+<td>KEBON KACANG</td>
+<td>Central</td>
+<td>Low</td>
+</tr>
+<tr class="even">
+<td>KEBON MELATI</td>
+<td>Central</td>
+<td>Low</td>
+</tr>
+<tr class="odd">
+<td>MANGGA BESAR</td>
+<td>West</td>
+<td>High</td>
+</tr>
+<tr class="even">
+<td>PETAMBURAN</td>
+<td>Central</td>
+<td>Low</td>
+</tr>
+</tbody>
+</table>
+<p>It is observed the Central and Eastern municipalities have very distributed vaccination rates throughout the year whereas the Western municipality has evenly distributed vaccinated rates throughout the year.</p>
+</section>
+</section>
+<section id="emerging-hot-spot-analysis-ehsa" class="level1">
+<h1>6.0 Emerging Hot Spot Analysis (EHSA)</h1>
+<hr>
+<section id="mann-kendall-test" class="level2">
+<h2 class="anchored" data-anchor-id="mann-kendall-test">6.1 Mann-Kendall Test</h2>
+<p>Perform the Mann-Kendall Test using the spatio-temporal local Gi* values on the following Sub-districts - “ANCOL”,“KOJA” and “JOHAR BARU”</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>sub_list <span class="ot">=</span> <span class="fu">list</span>(<span class="st">"KAMAL"</span>,<span class="st">"KOJA"</span>, <span class="st">"ANCOL"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Filter data</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>cbg <span class="ot">&lt;-</span> gi_val <span class="sc">%&gt;%</span> </span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sub_District <span class="sc">%in%</span> sub_list) <span class="sc">|&gt;</span> </span>
+<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Date, Sub_District, gi_star)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">KAMAL</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">KOJA</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-3" role="tab" aria-controls="tabset-6-3" aria-selected="false">ANCOL</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
+<p>Plot</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>cbg_ <span class="ot">&lt;-</span><span class="fu">filter</span>(cbg, Sub_District<span class="sc">==</span>sub_list[<span class="dv">1</span>])</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(<span class="fu">ggplot</span>(<span class="at">data=</span>cbg_, <span class="fu">aes</span>(<span class="at">x=</span>Date, <span class="at">y=</span>gi_star))<span class="sc">+</span></span>
+<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb83-5"><a href="#cb83-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_light</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-f761b11ad56c398eb11c" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-f761b11ad56c398eb11c">{"x":{"data":[{"x":[18839,18870,18900,18931,18961,18992,19023,19050,19082,19112,19143,19173],"y":[-0.353490302248339,1.22914364043294,-0.646344203556161,-1.28209948516924,-1.17403292157848,-1.47423917569317,-1.70534748798037,-1.87348154055788,-1.84137207726679,-1.85681314130811,-2.28461091757397,-1.89143136098858],"text":["Date: 2021-07-31<br />gi_star: -0.3534903","Date: 2021-08-31<br />gi_star:  1.2291436","Date: 2021-09-30<br />gi_star: -0.6463442","Date: 2021-10-31<br />gi_star: -1.2820995","Date: 2021-11-30<br />gi_star: -1.1740329","Date: 2021-12-31<br />gi_star: -1.4742392","Date: 2022-01-31<br />gi_star: -1.7053475","Date: 2022-02-27<br />gi_star: -1.8734815","Date: 2022-03-31<br />gi_star: -1.8413721","Date: 2022-04-30<br />gi_star: -1.8568131","Date: 2022-05-31<br />gi_star: -2.2846109","Date: 2022-06-30<br />gi_star: -1.8914314"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.2283105022831,"r":7.30593607305936,"b":40.1826484018265,"l":37.2602739726027},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18822.3,19189.7],"tickmode":"array","ticktext":["Oct 2021","Jan 2022","Apr 2022","Jul 2022"],"tickvals":[18901,18993,19083,19174],"categoryorder":"array","categoryarray":["Oct 2021","Jan 2022","Apr 2022","Jul 2022"],"nticks":null,"ticks":"outside","tickcolor":"rgba(179,179,179,1)","ticklen":3.65296803652968,"tickwidth":0.33208800332088,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(222,222,222,1)","gridwidth":0.33208800332088,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-2.46029864547432,1.40483136833329],"tickmode":"array","ticktext":["-2","-1","0","1"],"tickvals":[-2,-1,0,1],"categoryorder":"array","categoryarray":["-2","-1","0","1"],"nticks":null,"ticks":"outside","tickcolor":"rgba(179,179,179,1)","ticklen":3.65296803652968,"tickwidth":0.33208800332088,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(222,222,222,1)","gridwidth":0.33208800332088,"zeroline":false,"anchor":"x","title":{"text":"gi_star","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"transparent","line":{"color":"rgba(179,179,179,1)","width":0.66417600664176,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"f43a73c660b5":{"x":{},"y":{},"type":"scatter"}},"cur_data":"f43a73c660b5","visdat":{"f43a73c660b5":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>P-value of Mann-Kendall Test</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>cbg_ <span class="sc">|&gt;</span> </span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mk =</span> <span class="fu">list</span>(</span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unclass</span>(</span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>      Kendall<span class="sc">::</span><span class="fu">MannKendall</span>(gi_star)))) <span class="sc">|&gt;</span> </span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest_wider</span>(mk)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 5
+     tau       sl     S     D  varS
+   &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 -0.848 0.000162   -56  66.0  213.</code></pre>
+</div>
+</div>
+<p>The p-value (sl) is 0.0002 which is &lt; 0.05 hence p-value is significant and tau is -0.85 This means there is an overall significant downward trend.</p>
+</div>
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
+<p>Plot</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>cbg_ <span class="ot">&lt;-</span><span class="fu">filter</span>(cbg, Sub_District<span class="sc">==</span>sub_list[<span class="dv">2</span>])</span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(<span class="fu">ggplot</span>(<span class="at">data=</span>cbg_, <span class="fu">aes</span>(<span class="at">x=</span>Date, <span class="at">y=</span>gi_star))<span class="sc">+</span></span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_light</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-22f827fe82feda0d5fd8" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-22f827fe82feda0d5fd8">{"x":{"data":[{"x":[18839,18870,18900,18931,18961,18992,19023,19050,19082,19112,19143,19173],"y":[0.123094293420744,-1.04510173072878,-2.17494842434852,-2.15421841560993,-2.28209795256423,-1.8735763898839,-1.3351948722563,-1.20968208059811,-1.17737338712807,-0.934438200703373,-1.02916863298476,-0.896103017674014],"text":["Date: 2021-07-31<br />gi_star:  0.1230943","Date: 2021-08-31<br />gi_star: -1.0451017","Date: 2021-09-30<br />gi_star: -2.1749484","Date: 2021-10-31<br />gi_star: -2.1542184","Date: 2021-11-30<br />gi_star: -2.2820980","Date: 2021-12-31<br />gi_star: -1.8735764","Date: 2022-01-31<br />gi_star: -1.3351949","Date: 2022-02-27<br />gi_star: -1.2096821","Date: 2022-03-31<br />gi_star: -1.1773734","Date: 2022-04-30<br />gi_star: -0.9344382","Date: 2022-05-31<br />gi_star: -1.0291686","Date: 2022-06-30<br />gi_star: -0.8961030"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.2283105022831,"r":7.30593607305936,"b":40.1826484018265,"l":48.9497716894977},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18822.3,19189.7],"tickmode":"array","ticktext":["Oct 2021","Jan 2022","Apr 2022","Jul 2022"],"tickvals":[18901,18993,19083,19174],"categoryorder":"array","categoryarray":["Oct 2021","Jan 2022","Apr 2022","Jul 2022"],"nticks":null,"ticks":"outside","tickcolor":"rgba(179,179,179,1)","ticklen":3.65296803652968,"tickwidth":0.33208800332088,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(222,222,222,1)","gridwidth":0.33208800332088,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-2.40235756486348,0.243353905719993],"tickmode":"array","ticktext":["-2.0","-1.5","-1.0","-0.5","0.0"],"tickvals":[-2,-1.5,-1,-0.5,0],"categoryorder":"array","categoryarray":["-2.0","-1.5","-1.0","-0.5","0.0"],"nticks":null,"ticks":"outside","tickcolor":"rgba(179,179,179,1)","ticklen":3.65296803652968,"tickwidth":0.33208800332088,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(222,222,222,1)","gridwidth":0.33208800332088,"zeroline":false,"anchor":"x","title":{"text":"gi_star","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"transparent","line":{"color":"rgba(179,179,179,1)","width":0.66417600664176,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"f43a6e31da36":{"x":{},"y":{},"type":"scatter"}},"cur_data":"f43a6e31da36","visdat":{"f43a6e31da36":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>P-value of Mann-Kendall Test</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>cbg_ <span class="sc">|&gt;</span> </span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mk =</span> <span class="fu">list</span>(</span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unclass</span>(</span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>      Kendall<span class="sc">::</span><span class="fu">MannKendall</span>(gi_star)))) <span class="sc">|&gt;</span> </span>
+<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest_wider</span>(mk)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 5
+    tau    sl     S     D  varS
+  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 0.364 0.115    24  66.0  213.</code></pre>
+</div>
+</div>
+<p>The p-value (sl) is 0.6 which is &gt; 0.05 hence p-value is significant and tau is 0.21 This means there is an overall insignificant upward trend. This is because the Gi* values initially went down and then rose.</p>
+</div>
+<div id="tabset-6-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-3-tab">
+<p>Plot</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>cbg_ <span class="ot">&lt;-</span><span class="fu">filter</span>(cbg, Sub_District<span class="sc">==</span>sub_list[<span class="dv">3</span>])</span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(<span class="fu">ggplot</span>(<span class="at">data=</span>cbg_, <span class="fu">aes</span>(<span class="at">x=</span>Date, <span class="at">y=</span>gi_star))<span class="sc">+</span></span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_light</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-b5ba0357be7f653b0b46" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-b5ba0357be7f653b0b46">{"x":{"data":[{"x":[18839,18870,18900,18931,18961,18992,19023,19050,19082,19112,19143,19173],"y":[2.35231993618912,2.17202663520638,0.453333460202185,-0.714777661440997,-1.02163133313795,-0.737251395329177,-0.679392251222054,-0.870337580893983,-0.471220550314699,-0.459190346155749,-0.505949284634161,-0.720143018661453],"text":["Date: 2021-07-31<br />gi_star:  2.3523199","Date: 2021-08-31<br />gi_star:  2.1720266","Date: 2021-09-30<br />gi_star:  0.4533335","Date: 2021-10-31<br />gi_star: -0.7147777","Date: 2021-11-30<br />gi_star: -1.0216313","Date: 2021-12-31<br />gi_star: -0.7372514","Date: 2022-01-31<br />gi_star: -0.6793923","Date: 2022-02-27<br />gi_star: -0.8703376","Date: 2022-03-31<br />gi_star: -0.4712206","Date: 2022-04-30<br />gi_star: -0.4591903","Date: 2022-05-31<br />gi_star: -0.5059493","Date: 2022-06-30<br />gi_star: -0.7201430"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.2283105022831,"r":7.30593607305936,"b":40.1826484018265,"l":37.2602739726027},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18822.3,19189.7],"tickmode":"array","ticktext":["Oct 2021","Jan 2022","Apr 2022","Jul 2022"],"tickvals":[18901,18993,19083,19174],"categoryorder":"array","categoryarray":["Oct 2021","Jan 2022","Apr 2022","Jul 2022"],"nticks":null,"ticks":"outside","tickcolor":"rgba(179,179,179,1)","ticklen":3.65296803652968,"tickwidth":0.33208800332088,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(222,222,222,1)","gridwidth":0.33208800332088,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-1.19032889660431,2.52101749965547],"tickmode":"array","ticktext":["-1","0","1","2"],"tickvals":[-1,0,1,2],"categoryorder":"array","categoryarray":["-1","0","1","2"],"nticks":null,"ticks":"outside","tickcolor":"rgba(179,179,179,1)","ticklen":3.65296803652968,"tickwidth":0.33208800332088,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(222,222,222,1)","gridwidth":0.33208800332088,"zeroline":false,"anchor":"x","title":{"text":"gi_star","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"transparent","line":{"color":"rgba(179,179,179,1)","width":0.66417600664176,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"f43a6f58b269":{"x":{},"y":{},"type":"scatter"}},"cur_data":"f43a6f58b269","visdat":{"f43a6f58b269":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div>
+<p>P-value of Mann-Kendall Test</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>cbg_ <span class="sc">|&gt;</span> </span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mk =</span> <span class="fu">list</span>(</span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unclass</span>(</span>
+<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a>      Kendall<span class="sc">::</span><span class="fu">MannKendall</span>(gi_star)))) <span class="sc">|&gt;</span> </span>
+<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest_wider</span>(mk)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 5
+     tau    sl     S     D  varS
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 -0.273 0.244   -18  66.0  213.</code></pre>
+</div>
+</div>
+<p>The p-value is 0.24 which is &lt; 0.05 hence p-value is significant and tau is -0.27. This means there is an overall significant downward trend.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="ehsa-map-of-the-gi-values-of-the-vaccination-rate" class="level2">
+<h2 class="anchored" data-anchor-id="ehsa-map-of-the-gi-values-of-the-vaccination-rate">6.2 EHSA map of the Gi* values of the vaccination rate</h2>
+<section id="perform-the-mann-kendall-test-for-each-location" class="level3">
+<h3 class="anchored" data-anchor-id="perform-the-mann-kendall-test-for-each-location">6.2.1. Perform the Mann Kendall Test for each location</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>ehsa <span class="ot">&lt;-</span> gi_val <span class="sc">%&gt;%</span></span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Sub_District) <span class="sc">%&gt;%</span></span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mk =</span> <span class="fu">list</span>(</span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unclass</span>(</span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a>      Kendall<span class="sc">::</span><span class="fu">MannKendall</span>(gi_star)))) <span class="sc">%&gt;%</span></span>
+<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest_wider</span>(mk)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="arrange-to-show-significant-emerging-hotcold-spots" class="level3">
+<h3 class="anchored" data-anchor-id="arrange-to-show-significant-emerging-hotcold-spots">6.2.2. Arrange to show significant emerging hot/cold spots</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>emerging <span class="ot">&lt;-</span> ehsa <span class="sc">%&gt;%</span> </span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(sl, <span class="fu">abs</span>(tau)) <span class="sc">%&gt;%</span> </span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>emerging</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 6
+  Sub_District       tau        sl     S     D  varS
+  &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 PETOJO UTARA    -0.970 0.0000156   -64  66.0  213.
+2 KAYU MANIS       0.970 0.0000156    64  66.0  213.
+3 JATINEGARA KAUM  0.939 0.0000287    62  66.0  213.
+4 PISANGAN BARU    0.939 0.0000287    62  66.0  213.
+5 PASAR BARU      -0.939 0.0000288   -62  66.0  213.</code></pre>
+</div>
+</div>
+</section>
+<section id="performing-emerging-hotspot-analysis-ehsa" class="level3">
+<h3 class="anchored" data-anchor-id="performing-emerging-hotspot-analysis-ehsa">6.2.3. Performing Emerging Hotspot Analysis (EHSA)</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>ehsa <span class="ot">&lt;-</span> <span class="fu">emerging_hotspot_analysis</span>(</span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> vacc_rate_st, <span class="co">#spacetime object</span></span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">.var =</span> <span class="st">"Vaccination_Rate"</span>,</span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">k =</span> <span class="dv">1</span>, <span class="co">#number of time lags</span></span>
+<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">nsim =</span> <span class="dv">99</span></span>
+<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Plot</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> ehsa,</span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x=</span>classification, <span class="at">fill=</span>classification, <span class="at">stat =</span> <span class="st">"identity"</span>)) <span class="sc">+</span> </span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">"#8DD3C7"</span>, <span class="st">"#FFFFB3"</span>, <span class="st">"#BEBADA"</span>, <span class="st">"#FB8072"</span>)) <span class="sc">+</span> </span>
+<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-77-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Oscillating hotspot class has the highest number of Sub-districts.</p>
+<p>Combine EHSA values to main df nad add classification column</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>ehsa_df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(ehsa, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Sub_District"</span> <span class="ot">=</span> <span class="st">"location"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">NewClassification =</span> <span class="fu">case_when</span>(p_value <span class="sc">&lt;</span> <span class="fl">0.05</span> <span class="sc">~</span> classification,</span>
+<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>                                       p_value <span class="sc">&gt;=</span> <span class="fl">0.05</span> <span class="sc">~</span> <span class="st">"insignificant"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Visualise</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(ehsa_df) <span class="sc">+</span></span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span></span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(ehsa_df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(NewClassification <span class="sc">!=</span> <span class="st">"insignificant"</span>)) <span class="sc">+</span></span>
+<span id="cb98-6"><a href="#cb98-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"NewClassification"</span>) <span class="sc">+</span> </span>
+<span id="cb98-7"><a href="#cb98-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="take_home_ex02_files/figure-html/unnamed-chunk-79-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="observations-of-the-spatial-patterns" class="level2">
+<h2 class="anchored" data-anchor-id="observations-of-the-spatial-patterns">6.3 Observations of the spatial patterns</h2>
+<p>As aforementioned, most the places are categorised under <strong>oscillating hotspots</strong>. These points are evenly spread out throughout the province. This is because more sub-districts had higher vaccination rates over time.</p>
+<p>The second most number of places, under <strong>sporadic coldspots</strong> seem to be more clustered towards the Central municipality. This is because that region had the lowest relative vaccination rates, despite increasing over the year.</p>
+<p><strong>Oscillating coldspots</strong> are evenly spread out throughout the province, more so towards the provincial borders. This is because those regions started with the highest vaccination rates but were relatively less than its neighbours over time.</p>
+<p>Finally, with the fewest classes, the places where <strong>no patterns are detected</strong> seem to be mainly in the Central municipality.</p>
+</section>
+</section>
+<section id="acknowledgements" class="level1">
+<h1>7.0 Acknowledgements</h1>
+<hr>
+<p>I’d like to thank Professor Kam for his insights and resource materials provided under IS415 Geospatial Analytics and Applications.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
