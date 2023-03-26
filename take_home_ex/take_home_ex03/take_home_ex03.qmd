@@ -42,7 +42,7 @@ In this take-home exercise, you are tasked to predict HDB resale prices at the s
 -   tidyVerse - Used for data transformation and presentation
 
 ```{r}
-pacman::p_load(olsrr, corrplot, sf, spdep, tmap, tidyverse, gtsummary, sfdep, onemapsgapi, httr, rjson, plotly, ggplot2, GGally, units, matrixStats)
+pacman::p_load(olsrr, corrplot, sf, spdep, tmap, tidyverse, gtsummary, sfdep, onemapsgapi, httr, rjson, plotly, ggplot2, GGally, units, matrixStats, heatmaply, ggpubr, Metrics)
 ```
 
 # 3.0 Data Wrangling
@@ -52,7 +52,7 @@ pacman::p_load(olsrr, corrplot, sf, spdep, tmap, tidyverse, gtsummary, sfdep, on
 ## 3.1 Datasets Used
 
 | Type       | Name                                                                                                    |
-|--------------|----------------------------------------------------------|
+|-------------------|-----------------------------------------------------|
 | Aspatial   | [HDB Resale Data](https://data.gov.sg/dataset/resale-flat-prices)                                       |
 | Geospatial | [Singapore Subzones (base layer)](https://data.gov.sg/dataset/master-plan-2014-subzone-boundary-web)    |
 | Geospatial | [Bus Stops](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html?searchText=bus%20stop) |
@@ -114,78 +114,34 @@ This exercise will use four bedroom flats only and for a shorter time period - J
 ```{r}
 #| eval: false
 resale <- resale %>% 
-  filter(flat_type == "4 ROOM") %>%
-  filter(month >= "2021-01" & month <= "2022-12" | month >= "2023-01" & month <= "2023-02")
+  filter(flat_type == "3 ROOM") %>%
+  filter(month >= "2021-01" & month <= "2022-12" | month >= "2023-01" & month <= "2023-02") %>%
+  select(-c(town, flat_type, flat_model, lease_commence_date))  #drop irrelevant variables
 ```
 
 #### Glimpse
 
 ```{r}
 #| code-fold: true
-c = 25501 #nrow(resale)
+c = 13778 #nrow(resale)
 cat("The dataset now contains", c, "rows.")
 ```
 :::
 
-### 3.2.3 Remove Outliers
+### 3.2.3 Clean Up Variables
 
-Based on the boxplot below, there appear several outliers in resale_price of the 3 bedroom HDB units, especially on the higher side.
-
-```{r}
-#| eval: false
-#| code-fold: true
-
-plot <- ggplotly(ggplot(resale, aes(y= resale_price)) +
-  geom_boxplot())
-
-write_rds(plot, "data/aspatial/rds/boxplot.rds")
-
-```
-
-```{r}
-plot <- read_rds("data/aspatial/rds/boxplot.rds")
-plot
-```
-
-```{r}
-#| code-fold: true
-c = 1007500 #quantile(resale$resale_price, .95) + 1.5 * IQR(resale$resale_price)
-cat("Top 5% of resale prices are over -", c)
-```
-
-These outliers can induce a bias so the data points of the top 5% resale prices (prices over \$1,007,500) will be removed.
-
-```{r}
-#| eval: false
-#| code-fold: true
-is_outlier <- function(x) {
-  return(x > quantile(x, 0.95) + 1.5 * IQR(x))
-}
-resale <- resale %>%
-  mutate(outlier = ifelse(is_outlier(resale_price),  as.numeric(NA), 1))
-
-resale <- na.omit(resale)
-```
-
-```{r}
-#| code-fold: true
-c = 25418 #nrow(resale)
-cat("The dataset now contains", c, "rows.")
-```
-
-### 3.2.4 Clean Up Variables
-
-#### 3.2.4.1 Street Address
+#### 3.2.3.1 Street Address
 
 Extract full address with joint block and street name. This will later be used to get the corresponding latitude and longitude of the addresses.
 
 ```{r}
 #| eval: false
 resale <- resale %>%
-  mutate(resale, address = paste(block,street_name))
+  mutate(resale, address = paste(block,street_name)) %>%
+  select(-c(block, street_name)) #drop irrelevant variables
 ```
 
-#### 3.2.4.2 Remaining Lease
+#### 3.2.3.2 Remaining Lease
 
 Extract numeric value of remaining lease from text
 
@@ -209,9 +165,9 @@ resale<- resale |>
   mutate(remaining_lease=as.numeric(remaining_lease))
 ```
 
-#### 3.2.4.3 Floor Level
+#### 3.2.3.3 Floor Level
 
-The storey_range is a categorical variable with 16 categories - "01 TO 03", "04 TO 06" upto "46 TO 48". Keeping them as separate categories would induce high carnality into the model.
+The storey_range is a categorical variable with 15 categories - "01 TO 03", "04 TO 06" upto "46 TO 48". Keeping them as separate categories would induce high carnality into the model.
 
 The distribution of the storey_range is as follows -
 
@@ -232,7 +188,7 @@ For ease of use and to lower the carnality, the data will be categorised into 3 
 #| code-fold: true
 #get ordinal data of storey_range
 storey_text <- unique(resale$storey_range)
-storey_cat <- c(1,1,2,2, rep(3, 12))
+storey_cat <- c(1,1,2,2, rep(3, 11))
 
 #set label
 resale$storey_num <- storey_cat[match(resale$storey_range, storey_text)] 
@@ -240,32 +196,57 @@ levels(resale$storey_num) <- storey_text
 
 #change column to categorical data type
 resale<- resale |> 
-  mutate(storey_num=as.factor(storey_num))
+  mutate(storey_num=as.factor(storey_num)) |> 
+  select(-c(storey_range)) #drop irrelevant variables
 ```
 
-### 3.2.5 Data Visualisation
+### 3.2.4 Data Normalisation
 
-Visualise how ressale_price pairs with all other numeric variables
+**View Distribution**
 
 ```{r}
 #| eval: false
 #| code-fold: true
-pairs <- ggpairs(resale |> select(floor_area_sqm, remaining_lease, storey_num, resale_price))
-plots <- lapply(1:pairs$ncol, function(j) getPlot(pairs, i = 4, j = j))
-ggmatrix(
-    plots,
-    nrow = 1,
-    ncol = pairs$ncol,
-    xAxisLabels = pairs$xAxisLabels,
-    yAxisLabels = "resale_price"
-)
+factors <- c("floor_area_sqm","remaining_lease", "resale_price")
+factors_hist <- vector(mode = "list", length = 3)
+for (i in factors) {
+  hist_plot <- ggplot(resale, aes_string(x = i)) +
+    geom_histogram(fill = "lightblue3") +
+    labs(title = i) +
+    theme(axis.title = element_blank())
+  
+  factors_hist[[i]] <- hist_plot
+}
+ggarrange(plotlist = factors_hist, ncol = 3, nrow = 1)
 ```
 
-![](pairplot.png)
+![](bef_transform.png)
 
-Based on an initial glance, higher floor_area_sqm seems to increase resale price to a certain extent, remaining_lease directly increases resale_price, and higher storey_num increases resale_price significantly when it's in the 13-48 storey range.
+Based on the distribution, floor_area_sqm seems to follow a normal distribution, remaining_lease seems to have two peaks around 55- 65 years and 93 years so a normal distribution is assumed. Finally, resale_price seems to be highly right skewed which required further transformation.
 
-### 3.2.6 Get Latitude and Longitude
+**Transform data**
+
+```{r}
+#| eval: false
+#log transformation for right skewed data
+resale$resale_price <- log10(resale$resale_price)
+```
+
+**View Distribution**
+
+```{r}
+#| eval: false
+#| code-fold: true
+ggplot(resale, aes_string(x = "resale_price")) +
+    geom_histogram(fill = "lightblue4") +
+    labs(title = "resale_price") +
+    theme(axis.title = element_blank())
+
+```
+
+![](aft_transform.png)
+
+### 3.2.5 Get Latitude and Longitude
 
 Extract latitude, longitude and postal code of all addresses and store into temporary data frame for further inspection
 
@@ -304,7 +285,7 @@ for (i in add_list) {
 }
 ```
 
-#### 3.2.6.1 Check for missing values
+#### 3.2.5.1 Check for missing values
 
 ```{r}
 #| eval: false
@@ -315,78 +296,66 @@ postal_coords[(is.na(postal_coords$postal) | is.na(postal_coords$latitude) | is.
 
 After looking up the addresses on Google Maps, these were postal codes found.
 
-| address                 | postal |
-|-------------------------|--------|
-| 154 HOUGANG ST 11       | 530154 |
-| 215 CHOA CHU KANG CTRL  | 680215 |
-| 216 CHOA CHU KANG CTRL  | 680216 |
-| 220 SERANGOON AVE 4     | 550220 |
-| 273 TAMPINES ST 22      | 520273 |
-| 304 UBI AVE 1           | 400304 |
-| 322 YISHUN CTRL         | 760322 |
-| 361 HOUGANG AVE 5       | 310083 |
-| 386 BT BATOK WEST AVE 5 | 650386 |
-| 407 YISHUN AVE 6        | 760407 |
-| 447 CHOA CHU KANG AVE 4 | 680447 |
-| 620 WOODLANDS DR 52     | 730620 |
-| 639 PASIR RIS DR 1      | 510639 |
+| address             | postal |
+|---------------------|--------|
+| 154 HOUGANG ST 11   | 530154 |
+| 220 SERANGOON AVE 4 | 550220 |
+| 273 TAMPINES ST 22  | 520273 |
+| 304 UBI AVE 1       | 400304 |
+| 83 LOR 2 TOA PAYOH  | 310083 |
 
-Append found postal codes to the postal coords data frame
+: Append found postal codes to the postal coords data frame
 
 ```{r}
 #| eval: false
 #| code-fold: true
-indices = c(786, 1331, 1339, 1405, 1920, 2216, 2434, 2760, 2833, 2951, 3357, 4429, 4578)
-postal_codes = c("530154", "680215", "680216", "550220", "520273", "400304", "760322", "310083", "650386", "760407", "680447", "730620", "510639")
+indices = c(469, 813, 1053, 1156, 2493)
+postal_codes = c("530154", "550220", "520273", "400304", "310083")
 
 for (i in 1:length(indices)) {
   postal_coords$postal[indices[i]] <- postal_codes[i]
 }
 ```
 
-#### 3.2.6.2 Join into main apsatial data frame
+#### 3.2.5.2 Join into main apsatial data frame
 
 ```{r}
 #| eval: false
-rs_coords <- left_join(resale, postal_coords, by = c('address' = 'address'))
+resale <- left_join(resale, postal_coords, by = c('address' = 'address')) %>%
+  select(-c(address, postal)) #drop irrelevant variables
 ```
 
-#### 3.2.6.3 Convert to sf object
+#### 3.2.5.3 Convert to sf object
 
 ```{r}
 #| eval: false
-rs_coords <- st_as_sf(rs_coords, 
-                      coords = c("longitude", "latitude"),
-                      crs = 3414)
+resale <- st_as_sf(resale, 
+                   coords = c("longitude", "latitude"),
+                   crs = 4326) %>%
+  st_transform(crs = 3414)
 ```
 
-#### 3.2.6.4 Visualise resale price
+#### 3.2.5.4 Visualise resale price
 
 ```{r}
 #| eval: false
-plot(rs_coords["resale_price"], key.pos = 4)
+plot(resale["resale_price"], key.pos = 4)
 ```
 
 ![](plot_resale.png){width="1215"}
 
-Although this is simply an initial visualisation of the dataset, it shows a brief idea of the spread of the sales across Singapore. There is a slight clustering near the central region indicating the prices are different from the rest of the region. This is a useful indicator for variable selection.
+Although this is simply an initial visualisation of the dataset, it shows a brief idea of the spread of the sales across Singapore. There is a slight clustering near the central region indicating the prices are higher than the rest of the region. This is a useful indicator for variable selection.
 
-### 3.2.7 Retain relevant fields
+### 3.2.6 Save Checkpoint as RDS file
 
-```{r}
-#| eval: false
-rs_coords <- subset(rs_coords, 
-                    select = c(month, storey_num, floor_area_sqm, remaining_lease, resale_price))
-```
-
-### 3.2.8 Write file to RDS
+Save file
 
 ```{r}
 #| eval: false
-write_rds(rs_coords, "data/aspatial/rds/resale.rds")
+write_rds(resale, "data/aspatial/rds/resale.rds")
 ```
 
-### 3.2.9 Read RDS file
+Read File
 
 ```{r}
 resale <- read_rds("data/aspatial/rds/resale.rds")
@@ -428,6 +397,7 @@ token <- "your token"
 #### Base Map
 
 ```{r}
+#| eval: false
 mpsz <- st_read(dsn = "data/geospatial/base", layer="MP14_SUBZONE_WEB_PL") %>%
   st_transform(crs = 3414)
 ```
@@ -437,6 +407,7 @@ mpsz <- st_read(dsn = "data/geospatial/base", layer="MP14_SUBZONE_WEB_PL") %>%
 **Bus Stop**
 
 ```{r}
+#| eval: false
 busstop <- st_read(dsn = "data/geospatial/transport/BusStop", layer="BusStop") %>%
   st_transform(crs = 3414) %>%
   select(1)
@@ -459,6 +430,7 @@ st_write(obj = mrt,
 ```
 
 ```{r}
+#| eval: false
 #read shapefile
 mrt <- st_read(dsn= "data/geospatial/transport/MRT", layer = "MRT") %>%
   st_transform(crs = 3414) %>%
@@ -483,6 +455,7 @@ st_write(obj = kindergartens,
 ```
 
 ```{r}
+#| eval: false
 kindergartens <- st_read(dsn = "data/geospatial/education/kindergartens", layer = "kindergartens") %>%
   st_transform(crs = 3414) %>%
   select(1)
@@ -504,6 +477,7 @@ st_write(obj = childcare,
 ```
 
 ```{r}
+#| eval: false
 childcare <- st_read(dsn = "data/geospatial/education/childcare", layer = "childcare") %>%
   st_transform(crs = 3414) %>%
   select(1)
@@ -576,6 +550,7 @@ st_write(obj = primary_schools,
 ```
 
 ```{r}
+#| eval: false
 primary_schools <- st_read(dsn = "data/geospatial/education/primary_schools", layer = "primary_schools") %>%
   st_transform(crs = 3414) %>%
   select(1)
@@ -608,6 +583,7 @@ st_write(obj = good_primary_schools,
 ```
 
 ```{r}
+#| eval: false
 good_primary_schools <- st_read(dsn = "data/geospatial/education/good_primary_schools", layer = "good_primary_schools") %>%
   st_transform(crs = 3414) %>%
   select(1)
@@ -638,6 +614,7 @@ st_write(obj = sport_facilities,
 ```
 
 ```{r}
+#| eval: false
 sport_facilities <- st_read(dsn = "data/geospatial/sports/sport_facilities", layer = "sport_facilities") %>%
   st_transform(crs = 3414) %>%
   select(1)
@@ -660,6 +637,7 @@ st_write(obj = parks,
 ```
 
 ```{r}
+#| eval: false
 #read shapefile
 parks <- st_read(dsn= "data/geospatial/sports/parks", layer = "parks") %>%
   st_transform(crs = 3414) %>%
@@ -683,6 +661,7 @@ st_write(obj = gyms,
 ```
 
 ```{r}
+#| eval: false
 #read shapefile
 gyms <- st_read(dsn= "data/geospatial/sports/gyms", layer = "gyms") %>%
   st_transform(crs = 3414) %>%
@@ -706,6 +685,7 @@ st_write(obj = watersites,
 ```
 
 ```{r}
+#| eval: false
 #read shapefile
 watersites <- st_read(dsn= "data/geospatial/sports/watersites", layer = "watersites") %>%
   st_transform(crs = 3414) %>%
@@ -731,6 +711,7 @@ st_write(obj = hawker_centers,
 ```
 
 ```{r}
+#| eval: false
 #read shapefile
 hawker_centers <- st_read(dsn= "data/geospatial/amenities/hawker_centers", layer = "hawker_centers") %>%
   st_transform(crs = 3414) %>%
@@ -754,6 +735,7 @@ st_write(obj = supermarkets,
 ```
 
 ```{r}
+#| eval: false
 #read shapefile
 supermarkets <- st_read(dsn= "data/geospatial/amenities/supermarkets", layer = "supermarkets") %>%
   st_transform(crs = 3414) %>%
@@ -776,6 +758,7 @@ st_write(obj = eldercare,
 ```
 
 ```{r}
+#| eval: false
 eldercare <- st_read(dsn = "data/geospatial/amenities/eldercare", layer = "eldercare") %>%
   st_transform(crs = 3414) %>%
   select(1)
@@ -788,6 +771,7 @@ eldercare <- st_read(dsn = "data/geospatial/amenities/eldercare", layer = "elder
 As the 'Downtown Core' is also referred to as the Central Business District (CBD), the coordinates of 'Downtown Core' shall be used. Based on the information [here](https://www.latlong.net/place/downtown-core-singapore-20616.html), the latitude is 1.287953 and longitude is 103.851784
 
 ```{r}
+#| eval: false
 cbd <- st_as_sf(data.frame(name = c("CBD Area"), latitude = c(1.287953), longitude = c(103.851784)),
                 coords = c("longitude", "latitude"),
                 crs = 3414)
@@ -810,6 +794,7 @@ st_write(obj = supermarkets,
 ```
 
 ```{r}
+#| eval: false
 #read shapefile
 waste_disposal <- st_read(dsn= "data/geospatial/others/waste_disposal", layer = "waste_disposal") %>%
   st_transform(crs = 3414) %>%
@@ -833,6 +818,7 @@ st_write(obj = cemeteries,
 ```
 
 ```{r}
+#| eval: false
 #read shapefile
 cemeteries <- st_read(dsn= "data/geospatial/others/active_cemeteries", layer = "cemeteries") %>%
   st_transform(crs = 3414) %>%
@@ -856,6 +842,7 @@ st_write(obj = historic_sites,
 ```
 
 ```{r}
+#| eval: false
 #read shapefile
 historic_sites <- st_read(dsn= "data/geospatial/others/historic_sites", layer = "historic_sites") %>%
   st_transform(crs = 3414) %>%
@@ -869,30 +856,37 @@ historic_sites <- st_read(dsn= "data/geospatial/others/historic_sites", layer = 
 
 ```{r}
 #| code-fold: true
-cat("There are", length(which(st_is_valid(mpsz) == FALSE)) , "invalid geometries in the base layer. This shall be resolved in the following step.")
+c <- 9 #length(which(st_is_valid(mpsz) == FALSE))
+cat("There are", c , "invalid geometries in the base layer. This shall be resolved in the following step.")
 ```
 
 ```{r}
+#| eval: false
 mpsz <- st_make_valid(mpsz)
 ```
 
 ```{r}
 #| code-fold: true
-cat("There are now", length(which(st_is_valid(mpsz) == FALSE)) , "invalid geometries in the base layer.")
+c <- 0 #length(which(st_is_valid(mpsz) == FALSE))
+cat("There are now", c , "invalid geometries in the base layer.")
 ```
 
 #### 3.3.2.2 Geospatial Factors
 
 ```{r}
+#| eval: false
 #| code-fold: true
 df_list <- c("busstop", "cbd", "cemeteries", "childcare", "eldercare", "good_primary_schools", "gyms", "hawker_centers", "historic_sites", "kindergartens", "mrt", "parks", "primary_schools", "sport_facilities", "supermarkets", "waste_disposal", "watersites")
 
 c = 0 
-
 for(i in df_list) {
   c = c + length(which(st_is_valid(eval(parse(text = i))) == FALSE))
 }
+```
 
+```{r}
+#| code-fold: true
+c = 0 
 cat("There are", c , "invalid geometries in the geospatial factors")
 ```
 
@@ -902,17 +896,24 @@ cat("There are", c , "invalid geometries in the geospatial factors")
 
 ```{r}
 #| code-fold: true
-cat("There are", sum(is.na(mpsz)) , "missing values in the base layer.")
+c = 0 #sum(is.na(mpsz))
+cat("There are", c , "missing values in the base layer.")
 ```
 
 #### 3.3.3.2 Geospatial Factors
 
 ```{r}
+#| eval: false
 #| code-fold: true
 c = 0 
 for(i in df_list) {
   c = c + sum(is.na(mpsz))
 }
+```
+
+```{r}
+#| code-fold: true
+c = 0
 cat("There are", c , "missing values in the geospatial factors.")
 ```
 
@@ -921,18 +922,23 @@ cat("There are", c , "missing values in the geospatial factors.")
 #### 3.3.4.1 Base layer
 
 ```{r}
+#| eval: false
 st_crs(mpsz)[1]$input
 ```
+
+![](CRS/base.png){width="161"}
 
 #### 3.3.4.2 Geospatial Factors
 
 ```{r}
+#| eval: false
 #| code-fold: true
 for(i in df_list) {
   cat(i, st_crs(eval(parse(text = i)))[1]$input, "\n")
 }
-
 ```
+
+![](CRS/factors.png){width="231"}
 
 ## 3.4 Visualise Data
 
@@ -1049,58 +1055,23 @@ tm_shape(historic_sites) +
 ## 4.1 Proximity Calculation
 
 ```{r}
-# get_prox <- function(origin_df, dest_df, col_name){
-#   
-#   # creates a matrix of distances
-#   dist_matrix <- st_distance(origin_df, dest_df)           
-#   
-#   # find the nearest location_factor and create new data frame
-#   near <- origin_df %>% 
-#     mutate(PROX = apply(dist_matrix, 1, function(x) min(x)) / 1000) 
-#   
-#   # rename column name according to input parameter
-#   names(near)[names(near) == 'PROX'] <- col_name
-# 
-#   # Return df
-#   return(near)
-# }
-```
-
-```{r}
-# resale <- get_prox(resale, kindergartens, "PROX_Kindergartens") 
-```
-
-```{r}
-# resale <- proximity(resale, cbd, "PROX_CBD")
-# 
-# resale <- proximity(resale, eldercare, "PROX_ELDERCARE")
-#
-# resale <- proximity(resale, hawker_centers, "PROX_HAWKER_CENTRES")
-# 
-# resale <- proximity(resale, childcare, "PROX_CHILDCARE")
-# 
-# resale <- proximity(resale, kindergartens, "PROX_KINDERGARTENS")
-# 
-# resale <- proximity(resale, parks, "PROX_PARKS")
-
-```
-
-```{r}
-# for(i in df_list) {
-#   dist_matrix <- st_distance(resale, eval(parse(text = i))) |> drop_units()
-#   resale[,paste("PROX_",toupper(i), sep = "")] <- rowMins(dist_matrix)
-# }
+#| eval: false
+for(i in df_list) {
+  dist_matrix <- st_distance(resale, eval(parse(text = i))) |> drop_units()
+  resale[,paste("PROX_",toupper(i), sep = "")] <- rowMins(dist_matrix)
+}
 ```
 
 ## 4.2 Count in range Calculation
 
 ```{r}
-# num_list <- c("kindergartens", "childcare", "busstop", "primary_schools")
-# radius_list <- c(350, 350, 350, 1000)
-# for(i in 1:4) {
-#   dist_matrix <- st_distance(resale, eval(parse(text = num_list[i]))) |> drop_units()
-#   resale[,paste("NUM_",toupper(num_list[i]), sep = "")] <- rowSums(dist_matrix <= radius_list[i])
-# }
+#| eval: false
+num_list <- c("kindergartens", "childcare", "busstop", "primary_schools")
+radius_list <- c(350, 350, 350, 1000)
+for(i in 1:4) {
+  dist_matrix <- st_distance(resale, eval(parse(text = num_list[i]))) |> drop_units()
+  resale[,paste("NUM_",toupper(num_list[i]),"_WITHIN_",radius_list[i],"M", sep = "")] <- rowSums(dist_matrix <= radius_list[i])
+}
 ```
 
 ## 4.3 Save checkpoint as RDS file
@@ -1108,13 +1079,24 @@ tm_shape(historic_sites) +
 Save file
 
 ```{r}
-# write_rds(resale, "data/rds/resale.rds")
+#| eval: false
+write_rds(resale, "data/rds/resale.rds")
 ```
 
 Read file
 
 ```{r}
-# resale <- read_rds("data/rds/resale.rds")
+#| code-fold: true
+df_list <- c("busstop", "cbd", "cemeteries", "childcare", "eldercare", "good_primary_schools", "gyms", "hawker_centers", "historic_sites", "kindergartens", "mrt", "parks", "primary_schools", "sport_facilities", "supermarkets", "waste_disposal", "watersites")
+prox <- paste("PROX_",toupper(df_list), sep="")
+others <- c("floor_area_sqm", "remaining_lease", "NUM_KINDERGARTENS_WITHIN_350M", "NUM_CHILDCARE_WITHIN_350M", "NUM_BUSSTOP_WITHIN_350M", "NUM_PRIMARY_SCHOOLS_WITHIN_1000M", "resale_price")
+df_list <- c(prox, others)
+```
+
+```{r}
+resale <- read_rds("data/rds/resale.rds") %>%
+  select(df_list) %>%
+  st_drop_geometry()
 ```
 
 ## 4.4 Data Preparation
@@ -1124,62 +1106,143 @@ Read file
 To check for multicolinearity
 
 ```{r}
-# cor(corr)
-```
-
-```{r}
+#| eval: false
 #| code-fold: true
-# corr <- resale |>
-#   st_drop_geometry() |>
-#   select_if(is.numeric) |>
-#   select(-resale_price)
-#   
-# corrplot(cor(corr), 
-#          diag = FALSE,
-#          #order = "AOE",
-#          tl.pos = "td",
-#          tl.cex = 0.5,
-#          method = "number", 
-#            type = "upper")
+corr <- resale |>
+  select_if(is.numeric) |>
+  select(-resale_price)
+
+corrplot(cor(corr),
+         diag = FALSE,
+         order = "AOE",
+         tl.pos = "td",
+         tl.cex = 0.5,
+         method = "number",
+           type = "upper")
 ```
 
-While variables don't have perfect correlation with other variables, PROX_WATERSITES, PROX_WASTE_DISPOSAL, PROX_CEMETERIES, PROX_BUSSTOP, PROX_HISTORIC_SITES, PROX_GYMS, PROX_CHILDCARE, PROX_ELDERCARE, PROX_WATERSITES have high correlation (\> 0.99) with other variables so they will be discarded
+![](corr_matrix.png)
 
-```{r}
-# resale <- subset(resale, select = -c(PROX_WATERSITES, PROX_WASTE_DISPOSAL, PROX_CEMETERIES, PROX_SPORT_FACILITIES,  PROX_SUPERMARKETS, PROX_BUSSTOP, PROX_HISTORIC_SITES, PROX_HAWKER_CENTERS, PROX_GYMS, PROX_CHILDCARE, PROX_ELDERCARE, PROX_WATERSITES))
-```
+Variables are not correlated to each other so all values can be selected for the model
 
 ### 4.4.2 Data Sampling
 
 Seperate data into train and test. Train data - all transactions between Jan 01 2021 to Dec 31 2021. Test data - Jan 01 2023 to Feb 28 2023
 
 ```{r}
-# train_data<-resale |> 
-#   filter(month >= "2021-01" & month <= "2022-12")
-# 
-# test_data<-resale |> 
-#   filter(month >= "2023-01" & month <= "2023-02")
+#| eval: false
+train_data<-resale |>
+  filter(month >= "2021-01" & month <= "2022-12") |>
+  select(-c(month))
+
+test_data<-resale |>
+  filter(month >= "2023-01" & month <= "2023-02") |>
+  select(-c(month))
 ```
 
 #### 4.4.2.1 Save Train and Test data as Checkpoint
 
+Save file
+
 ```{r}
-# write_rds(train_data, "data/rds/train_data.rds")
-# write_rds(test_data, "data/rds/test_data.rds")
+#| eval: false
+write_rds(train_data, "data/rds/train_data.rds")
+write_rds(test_data, "data/rds/test_data.rds")
+```
+
+Read file
+
+```{r}
+train_data <- read_rds("data/rds/train_data.rds")
+test_data <- read_rds("data/rds/test_data.rds")
 ```
 
 ## 4.5 OLS method
 
+Non Spatial Multiple Linear Regression using OLS method
+
+### 4.5.1 Train model
+
 ```{r}
-# mlr<- lm(resale_price ~ storey_num + floor_area_sqm + remaining_lease + PROX_KINDERGARTENS + PROX_CBD + PROX_MRT + NUM_KINDERGARTENS + NUM_CHILDCARE + NUM_BUSSTOP + NUM_PRIMARY_SCHOOLS, data=train_data)
-# 
-# # save result
-# write_rds(mlr, "data/rds/mlr.rds")
+#| eval: false
+#| code-fold: true
+mlr<- lm(resale_price ~ floor_area_sqm + remaining_lease + PROX_BUSSTOP + PROX_CBD + PROX_CEMETERIES + PROX_CHILDCARE + PROX_ELDERCARE + PROX_GOOD_PRIMARY_SCHOOLS + PROX_GYMS + PROX_HAWKER_CENTERS + PROX_HISTORIC_SITES + PROX_KINDERGARTENS + PROX_MRT + PROX_PARKS + PROX_PRIMARY_SCHOOLS + PROX_SPORT_FACILITIES + PROX_SUPERMARKETS + PROX_WASTE_DISPOSAL + PROX_WATERSITES + NUM_KINDERGARTENS_WITHIN_350M + NUM_CHILDCARE_WITHIN_350M + NUM_BUSSTOP_WITHIN_350M + NUM_BUSSTOP_WITHIN_350M,
+         data = train_data)
+
+# save result
+write_rds(mlr, "data/rds/mlr.rds")
 ```
 
 Summary
 
 ```{r}
-# mlr<-read_rds("data/rds/mlr.rds")
-# gtsummary::tbl_regression(mlr)
+mlr<-read_rds("data/rds/mlr.rds")
+ols_regress(mlr)
 ```
+
+With a final adjusted R squared of 61.6%, the model does show scope for imporvement especially in terms of reducing cardinality by removing variables like proximity to waste disposal sites and other variables with low significance (p value \< 0.05)
+
+### 4.5.2 Check Model
+
+::: panel-tabset
+#### Multicolinearity
+
+```{r}
+ols_vif_tol(mlr)
+```
+
+All values are less than 10 which means the variables are not multicolinear.
+
+#### Non-Linearity
+
+```{r}
+ols_plot_resid_fit(mlr)
+```
+
+As most of the variables are scattered around the 0 line, the relationships between the dependent variable and independent variables are linear.
+
+#### Normality Assumption 
+
+```{r}
+ols_plot_resid_hist(mlr)
+```
+
+Normal distribution is followed
+:::
+
+### 4.5.3 Test Model
+
+#### 4.5.3.1 Generate Predictions
+
+```{r}
+#| eval: false
+mlr_pred <- as.data.frame(predict(mlr, 
+                    newdata = test_data, 
+                    interval = 'confidence'))
+
+#Store as RDS
+test_data_mlr <- cbind(test_data, mlr_pred)
+write_rds(test_data_mlr, "data/rds/test_data_mlr.rds")
+```
+
+#### 4.5.3.2 Root Mean Square Error (RSME)
+
+```{r}
+#| code-fold: true
+test_data_mlr <- read_rds("data/rds/test_data_mlr.rds")
+rmse(test_data_mlr$resale_price, test_data_mlr$fit)
+```
+
+As the value is less than 0.1, it means the model is able to satisfactory predictions.
+
+#### 4.5.3.3 Visualise 
+
+Actual vs. predicted values
+
+```{r}
+ggplot(data = test_data_mlr,
+       aes(x = fit, y = resale_price)) +
+  geom_point()
+```
+
+## 4.6 GWR predictive method

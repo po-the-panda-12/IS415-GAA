@@ -1,5 +1,5 @@
 ---
-title: "Hands-on Exercise 2: Choropleth Mapping with R"
+title: "Hands-on Exercise 3: Choropleth Mapping with R"
 date: "30 January 2023"
 execute: 
   eval: true
@@ -193,7 +193,7 @@ tm_shape(mpsz_pop2020)+
 
 Notice that the choropleth map is shaded in green.
 
-To reverse the colour shading, add a \"-\" prefix.
+To reverse the colour shading, add a "-" prefix.
 
 ```{r}
 tm_shape(mpsz_pop2020)+
