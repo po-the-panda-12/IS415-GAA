@@ -15,7 +15,9 @@ editor: visual
 
 ## 1.1 Background
 
-HDB Pricing
+Housing is an essential component of household wealth worldwide. Buying a housing has always been a major investment for most people. The price of housing is affected by many factors. Some of them are global in nature such as the general economy of a country or inflation rate. Others can be more specific to the properties themselves. These factors can be further divided to structural and locational factors. Structural factors are variables related to the property themselves such as the size, fitting, and tenure of the property. Locational factors are variables related to the neighbourhood of the properties such as proximity to childcare centre, public transport service and shopping centre.
+
+Conventional, housing resale prices predictive models were built by using [**Ordinary Least Square (OLS)**](https://en.wikipedia.org/wiki/Ordinary_least_squares) method. However, this method failed to take into consideration that spatial autocorrelation and spatial heterogeneity exist in geographic data sets such as housing transactions. With the existence of spatial autocorrelation, the OLS estimation of predictive housing resale pricing models could lead to biased, inconsistent, or inefficient results (Anselin 1998). In view of this limitation, **Geographical Weighted Models** were introduced for calibrating predictive model for housing resale prices.
 
 ## 1.2 Task
 
@@ -27,22 +29,22 @@ In this take-home exercise, you are tasked to predict HDB resale prices at the s
 
 ## 2.1 Import Packages
 
--   sf - Used for handling geospatial data
+-   sf, spdep, sfdep - Used for handling geospatial data
 
--   sfdep - Used for functions not in spdep
+-   tmap, plotly, ggplot2, corrplot - Used for visualizing dataframes and plots
 
--   tmap, maptools, kableExtra, plotly - Used for visualizing dataframes and plots
+-   units, maxtrixStats - Used for computing proximity matrix
 
--   lubridate - Used for handling datetime
+-   ggpubr, olsrr, GWmodel, SpatialML - Used for model creation
 
--   tidyr - Used for changing the shape and hierarchy of dataframe
-
--   readxl - to read excel data (.xlsx files)
+-   Metrics - Used for calculating rmse
 
 -   tidyVerse - Used for data transformation and presentation
 
+-   onemapsgapi, httr, rjson - Used for data collection and wrangling
+
 ```{r}
-pacman::p_load(olsrr, corrplot, sf, spdep, tmap, tidyverse, gtsummary, sfdep, onemapsgapi, httr, rjson, plotly, ggplot2, GGally, units, matrixStats, heatmaply, ggpubr, Metrics)
+pacman::p_load(olsrr, corrplot, sf, spdep, tmap, tidyverse, sfdep, onemapsgapi, httr, rjson, plotly, ggplot2, units, matrixStats, heatmaply, ggpubr, Metrics, GWmodel, SpatialML)
 ```
 
 # 3.0 Data Wrangling
@@ -51,25 +53,25 @@ pacman::p_load(olsrr, corrplot, sf, spdep, tmap, tidyverse, gtsummary, sfdep, on
 
 ## 3.1 Datasets Used
 
-| Type       | Name                                                                                                    |
-|-------------------|-----------------------------------------------------|
-| Aspatial   | [HDB Resale Data](https://data.gov.sg/dataset/resale-flat-prices)                                       |
-| Geospatial | [Singapore Subzones (base layer)](https://data.gov.sg/dataset/master-plan-2014-subzone-boundary-web)    |
-| Geospatial | [Bus Stops](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html?searchText=bus%20stop) |
-| Geospatial | [MRT Station Exits](https://data.gov.sg/dataset/lta-mrt-station-exit)                                   |
-| Geospatial | [Kindergartens](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                       |
-| Geospatial | [Childcare](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                           |
-| Geospatial | [Primary Schools](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                     |
-| Geospatial | [Sports Facilities](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                   |
-| Geospatial | [Parks](https://data.gov.sg/dataset/parks)                                                              |
-| Geospatial | [Gyms](https://data.gov.sg/dataset/gymssg)                                                              |
-| Geospatial | [Water Sites](https://data.gov.sg/dataset/abc-waters-sites)                                             |
-| Geospatial | [Hawker Centers](https://data.gov.sg/dataset/hawker-centres)                                            |
-| Geospatial | [Supermarkets](https://data.gov.sg/dataset/supermarkets)                                                |
-| Geospatial | [Eldercare](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                           |
-| Geospatial | [Waste Disposal](https://data.gov.sg/dataset/waste-treatment)                                           |
-| Geospatial | [Active Cemeteries](https://data.gov.sg/dataset/active-cemeteries)                                      |
-| Geospatial | [Historic Sites](https://data.gov.sg/dataset/historic-sites)                                            |
+| Type                | Name                                                                                                    |
+|-----------------------------|-------------------------------------------|
+| Aspatial            | [HDB Resale Data](https://data.gov.sg/dataset/resale-flat-prices)                                       |
+| Geospatial          | [Singapore Subzones (base layer)](https://data.gov.sg/dataset/master-plan-2014-subzone-boundary-web)    |
+| Geospatial (factor) | [Bus Stops](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html?searchText=bus%20stop) |
+| Geospatial (factor) | [MRT Station Exits](https://data.gov.sg/dataset/lta-mrt-station-exit)                                   |
+| Geospatial (factor) | [Kindergartens](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                       |
+| Geospatial (factor) | [Childcare](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                           |
+| Geospatial (factor) | [Primary Schools](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                     |
+| Geospatial (factor) | [Sports Facilities](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                   |
+| Geospatial (factor) | [Parks](https://data.gov.sg/dataset/parks)                                                              |
+| Geospatial (factor) | [Gyms](https://data.gov.sg/dataset/gymssg)                                                              |
+| Geospatial (factor) | [Water Sites](https://data.gov.sg/dataset/abc-waters-sites)                                             |
+| Geospatial (factor) | [Hawker Centers](https://data.gov.sg/dataset/hawker-centres)                                            |
+| Geospatial (factor) | [Supermarkets](https://data.gov.sg/dataset/supermarkets)                                                |
+| Geospatial (factor) | [Eldercare](https://www.onemap.gov.sg/docs/#onemap-rest-apis)                                           |
+| Geospatial (factor) | [Waste Disposal](https://data.gov.sg/dataset/waste-treatment)                                           |
+| Geospatial (factor) | [Active Cemeteries](https://data.gov.sg/dataset/active-cemeteries)                                      |
+| Geospatial (factor) | [Historic Sites](https://data.gov.sg/dataset/historic-sites)                                            |
 
 ## 3.2 Aspatial Data
 
@@ -365,25 +367,51 @@ resale <- read_rds("data/aspatial/rds/resale.rds")
 
 The geospatial data used is the base map layer of Singapore and locational factors. For ease of use, the factors will be grouped by category (transport, education, sports, amenities and others).
 
-| Category      | Geospatial Factor    | Reason |
-|---------------|----------------------|--------|
-| **Transport** | Bus Stop             |        |
-|               | MRT                  |        |
-| **Education** | Kindergartens        |        |
-|               | Childcare            |        |
-|               | Primary Schools      |        |
-|               | Good Primary Schools |        |
-| **Sports**    | Sports Facilities    |        |
-|               | Parks                |        |
-|               | Gym                  |        |
-|               | Water Sites          |        |
-| **Amenities** | Hawker Center        |        |
-|               | Supermarket          |        |
-|               | Eldercare            |        |
-| **Others**    | CBD Area             |        |
-|               | Waste Disposal       |        |
-|               | Active Cemeteries    |        |
-|               | Historic Sites       |        |
+::: panel-tabset
+#### Transport
+
+-   Bus Stop
+
+-   MRT
+
+#### Education
+
+-   Kindergartens
+
+-   Childcare
+
+-   Primary Schools
+
+-   Good Primary Schools
+
+#### Sports
+
+-   Sports Facilities
+
+-   Parks
+
+-   Gyms
+
+-   Water Sites
+
+#### Amenities
+
+-   Hawker Centers
+
+-   Supermarkets
+
+-   Eldercare
+
+#### Others
+
+-   CBD Area
+
+-   Waste Disposal
+
+-   Active Cemeteries
+
+-   Historic Sites
+:::
 
 ### 3.3.1 Load Data and Transform CRS
 
@@ -1052,6 +1080,8 @@ tm_shape(historic_sites) +
 
 # 4.0 Regression Modelling
 
+------------------------------------------------------------------------
+
 ## 4.1 Proximity Calculation
 
 ```{r}
@@ -1089,14 +1119,13 @@ Read file
 #| code-fold: true
 df_list <- c("busstop", "cbd", "cemeteries", "childcare", "eldercare", "good_primary_schools", "gyms", "hawker_centers", "historic_sites", "kindergartens", "mrt", "parks", "primary_schools", "sport_facilities", "supermarkets", "waste_disposal", "watersites")
 prox <- paste("PROX_",toupper(df_list), sep="")
-others <- c("floor_area_sqm", "remaining_lease", "NUM_KINDERGARTENS_WITHIN_350M", "NUM_CHILDCARE_WITHIN_350M", "NUM_BUSSTOP_WITHIN_350M", "NUM_PRIMARY_SCHOOLS_WITHIN_1000M", "resale_price")
+others <- c("floor_area_sqm", "remaining_lease", "storey_num", "NUM_KINDERGARTENS_WITHIN_350M", "NUM_CHILDCARE_WITHIN_350M", "NUM_BUSSTOP_WITHIN_350M", "NUM_PRIMARY_SCHOOLS_WITHIN_1000M", "resale_price", "month")
 df_list <- c(prox, others)
 ```
 
 ```{r}
 resale <- read_rds("data/rds/resale.rds") %>%
-  select(df_list) %>%
-  st_drop_geometry()
+  select(df_list)
 ```
 
 ## 4.4 Data Preparation
@@ -1110,6 +1139,7 @@ To check for multicolinearity
 #| code-fold: true
 corr <- resale |>
   select_if(is.numeric) |>
+  st_drop_geometry() |>
   select(-resale_price)
 
 corrplot(cor(corr),
@@ -1166,7 +1196,7 @@ Non Spatial Multiple Linear Regression using OLS method
 ```{r}
 #| eval: false
 #| code-fold: true
-mlr<- lm(resale_price ~ floor_area_sqm + remaining_lease + PROX_BUSSTOP + PROX_CBD + PROX_CEMETERIES + PROX_CHILDCARE + PROX_ELDERCARE + PROX_GOOD_PRIMARY_SCHOOLS + PROX_GYMS + PROX_HAWKER_CENTERS + PROX_HISTORIC_SITES + PROX_KINDERGARTENS + PROX_MRT + PROX_PARKS + PROX_PRIMARY_SCHOOLS + PROX_SPORT_FACILITIES + PROX_SUPERMARKETS + PROX_WASTE_DISPOSAL + PROX_WATERSITES + NUM_KINDERGARTENS_WITHIN_350M + NUM_CHILDCARE_WITHIN_350M + NUM_BUSSTOP_WITHIN_350M + NUM_BUSSTOP_WITHIN_350M,
+mlr<- lm(resale_price ~ floor_area_sqm + remaining_lease + storey_num + PROX_BUSSTOP + PROX_CBD + PROX_CEMETERIES + PROX_CHILDCARE + PROX_ELDERCARE + PROX_GOOD_PRIMARY_SCHOOLS + PROX_GYMS + PROX_HAWKER_CENTERS + PROX_HISTORIC_SITES + PROX_KINDERGARTENS + PROX_MRT + PROX_PARKS + PROX_PRIMARY_SCHOOLS + PROX_SPORT_FACILITIES + PROX_SUPERMARKETS + PROX_WASTE_DISPOSAL + PROX_WATERSITES + NUM_KINDERGARTENS_WITHIN_350M + NUM_CHILDCARE_WITHIN_350M + NUM_BUSSTOP_WITHIN_350M + NUM_PRIMARY_SCHOOLS_WITHIN_1000M,
          data = train_data)
 
 # save result
@@ -1201,7 +1231,7 @@ ols_plot_resid_fit(mlr)
 
 As most of the variables are scattered around the 0 line, the relationships between the dependent variable and independent variables are linear.
 
-#### Normality Assumption 
+#### Normality Assumption
 
 ```{r}
 ols_plot_resid_hist(mlr)
@@ -1235,14 +1265,206 @@ rmse(test_data_mlr$resale_price, test_data_mlr$fit)
 
 As the value is less than 0.1, it means the model is able to satisfactory predictions.
 
-#### 4.5.3.3 Visualise 
+#### 4.5.3.3 Visualise
 
 Actual vs. predicted values
 
 ```{r}
+#| eval: false
 ggplot(data = test_data_mlr,
        aes(x = fit, y = resale_price)) +
   geom_point()
 ```
 
+![](MODEL/ols_plot.png)
+
 ## 4.6 GWR predictive method
+
+### 4.6.1 Convert to spatial points dataframe
+
+```{r}
+train_data.sp <- as_Spatial(train_data)
+```
+
+### 4.6.2 Compute adaptive bandwidth
+
+```{r}
+#| eval: false
+#| code-fold: true
+adaptive_bw <- bw.gwr(resale_price ~ floor_area_sqm + remaining_lease + storey_num + PROX_BUSSTOP + PROX_CBD + PROX_CEMETERIES + PROX_CHILDCARE + PROX_ELDERCARE + PROX_GOOD_PRIMARY_SCHOOLS + PROX_GYMS + PROX_HAWKER_CENTERS + PROX_HISTORIC_SITES + PROX_KINDERGARTENS + PROX_MRT + PROX_PARKS + PROX_PRIMARY_SCHOOLS + PROX_SPORT_FACILITIES + PROX_SUPERMARKETS + PROX_WASTE_DISPOSAL + PROX_WATERSITES + NUM_KINDERGARTENS_WITHIN_350M + NUM_CHILDCARE_WITHIN_350M + NUM_BUSSTOP_WITHIN_350M + NUM_PRIMARY_SCHOOLS_WITHIN_1000M,
+                data=train_data.sp,
+                approach="CV",
+                kernel="gaussian",
+                adaptive=TRUE,
+                longlat=FALSE)
+write_rds(adaptive_bw, "data/rds/adaptive_bw.rds")
+```
+
+![](MODEL/bw_calc.png){width="651"}
+
+The output seems to have reached a local minima of 99m for the bandwidth.
+
+### 4.6.3 Construct Model
+
+```{r}
+#| eval: false
+#| code-fold: true
+#read data
+adaptive_bw <- read_rds("data/rds/adaptive_bw.rds")
+
+#construct model
+gwr_adaptive <- gwr.basic(formula = resale_price ~ floor_area_sqm + storey_num + remaining_lease + PROX_BUSSTOP + PROX_CBD + PROX_CEMETERIES + PROX_CHILDCARE + PROX_ELDERCARE + PROX_GOOD_PRIMARY_SCHOOLS + PROX_GYMS + PROX_HAWKER_CENTERS + PROX_HISTORIC_SITES + PROX_KINDERGARTENS + PROX_MRT + PROX_PARKS + PROX_SUPERMARKETS + PROX_PRIMARY_SCHOOLS + PROX_SPORT_FACILITIES + PROX_WASTE_DISPOSAL + PROX_WATERSITES + NUM_KINDERGARTENS_WITHIN_350M + NUM_CHILDCARE_WITHIN_350M + NUM_BUSSTOP_WITHIN_350M + NUM_PRIMARY_SCHOOLS_WITHIN_1000M,
+                data=train_data.sp,
+                bw = adaptive_bw,
+                kernel="gaussian",
+                adaptive=TRUE,
+                longlat=FALSE)
+
+#store data
+write_rds(gwr_adaptive, "data/model/gwr_adaptive.rds")
+```
+
+### 4.6.3 Prepare Coordinates Data
+
+#### 4.6.3.1 Extract Coordinates
+
+```{r}
+coords <- st_coordinates(resale)
+coords_train <- st_coordinates(train_data)
+coords_test <- st_coordinates(test_data)
+```
+
+Save as RDS file
+
+```{r}
+#| eval: false
+coords_train <- write_rds(coords_train, "data/rds/coords_train.rds" )
+coords_test <- write_rds(coords_test, "data/rds/coords_test.rds" )
+```
+
+#### 4.6.3.2 Drop Geometry
+
+```{r}
+train_data <- train_data %>% 
+  st_drop_geometry()
+```
+
+## 4.7 Calibrate Random Forest Model
+
+### 4.7.1 Compute adaptive bandwidth
+
+```{r}
+#| eval: false
+#| code-fold: true
+adaptive_bw <- grf.bw(formula = resale_price ~ floor_area_sqm + remaining_lease + PROX_BUSSTOP + PROX_CBD + PROX_CEMETERIES + PROX_CHILDCARE + PROX_ELDERCARE + PROX_GOOD_PRIMARY_SCHOOLS + PROX_GYMS + PROX_HAWKER_CENTERS + PROX_HISTORIC_SITES + PROX_KINDERGARTENS + PROX_MRT + PROX_PARKS + PROX_PRIMARY_SCHOOLS + PROX_SPORT_FACILITIES + PROX_WASTE_DISPOSAL + PROX_WATERSITES + NUM_KINDERGARTENS_WITHIN_350M + NUM_CHILDCARE_WITHIN_350M + NUM_BUSSTOP_WITHIN_350M + NUM_PRIMARY_SCHOOLS_WITHIN_1000M,
+                data=train_data,
+                kernel="adaptive",
+                trees = 50,
+                coords=coords_train)
+```
+
+![](MODEL/bw.png){width="516"}
+
+The bandwidth should be 630m
+
+### 4.7.2 Generate model
+
+```{r}
+#| eval: false
+#| code-fold: true
+set.seed(1234)
+gwRF_adaptive<-grf(formula = resale_price ~ floor_area_sqm + remaining_lease + storey_num + PROX_BUSSTOP + PROX_CBD + PROX_CEMETERIES + PROX_CHILDCARE + PROX_ELDERCARE + PROX_GOOD_PRIMARY_SCHOOLS + PROX_GYMS + PROX_SUPERMARKETS + PROX_HAWKER_CENTERS + PROX_HISTORIC_SITES + PROX_KINDERGARTENS + PROX_MRT + PROX_PARKS + PROX_PRIMARY_SCHOOLS + PROX_SPORT_FACILITIES + PROX_WASTE_DISPOSAL + PROX_WATERSITES + NUM_KINDERGARTENS_WITHIN_350M + NUM_CHILDCARE_WITHIN_350M + NUM_BUSSTOP_WITHIN_350M + NUM_PRIMARY_SCHOOLS_WITHIN_1000M,
+                   dframe=train_data,
+                   bw=630,
+                   kernel="adaptive",
+                   coords=coords_train,
+                   ntree=50)
+
+#save as rds
+write_rds(gwRF_adaptive, "data/model/gwRF_adaptive.rds")
+```
+
+```{r}
+#| eval: false
+gwRF_adaptive$Global.Model
+```
+
+![](MODEL/summary.png)
+
+### 4.7.3 Test model
+
+#### 4.7.3.1 Prepare Test Data
+
+```{r}
+test_data <- cbind(test_data, coords_test) %>%
+  st_drop_geometry()
+```
+
+#### 4.7.3.2 Generate Predictions
+
+```{r}
+#| eval: false
+#| code-fold: true
+gwRF_pred <- as.data.frame(predict.grf(gwRF_adaptive,
+                           test_data,
+                           x.var.name="X",
+                           y.var.name="Y",
+                           local.w=1,
+                           global.w=0))
+
+#Store as RDS
+test_data_gwr <- cbind(test_data, gwRF_pred)
+test_data_gwr <- test_data_gwr %>%
+  rename(GRF_pred = `predict.grf(gwRF_adaptive, test_data, x.var.name = "X", y.var.name = "Y", local.w = 1, global.w = 0)`)
+
+write_rds(gwRF_pred, "data/rds/GRF_pred.rds")
+```
+
+#### 4.7.3.3 Root mean square error (RMSE)
+
+```{r}
+#| code-fold: true
+test_data_gwr <- read_rds("data/rds/GRF_pred.rds")
+rmse(test_data$resale_price, test_data_gwr$GRF_pred)
+```
+
+As the value is less than 0.1, it means the model is able to satisfactory predictions.
+
+#### 4.7.3.4 Visualise
+
+Actual vs. predicted values
+
+```{r}
+#| eval: false
+#| code-fold: true
+ggplot(data = temp,
+       aes(x = GRF_pred,
+           y = resale_price)) +
+  geom_point()
+```
+
+![](MODEL/final_plot.png)
+
+## 4.8 Comparison
+
+Based on the root mean square error (RMSE) of the two models, the GWR model has a lower error of **`0.03629414`** whereas the OLS model had an error of **`0.06123716`**. Although the difference is not that great, there are some reasons why they both performed well and why GWR method is more suitable.
+
+Furthermore, based on the graphs, below, the GWR model seems to be more centered with a lower R squared than the OLS model.
+
+::: panel-tabset
+#### OLS model
+
+![](MODEL/ols_plot.png)
+
+#### GWR model
+
+![](MODEL/final_plot.png)
+:::
+
+Due to high cardinality of the data, both models ended up having similar performance. However, the OLS model makes several assumptions of normality and linearity. GWR on the other hand is more dynamic as is allows for spatial data to come and considers the local neighbourhood around each observation.
+
+# 5.0 Acknowledgements
+
+------------------------------------------------------------------------
+
+I'd like to thank Professor Kam for his insights and resource materials provided under IS415 Geospatial Analytics and Applications.
